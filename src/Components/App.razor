@@ -52,11 +52,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/">
-    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet">
-    <link href="css/site.css" rel="stylesheet" />
-    <link href="AzureNamingTool.styles.css" rel="stylesheet" />
-    <link href="/_content/PSC.Blazor.Components.MarkdownEditor/css/easymde.min.css" rel="stylesheet" />
-    <HeadOutlet @rendermode="InteractiveServer" />
+    <link rel="stylesheet" href="@Assets["css/bootstrap/bootstrap.min.css"]" />
+    <link rel="stylesheet" href="@Assets["css/site.css"]" />
+    <link rel="stylesheet" href="@Assets["AzureNamingTool.styles.css"]" />
+    <link rel="stylesheet" href="@Assets["/_content/PSC.Blazor.Components.MarkdownEditor/css/easymde.min.css"]" />
+    <ImportMap />
+    <HeadOutlet />
 </head>
 
 <body>
