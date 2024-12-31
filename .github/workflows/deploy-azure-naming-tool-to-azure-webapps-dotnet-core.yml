@@ -62,19 +62,22 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      # Setup .NET Core SDK
-      - name: Setup .NET Core
+      # Setup .NET 
+      - name: Setup .NET 
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }} 
+
+      - name: Install dependencies
+        run: dotnet restore
 
       # Run dotnet build and publish
       - name: dotnet build and publish
         run: |
           dotnet restore
           dotnet build --configuration Release
-          dotnet publish -c Release --property:PublishDir='${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/azurenamingtool' 
-
+          dotnet publish -c Release -o ./azurenamingtool-publish' 
+          
   deploy: 
     runs-on: ubuntu-latest
     defaults:
@@ -89,4 +92,4 @@ jobs:
         with: 
           app-name: ${{ env.AZURE_WEBAPP_NAME }} # Replace with your app name
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE  }} # Define secret variable in repository settings as per action documentation
-          package: '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/azurenamingtool'
+          package: './azurenamingtool-publish'
