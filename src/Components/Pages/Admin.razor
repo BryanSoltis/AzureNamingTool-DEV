@@ -53,8 +53,8 @@
                         This page allows you to security settings, view cache data, and site configurations for the Azure Naming Tool.
                     </p>
                     <div class="card mb-3" style="width:auto;">
-                        <div class="card-header bg-default text-dark">
-                            <a id="versiondetailslink" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="#versiondetails" role="button" aria-expanded="false" aria-controls="versiondetails">
+                        <div class="card-header bg-success text-white">
+                            <a class="text-decoration-none text-white" data-bs-toggle="collapse" href="#versiondetails" role="button" aria-expanded="false" aria-controls="versiondetails">
                                 <span class="oi oi-chevron-bottom" aria-hidden="true"></span> <span class="fw-bold">Version Details</span>
                             </a>
                         </div>
@@ -70,27 +70,6 @@
                                     </div>
                                 </div>
                             }
-                            @if ((currentuser == "GlobalAdmin") && (GeneralHelper.IsNotNull(environmentvariables)))
-                            {
-                                <div class="card mb-3" style="width:auto;">
-                                    <div class="card-header bg-default text-dark">
-                                        <a id="environmentvariableslink" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="#environmentvariables" role="button" aria-expanded="false" aria-controls="environmentvariables">
-                                            <span class="oi oi-chevron-bottom" aria-hidden="true"></span> <span class="fw-bold">Environment Details</span>
-                                        </a>
-                                    </div>
-                                    <div class="collapse card card-body @theme.ThemeStyle" id="environmentvariables">
-                                        <div class="mb-3">
-                                            <ul>
-                                                @foreach (var variable in environmentvariables)
-                                                {
-                                                    <li><span class="fw-bold">@variable.Key:</span> @variable.Value</li>
-                                                }
-                                            </ul>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            }
                             <div class="mb-3">
                                 <button type="button" class="btn btn-success" @onclick="@(e => SubmitGHTopic("feature"))" title="Feature request">Feature Request</button>
                                 <button type="button" class="btn btn-danger" @onclick="@(e => SubmitGHTopic("bug"))" title="Submit a bug">Submit a bug</button>
@@ -98,6 +77,65 @@
                             </div>
                         </div>
                     </div>
+                    @if (((currentuser == "GlobalAdmin") || (showadmindetailstoallusers)) && (GeneralHelper.IsNotNull(environmentvariables)))
+                    {
+                        <div class="card mb-3" style="width:auto;">
+                            <h5 class="card-header bg-primary text-white">
+                                <a class="text-decoration-none text-white" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#admindetails" role="button" aria-expanded="false" aria-controls="admindetails">
+                                    <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Admin Details
+                                </a>
+                            </h5>
+                            <div class="collapse card card-body @theme.ThemeStyle" id="admindetails">
+                                <div class="card mb-3" style="width:auto;">
+                                    <div class="card-header bg-default text-dark">
+                                        <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#viewcache" role="button" aria-expanded="false" aria-controls="viewcache">
+                                            <span class="oi oi-chevron-bottom" aria-hidden="true"></span> View Cache
+                                        </a>
+                                    </div>
+                                    <div class="collapse show card card-body @theme.ThemeStyle" id="viewcache">
+                                        <p>
+                                            Click <span class="fw-bold">View</span> to view cached data.
+                                        </p>
+                                        <p>
+                                            <button type="button" class="btn btn-primary" @onclick="@(e => AdminFormAction("viewcachedata"))" title="View Cache Data">View Cache Data</button>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="card mb-3" style="width:auto;">
+                                    <div class="card-header bg-default text-dark">
+                                        <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#clearcache" role="button" aria-expanded="false" aria-controls="clearcache">
+                                            <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Clear Cache
+                                        </a>
+                                    </div>
+                                    <div class="collapse show card card-body @theme.ThemeStyle" id="clearcache">
+                                        <p>
+                                            Click <span class="fw-bold">Clear</span> to clear all cached data.
+                                        </p>
+                                        <p>
+                                            <button type="button" class="btn btn-success" @onclick="@(e => AdminFormAction("clearcache"))" title="Clear Cache">Clear Cache Data</button>
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="card mb-3" style="width:auto;">
+                                    <div class="card-header bg-default text-dark">
+                                        <a id="environmentvariableslink" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="#environmentvariables" role="button" aria-expanded="false" aria-controls="environmentvariables">
+                                            <span class="oi oi-chevron-bottom" aria-hidden="true"></span> <span class="fw-bold">Environment Details</span>
+                                        </a>
+                                    </div>
+                                    <div class="collapse show card card-body @theme.ThemeStyle" id="environmentvariables">
+                                        <div class="mb-3 text-break">
+                                            <ul>
+                                                @foreach (var variable in environmentvariables)
+                                                {
+                                                    <li><span class="fw-bold text-wrap">@variable.Key:</span> @variable.Value</li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
                     <div class="card mb-3" style="width:auto;">
                         <h5 class="card-header text-white bg-secondary text-white">
                             <a class="text-decoration-none text-white" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#customization" role="button" aria-expanded="false" aria-controls="customization">
@@ -561,36 +599,6 @@
                             <p>
                                 This section allows you to view/manage cached data for the tool.
                             </p>
-                            <div class="card mb-3" style="width:auto;">
-                                <div class="card-header bg-default text-dark">
-                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#viewcache" role="button" aria-expanded="false" aria-controls="viewcache">
-                                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> View Cache
-                                    </a>
-                                </div>
-                                <div class="collapse show card card-body @theme.ThemeStyle" id="viewcache">
-                                    <p>
-                                        Click <span class="fw-bold">View</span> to view cached data.
-                                    </p>
-                                    <p>
-                                        <button type="button" class="btn btn-primary" @onclick="@(e => AdminFormAction("viewcachedata"))" title="View Cache Data">View Cache Data</button>
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="card mb-3" style="width:auto;">
-                                <div class="card-header bg-default text-dark">
-                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#clearcache" role="button" aria-expanded="false" aria-controls="clearcache">
-                                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Clear Cache
-                                    </a>
-                                </div>
-                                <div class="collapse show card card-body @theme.ThemeStyle" id="clearcache">
-                                    <p>
-                                        Click <span class="fw-bold">Clear</span> to clear all cached data.
-                                    </p>
-                                    <p>
-                                        <button type="button" class="btn btn-success" @onclick="@(e => AdminFormAction("clearcache"))" title="Clear Cache">Clear Cache Data</button>
-                                    </p>
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div class="card mb-3">
@@ -666,6 +674,27 @@
                                     <div>
                                         <label class="switch" title="Resource Type Editing Enabled">
                                             <input type="checkbox" checked="@resourcetypeeditingallowed" @oninput='args => SettingChanged(args, "resourcetypeeditingallowed")'>
+                                            <span class="slider round"></span>
+                                        </label>
+                                        <span class="align-text-top"> Enable</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card mb-3" style="width:auto;">
+                                <div class="card-header bg-default text-dark">
+                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#admindatatoallusers" role="button" aria-expanded="false" aria-controls="admindatatoallusers">
+                                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Show Admin Data To All Users
+                                    </a>
+                                </div>
+                                <div class="collapse show card card-body @theme.ThemeStyle" id="admindatatoallusers">
+                                    <div class="mb-3">
+                                        <p>
+                                            By default, admin details is only displayed for the Global Admin. This setting enables admin details to be shown to all admin users.
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <label class="switch" title="Show Admin Details To All Users">
+                                            <input type="checkbox" checked="@showadmindetailstoallusers" @oninput='args => SettingChanged(args, "showadmindetailstoallusers")'>
                                             <span class="slider round"></span>
                                         </label>
                                         <span class="align-text-top"> Enable</span>
@@ -804,6 +833,7 @@
     private bool referenceenabled = false;
     private bool latestnewsenabled = false;
     private bool retaingenerateselections = false;
+    private bool showadmindetailstoallusers = false;
     private string customhomecontent = String.Empty;
     MarkdownEditor mdCustomHomeContent = new();
     private string customlogopath = String.Empty;
@@ -846,6 +876,7 @@
                 referenceenabled = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("ReferenceEnabled"));
                 latestnewsenabled = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("LatestNewsEnabled"));
                 retaingenerateselections = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("RetainGenerateSelections"));
+                showadmindetailstoallusers = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("ShowAdminDetailsToAllUsers"));
                 customhomecontent = ConfigurationHelper.GetAppSetting("CustomHomeContent", false);
                 //await mdCustomHomeContent.SetValueAsync(customhomecontent);
                 customlogopath = ConfigurationHelper.GetAppSetting("CustomLogoPath", false);
@@ -1274,6 +1305,7 @@
                     ConfigurationHelper.SetAppSetting("CustomToolName", String.Empty, false);
                     ConfigurationHelper.SetAppSetting("ConnectivityCheckEnabled", resetconfig.ConnectivityCheckEnabled!, false);
                     ConfigurationHelper.SetAppSetting("GenerationWebhook", String.Empty, true);
+                    ConfigurationHelper.SetAppSetting("ShowAdminDataToAllUsers", String.Empty, false);
                     AdminLogService.PostItem(new AdminLogMessage() { Title = MessageTypesEnum.SUCCESS.ToString(), Message = "Site Settings reset!", Source = currentuser });
                     NavigationManager.NavigateTo("admin?reset=true", true);
                 }
@@ -1456,6 +1488,13 @@
                         {
                             ConfigurationHelper.SetAppSetting("RetainGenerateSelections", e.Value!.ToString() ?? "");
                             message.Message = "Retain Generate Selections setting updated to " + e.Value?.ToString()!.ToUpper() ?? "" + "!";
+                        }
+                        break;
+                    case "showadmindetailstoallusers":
+                        if (GeneralHelper.IsNotNull(e.Value))
+                        {
+                            ConfigurationHelper.SetAppSetting("ShowAdminDetailsToAllUsers", e.Value!.ToString() ?? "");
+                            message.Message = "Show Admin Details To All Users setting updated to " + e.Value?.ToString()!.ToUpper() ?? "" + "!";
                         }
                         break;
                 }

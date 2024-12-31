@@ -96,7 +96,7 @@
         public string? LatestNewsEnabled { get; set; } = "False";
 
         /// <summary>
-        /// Gets or sets a value indicating whether the Generate oage will retain selected vlues after generation
+        /// Gets or sets a value indicating whether the Generate page will retain selected vlues after generation
         /// </summary>
         public string? RetainGenerateSelections { get; set; } = "False";
 
@@ -114,5 +114,10 @@
         /// Gets or sets custom tool name.
         /// </summary>
         public string? CustomToolName { get; set; } = String.Empty;
+
+        /// <summary>
+        /// Gets or sets a value indicating whether to display admin data to all admin users.
+        /// </summary>
+        public string? ShowAdminDetailsToAllUsers { get; set; } = "False";
     }
 }
