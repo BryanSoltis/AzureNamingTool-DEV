@@ -68,16 +68,19 @@ jobs:
         with:
           dotnet-version: ${{ env.DOTNET_VERSION }} 
 
-      - name: Install dependencies
+      # Run dotnet build and publish
+      - name: dotnet restore
         run: dotnet restore
 
       # Run dotnet build and publish
-      - name: dotnet build and publish
-        run: |
-          dotnet restore
-          dotnet build --configuration Release
-          dotnet publish -c Release -o ./azurenamingtool-publish' 
-          
+      - name: dotnet build 
+        run: dotnet build --configuration Release
+
+      # Run dotnet publish
+      - name: dotnet publish 
+        run: dotnet publish -c Release -o ./azurenamingtool-publish 
+
+
   deploy: 
     runs-on: ubuntu-latest
     defaults:
