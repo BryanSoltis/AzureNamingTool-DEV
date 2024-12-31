@@ -680,27 +680,30 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="card mb-3" style="width:auto;">
-                                <div class="card-header bg-default text-dark">
-                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#admindatatoallusers" role="button" aria-expanded="false" aria-controls="admindatatoallusers">
-                                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Show Admin Data To All Users
-                                    </a>
-                                </div>
-                                <div class="collapse show card card-body @theme.ThemeStyle" id="admindatatoallusers">
-                                    <div class="mb-3">
-                                        <p>
-                                            By default, admin details is only displayed for the Global Admin. This setting enables admin details to be shown to all admin users.
-                                        </p>
+                            @if (currentuser == "GlobalAdmin")
+                            {
+                                <div class="card mb-3" style="width:auto;">
+                                    <div class="card-header bg-default text-dark">
+                                        <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#admindatatoallusers" role="button" aria-expanded="false" aria-controls="admindatatoallusers">
+                                            <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Show Admin Data To All Users
+                                        </a>
                                     </div>
-                                    <div>
-                                        <label class="switch" title="Show Admin Details To All Users">
-                                            <input type="checkbox" checked="@showadmindetailstoallusers" @oninput='args => SettingChanged(args, "showadmindetailstoallusers")'>
-                                            <span class="slider round"></span>
-                                        </label>
-                                        <span class="align-text-top"> Enable</span>
+                                    <div class="collapse show card card-body @theme.ThemeStyle" id="admindatatoallusers">
+                                        <div class="mb-3">
+                                            <p>
+                                                By default, admin details is only displayed for the Global Admin. This setting enables admin details to be shown to all admin users.
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <label class="switch" title="Show Admin Details To All Users">
+                                                <input type="checkbox" checked="@showadmindetailstoallusers" @oninput='args => SettingChanged(args, "showadmindetailstoallusers")'>
+                                                <span class="slider round"></span>
+                                            </label>
+                                            <span class="align-text-top"> Enable</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            }
 
                             <!--// TO DO: Implement retention of the selected values
                             <div class="card mb-3" style="width:auto;">
