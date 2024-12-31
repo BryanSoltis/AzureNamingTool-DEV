@@ -64,7 +64,7 @@ jobs:
       - name: Set up .NET Core
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
+          dotnet-version: '9.x'
       
       - name: Set up dependency caching for faster builds
         uses: actions/cache@v3
