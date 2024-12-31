@@ -61,18 +61,12 @@ jobs:
     if: needs.check-secrets.outputs.secrets-valid == 'true'
     steps:
       - uses: actions/checkout@v3
-      - name: Set up .NET Core
-        uses: actions/setup-dotnet@v2
-        with:
-          dotnet-version: ${{ env.DOTNET_VERSION }}
       
-      - name: Set up dependency caching for faster builds
-        uses: actions/cache@v3
+      # Setup .NET Core SDK
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v3
         with:
-          path: ~/.nuget/packages
-          key: ${{ runner.os }}-nuget-${{ hashFiles('**/packages.lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-nuget-
+          dotnet-version: ${{ env.DOTNET_VERSION }} 
 
       # Run dotnet build and publish
       - name: dotnet build and publish
@@ -81,18 +75,12 @@ jobs:
           dotnet build --configuration Release
           dotnet publish -c Release --property:PublishDir='${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/azurenamingtool' 
 
-      - name: Upload artifact for deployment job
-        uses: actions/upload-artifact@v4.4.3
-        with:
-          name: .net-app
-          path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/azurenamingtool
-
   deploy: 
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: src    
-    needs: [build]
+    needs: [build,check-secrets]
     if: needs.check-secrets.outputs.secrets-valid == 'true'
     steps:
       # Deploy to Azure Web apps
