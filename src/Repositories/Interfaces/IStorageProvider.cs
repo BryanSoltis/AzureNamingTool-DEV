@@ -4,7 +4,8 @@ namespace AzureNamingTool.Repositories.Interfaces
     /// Storage provider health status
     /// </summary>
     public record StorageHealthStatus(
-        bool IsHealthy, 
+        bool IsHealthy,
+        string ProviderName,
         string Message, 
         Dictionary<string, object>? Metadata = null);
 

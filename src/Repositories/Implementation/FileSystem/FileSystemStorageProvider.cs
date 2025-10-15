@@ -66,7 +66,8 @@ namespace AzureNamingTool.Repositories.Implementation.FileSystem
                 if (!isAvailable)
                 {
                     return new StorageHealthStatus(
-                        false, 
+                        false,
+                        ProviderName,
                         $"Settings directory not accessible: {_settingsPath}");
                 }
 
@@ -81,7 +82,8 @@ namespace AzureNamingTool.Repositories.Implementation.FileSystem
                 {
                     _logger.LogWarning(ex, "Cannot write to settings directory");
                     return new StorageHealthStatus(
-                        false, 
+                        false,
+                        ProviderName,
                         "Settings directory is not writable",
                         new Dictionary<string, object>
                         {
@@ -109,7 +111,8 @@ namespace AzureNamingTool.Repositories.Implementation.FileSystem
                 }
 
                 return new StorageHealthStatus(
-                    true, 
+                    true,
+                    ProviderName,
                     "File system storage is healthy", 
                     metadata);
             }
@@ -117,7 +120,8 @@ namespace AzureNamingTool.Repositories.Implementation.FileSystem
             {
                 _logger.LogError(ex, "Storage health check failed");
                 return new StorageHealthStatus(
-                    false, 
+                    false,
+                    ProviderName,
                     $"Health check failed: {ex.Message}",
                     new Dictionary<string, object>
                     {
