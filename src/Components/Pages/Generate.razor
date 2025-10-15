@@ -2,6 +2,7 @@
 @using AzureNamingTool.Helpers
 @using AzureNamingTool.Models
 @using AzureNamingTool.Services
+@using AzureNamingTool.Services.Interfaces
 @using AzureNamingTool.Components.Modals;
 @using System.Text;
 @using AzureNamingTool.Components.General;
@@ -553,6 +554,16 @@
     protected ThemeInfo theme { get; set; } = new();
     [CascadingParameter]
     public IModalService? Modal { get; set; }
+    
+    [Inject]
+    public IResourceTypeService? ResourceTypeService { get; set; }
+    
+    [Inject]
+    public IAdminLogService? AdminLogService { get; set; }
+    
+    [Inject]
+    public IResourceNamingRequestService? ResourceNamingRequestService { get; set; }
+    
     private SiteConfiguration config = ConfigurationHelper.GetConfigurationData();
     private ServicesData servicesData = new();
     private ResourceDelimiter resourceDelimiter = new();
@@ -728,7 +739,7 @@
                     {
                         resourceNameRequest.ResourceType = resourceType.ShortName;
                         resourceNameRequest.ResourceId = resourceType.Id;
-                        resourceNameRequestResponse = await ResourceNamingRequestService.RequestName(resourceNameRequest);
+                        resourceNameRequestResponse = await ResourceNamingRequestService!.RequestNameAsync(resourceNameRequest);
                         namerequested = true;
 
                         // Prepare the response
@@ -776,7 +787,7 @@
                         {
                             resourceNameRequest.ResourceType = resourceType.ShortName;
                             resourceNameRequest.ResourceId = resourceType.Id;
-                            resourceNameRequestResponse = await ResourceNamingRequestService.RequestName(resourceNameRequest);
+                            resourceNameRequestResponse = await ResourceNamingRequestService!.RequestNameAsync(resourceNameRequest);
 
                             sbNames.Append("<tr>");
                             if (!String.IsNullOrEmpty(resourceType.Property))

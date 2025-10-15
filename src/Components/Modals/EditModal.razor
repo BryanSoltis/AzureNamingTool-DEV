@@ -1,6 +1,7 @@
 @using AzureNamingTool.Helpers
 @using AzureNamingTool.Models
 @using AzureNamingTool.Services
+@using AzureNamingTool.Services.Interfaces
 @using Microsoft.AspNetCore.Html
 @using System.Text.RegularExpressions
 @inject IJSRuntime JsRuntime
@@ -603,6 +604,42 @@
     [Parameter] public string headerstyle { get; set; } = String.Empty;
     [Parameter] public bool admin { get; set; } = false;
     [Parameter] public ServicesData servicesData { get; set; } = new();
+    
+    [Inject]
+    public IResourceComponentService? ResourceComponentService { get; set; }
+    
+    [Inject]
+    public IAdminUserService? AdminUserService { get; set; }
+    
+    [Inject]
+    public IResourceEnvironmentService? ResourceEnvironmentService { get; set; }
+    
+    [Inject]
+    public IResourceLocationService? ResourceLocationService { get; set; }
+    
+    [Inject]
+    public IResourceOrgService? ResourceOrgService { get; set; }
+    
+    [Inject]
+    public IResourceProjAppSvcService? ResourceProjAppSvcService { get; set; }
+    
+    [Inject]
+    public IResourceTypeService? ResourceTypeService { get; set; }
+    
+    [Inject]
+    public IResourceUnitDeptService? ResourceUnitDeptService { get; set; }
+    
+    [Inject]
+    public IResourceFunctionService? ResourceFunctionService { get; set; }
+    
+    [Inject]
+    public IResourceDelimiterService? ResourceDelimiterService { get; set; }
+    
+    [Inject]
+    public ICustomComponentService? CustomComponentService { get; set; }
+    
+    [Inject]
+    public IAdminLogService? AdminLogService { get; set; }
 
     private ServiceResponse serviceResponse = new();
     private string itemName = String.Empty;
@@ -733,7 +770,7 @@
         StateHasChanged();
     }
 
-    async void Save()
+    async Task Save()
     {
         try
         {
@@ -794,7 +831,7 @@
                             confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will update the custom component to free text and remove the current component options! This cannot be un-done!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                             if (confirm)
                             {
-                                serviceResponse = await CustomComponentService.DeleteByParentComponentId((int)resourceComponent.Id);
+                                serviceResponse = await CustomComponentService.DeleteByParentComponentIdAsync((int)resourceComponent.Id);
                                 serviceResponse = await ResourceComponentService.PostItemAsync(resourceComponent);
                             }
                             else
@@ -960,7 +997,7 @@
                 {
                     await ModalInstance.CloseAsync();
                     toastService.ShowSuccess(GeneralHelper.NormalizeName(type, false) + " updated!");
-                    await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "SUCCESS", Message = "(" + GeneralHelper.NormalizeName(type, false) + ") " + itemName + " updated!", Source = currentuser });
+                    await AdminLogService?.PostItemAsync(new AdminLogMessage() { Title = "SUCCESS", Message = "(" + GeneralHelper.NormalizeName(type, false) + ") " + itemName + " updated!", Source = currentuser });
                 }
                 else
                 {
@@ -970,7 +1007,7 @@
         }
         catch (Exception ex)
         {
-            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService?.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             toastService.ShowError("There was an error updating the " + GeneralHelper.NormalizeName(type, false) + "! " + ex.Message);
         }
     }
@@ -1014,28 +1051,28 @@
                                     switch (action)
                                     {
                                         case "optional-add":
-                                            serviceResponse = await ResourceTypeService.UpdateTypeComponents("optional-add", componentid);
+                                            serviceResponse = await ResourceTypeService.UpdateTypeComponentsAsync("optional-add", componentid);
                                             if (serviceResponse.Success)
                                             {
                                                 responseMessage.Message += " ADDED as OPTIONAL!";
                                             }
                                             break;
                                         case "optional-remove":
-                                            serviceResponse = await ResourceTypeService.UpdateTypeComponents("optional-remove", componentid);
+                                            serviceResponse = await ResourceTypeService.UpdateTypeComponentsAsync("optional-remove", componentid);
                                             if (serviceResponse.Success)
                                             {
                                                 responseMessage.Message += " REMOVED from OPTIONAL!";
                                             }
                                             break;
                                         case "exclude-add":
-                                            serviceResponse = await ResourceTypeService.UpdateTypeComponents("exclude-add", componentid);
+                                            serviceResponse = await ResourceTypeService.UpdateTypeComponentsAsync("exclude-add", componentid);
                                             if (serviceResponse.Success)
                                             {
                                                 responseMessage.Message += " ADDED as EXCLUDE!";
                                             }
                                             break;
                                         case "exclude-remove":
-                                            serviceResponse = await ResourceTypeService.UpdateTypeComponents("exclude-remove", componentid);
+                                            serviceResponse = await ResourceTypeService.UpdateTypeComponentsAsync("exclude-remove", componentid);
                                             if (serviceResponse.Success)
                                             {
                                                 responseMessage.Message += " REMOVED from EXCLUDE!";
@@ -1049,7 +1086,7 @@
                     }
                     catch (Exception ex)
                     {
-                        await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                        await AdminLogService?.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                         responseMessage.Type = MessageTypesEnum.ERROR;
                         responseMessage.Message = "There was a problem with the request.";
                     }
@@ -1074,13 +1111,13 @@
                             toastService.ShowError(responseMessage.Message);
                             break;
                     }
-                    await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = responseMessage.Type.ToString(), Message = responseMessage.Message, Source = currentuser });
+                    await AdminLogService?.PostItemAsync(new AdminLogMessage() { Title = responseMessage.Type.ToString(), Message = responseMessage.Message, Source = currentuser });
                 }
             }
         }
         catch (Exception ex)
         {
-            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService?.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             toastService.ShowError("There was an error with the action! " + ex.Message);
         }
     }
@@ -1102,7 +1139,7 @@
         }
     }
 
-    private void ComponentSettingChanged(ChangeEventArgs e, string setting)
+    private async Task ComponentSettingChanged(ChangeEventArgs e, string setting)
     {
         try
         {
@@ -1134,7 +1171,7 @@
         }
         catch (Exception ex)
         {
-            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService?.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             toastService.ShowError("There was an error updating the " + GeneralHelper.NormalizeName(type, false) + "! " + ex.Message);
         }
     }
@@ -1142,3 +1179,6 @@
 
     async Task Cancel() => await ModalInstance.CancelAsync();
 }
+
+
+

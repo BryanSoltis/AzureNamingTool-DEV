@@ -1,6 +1,7 @@
 @using AzureNamingTool.Helpers
 @using AzureNamingTool.Models
 @using AzureNamingTool.Services
+@using AzureNamingTool.Services.Interfaces
 @using Microsoft.AspNetCore.Html
 @using System.Text.RegularExpressions
 @inject IToastService toastService
@@ -302,6 +303,42 @@
     [Parameter] public string headerstyle { get; set; } = String.Empty;
     [Parameter] public bool admin { get; set; } = false;
     [Parameter] public ServicesData servicesData { get; set; } = new();
+    
+    [Inject]
+    public IResourceComponentService? ResourceComponentService { get; set; }
+    
+    [Inject]
+    public IAdminUserService? AdminUserService { get; set; }
+    
+    [Inject]
+    public IResourceEnvironmentService? ResourceEnvironmentService { get; set; }
+    
+    [Inject]
+    public IResourceLocationService? ResourceLocationService { get; set; }
+    
+    [Inject]
+    public IResourceOrgService? ResourceOrgService { get; set; }
+    
+    [Inject]
+    public IResourceProjAppSvcService? ResourceProjAppSvcService { get; set; }
+    
+    [Inject]
+    public IResourceTypeService? ResourceTypeService { get; set; }
+    
+    [Inject]
+    public IResourceUnitDeptService? ResourceUnitDeptService { get; set; }
+    
+    [Inject]
+    public IResourceFunctionService? ResourceFunctionService { get; set; }
+    
+    [Inject]
+    public IResourceDelimiterService? ResourceDelimiterService { get; set; }
+    
+    [Inject]
+    public ICustomComponentService? CustomComponentService { get; set; }
+    
+    [Inject]
+    public IAdminLogService? AdminLogService { get; set; }
 
 
     private ServiceResponse serviceResponse = new();
@@ -338,7 +375,7 @@
         }
     }
 
-    async void Save()
+    async Task Save()
     {
         bool valid = false;
         switch (type)
@@ -641,7 +678,7 @@
             {
                 await ModalInstance.CloseAsync();
                 toastService.ShowSuccess(type.Replace("Resource", "Resource ") + " added!");
-                await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "SUCCESS", Message = "(" + type + ") " + itemName + " added!", Source = currentuser });
+                await AdminLogService?.PostItemAsync(new AdminLogMessage() { Title = "SUCCESS", Message = "(" + type + ") " + itemName + " added!", Source = currentuser });
             }
             else
             {
@@ -650,7 +687,7 @@
         }
     }
 
-    private void ComponentSettingChanged(ChangeEventArgs e, string setting)
+    private async Task ComponentSettingChanged(ChangeEventArgs e, string setting)
     {
         try
         {
@@ -682,7 +719,7 @@
         }
         catch (Exception ex)
         {
-            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService?.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             toastService.ShowError("There was an error updating the " + GeneralHelper.NormalizeName(type, false) + "! " + ex.Message);
         }
     }
@@ -690,3 +727,4 @@
 
     async Task Cancel() => await ModalInstance.CancelAsync();
 }
+

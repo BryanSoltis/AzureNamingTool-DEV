@@ -3,7 +3,8 @@
 @using AzureNamingTool.Helpers;
 @using AzureNamingTool.Models;
 @using System.Runtime.Caching;
-@using AzureNamingTool.Services;
+@using AzureNamingTool.Services
+@using AzureNamingTool.Services.Interfaces;
 @using Blazored.Toast.Configuration;
 @using Microsoft.AspNetCore.Html
 @using Microsoft.AspNetCore.WebUtilities
@@ -823,6 +824,16 @@
     public IModalService? Modal { get; set; }
     [CascadingParameter]
     private IdentityProviderDetails identityProviderDetails { get; set; } = new();
+    
+    [Inject]
+    public IAdminService? AdminService { get; set; }
+    
+    [Inject]
+    public IAdminUserService? AdminUserService { get; set; }
+    
+    [Inject]
+    public IAdminLogService? AdminLogService { get; set; }
+    
     private ServicesData servicesData = new();
     private string currentpassword = String.Empty;
     private string newpassword = String.Empty;
@@ -980,7 +991,7 @@
                 if (confirm)
                 {
                     // Set the new Global admin password
-                    serviceResponse = await AdminService.UpdatePassword(newpassword);
+                    serviceResponse = await AdminService!.UpdatePasswordAsync(newpassword);
                     if (serviceResponse.Success)
                     {
                         message.Type = MessageTypesEnum.SUCCESS;
@@ -1003,7 +1014,7 @@
                 confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will update the Identity Header Name.</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                 if (confirm)
                 {
-                    serviceResponse = await AdminService.UpdateIdentityHeaderName(currentidentityheadername);
+                    serviceResponse = await AdminService!.UpdateIdentityHeaderNameAsync(currentidentityheadername);
                     if (serviceResponse.Success)
                     {
                         message.Type = MessageTypesEnum.SUCCESS;
@@ -1026,7 +1037,7 @@
                 confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will update the Full Access API Key.</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                 if (confirm)
                 {
-                    serviceResponse = await AdminService.UpdateAPIKey(currentapikey, "fullaccess");
+                    serviceResponse = await AdminService!.UpdateAPIKeyAsync(currentapikey, "fullaccess");
                     if (serviceResponse.Success)
                     {
                         message.Type = MessageTypesEnum.SUCCESS;
@@ -1049,7 +1060,7 @@
                 confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will generate a new Full Access API Key.</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                 if (confirm)
                 {
-                    serviceResponse = await AdminService.GenerateAPIKey("fullaccess");
+                    serviceResponse = await AdminService!.GenerateAPIKeyAsync("fullaccess");
                     if (serviceResponse.Success)
                     {
                         if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -1082,7 +1093,7 @@
                 confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will update the Name Generation API Key.</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                 if (confirm)
                 {
-                    serviceResponse = await AdminService.UpdateAPIKey(currentnamegenerationapikey, "namegeneration");
+                    serviceResponse = await AdminService!.UpdateAPIKeyAsync(currentnamegenerationapikey, "namegeneration");
                     if (serviceResponse.Success)
                     {
                         message.Type = MessageTypesEnum.SUCCESS;
@@ -1105,7 +1116,7 @@
                 confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will generate a new Name Generation API Key.</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                 if (confirm)
                 {
-                    serviceResponse = await AdminService.GenerateAPIKey("namegeneration");
+                    serviceResponse = await AdminService!.GenerateAPIKeyAsync("namegeneration");
                     if (serviceResponse.Success)
                     {
                         if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -1138,7 +1149,7 @@
                 confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will update the Read-Only API Key.</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                 if (confirm)
                 {
-                    serviceResponse = await AdminService.UpdateAPIKey(currentreadonlyapikey, "readonly");
+                    serviceResponse = await AdminService!.UpdateAPIKeyAsync(currentreadonlyapikey, "readonly");
                     if (serviceResponse.Success)
                     {
                         message.Type = MessageTypesEnum.SUCCESS;
@@ -1161,7 +1172,7 @@
                 confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will generate a new Read-Only API Key.</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                 if (confirm)
                 {
-                    serviceResponse = await AdminService.GenerateAPIKey("readonly");
+                    serviceResponse = await AdminService!.GenerateAPIKeyAsync("readonly");
                     if (serviceResponse.Success)
                     {
                         if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -1336,7 +1347,7 @@
                 confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will delete the Admin User.</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                 if (confirm)
                 {
-                    serviceResponse = await AdminUserService.DeleteItemAsync(Convert.ToInt32(id));
+                    serviceResponse = await AdminUserService!.DeleteItemAsync(Convert.ToInt32(id));
                     if (serviceResponse.Success)
                     {
                         message.Type = MessageTypesEnum.SUCCESS;
@@ -1376,7 +1387,7 @@
                     ConfigurationHelper.SetAppSetting("ConnectivityCheckEnabled", resetconfig.ConnectivityCheckEnabled!, false);
                     ConfigurationHelper.SetAppSetting("GenerationWebhook", String.Empty, true);
                     ConfigurationHelper.SetAppSetting("ShowAdminDataToAllUsers", String.Empty, true);
-                    await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = MessageTypesEnum.SUCCESS.ToString(), Message = "Site Settings reset!", Source = currentuser });
+                    await AdminLogService!.PostItemAsync(new AdminLogMessage() { Title = MessageTypesEnum.SUCCESS.ToString(), Message = "Site Settings reset!", Source = currentuser });
                     NavigationManager.NavigateTo("admin?reset=true", true);
                 }
                 else
@@ -1407,7 +1418,7 @@
                         toastService.ShowError(message.Message);
                         break;
                 }
-                await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
             }
         }
 
@@ -1582,7 +1593,7 @@
         }
         catch (Exception ex)
         {
-            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             message.Message = "There was a problem updating the setting!";
             message.Header = "ERROR";
         }
@@ -1604,7 +1615,7 @@
                     toastService.ShowError(message.Message);
                     break;
             }
-            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
         }
 
         servicesData = await ServicesHelper.LoadServicesData(servicesData, admin);
@@ -1665,7 +1676,7 @@
         }
         catch (Exception ex)
         {
-            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             message.Message = "There was a problem uploading the custom logo!";
             message.Header = "ERROR";
         }
@@ -1687,8 +1698,10 @@
                     toastService.ShowError(message.Message);
                     break;
             }
-            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
         }
         StateHasChanged();
     }
 }
+
+

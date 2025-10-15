@@ -1,6 +1,7 @@
 @using AzureNamingTool.Helpers
 @using AzureNamingTool.Models
 @using AzureNamingTool.Services
+@using AzureNamingTool.Services.Interfaces
 @using Microsoft.AspNetCore.Html
 @inject IToastService toastService
 @inject StateContainer state
@@ -100,6 +101,12 @@
     [Parameter] public string title { get; set; } = String.Empty;
     [Parameter] public string message { get; set; } = String.Empty;
     [Parameter] public List<string> multiselectedResourceTypes { get; set; } = new();
+    
+    [Inject]
+    public IResourceTypeService? ResourceTypeService { get; set; }
+    
+    [Inject]
+    public IAdminLogService? AdminLogService { get; set; }
 
     private ServicesData servicesData = new();
     private List<string> categories = new();

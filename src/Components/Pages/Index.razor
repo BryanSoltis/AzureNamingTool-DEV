@@ -3,6 +3,7 @@
 @using AzureNamingTool.Helpers
 @using AzureNamingTool.Models
 @using AzureNamingTool.Services
+@using AzureNamingTool.Services.Interfaces
 @using Markdig;
 @inject ILogger<Index> Logger
 @inject NavigationManager NavigationManager
@@ -80,6 +81,10 @@
     protected ThemeInfo? theme { get; set; }
     [CascadingParameter]
     public IModalService? Modal { get; set; }
+    
+    [Inject]
+    public IAdminLogService? AdminLogService { get; set; }
+    
     private bool admin;
     private SiteConfiguration config = ConfigurationHelper.GetConfigurationData();
     private string? customhomecontent = String.Empty;
