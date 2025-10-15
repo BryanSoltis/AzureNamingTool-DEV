@@ -1,56 +1,512 @@
 # Azure Naming Tool - Modernization Plan
 
-**Version:** 2.0  
-**Status:** Phase 1-5 Complete ✅ | Phase 6 Deferred
+**Version:** 3.0  
+**Status:** Core Complete ✅ | Storage Migration & Enhancements Planned 🎯
 
 ---
 
-## 📊 Progress Overview
+## 📊 Status Overview
 
-| Phase | Status |
-|-------|--------|
-| **Phase 1: Foundation & Infrastructure** | ✅ Complete |
-| **Phase 2: Service Layer Refactoring** | ✅ Complete |
-| **Phase 3: Controller Modernization** | ✅ Complete |
-| **Phase 4: Blazor & JSON Fixes** | ✅ Complete |
-| **Phase 5: Testing Infrastructure** | ✅ Complete |
-| **Phase 6: Enhanced Features** | ⏸️ Deferred |
+| Phase | Status | Priority |
+|-------|--------|----------|
+| **Phases 1-5: Core Modernization** | ✅ Complete | - |
+| **Phase 6: Storage Migration (SQLite)** | 📋 Planned | 🔴 High |
+| **Phase 7: Enhanced Features** | 📋 Planned | 🟡 Medium |
+| **Phase 8: Advanced Monitoring** | 📋 Planned | 🟢 Low |
+
+### What's Been Completed (Phases 1-5)
+
+✅ **Modern Architecture Foundation**
+- 18 service interfaces created
+- 17 services converted from static to DI
+- 14 API controllers modernized
+- 12 Blazor components updated
+- Repository pattern implemented for data access
+- Cache service modernized (IMemoryCache)
+- 30 unit tests with 97% pass rate
+
+✅ **Technical Debt Eliminated**
+- No more static classes
+- Proper async/await patterns
+- Circular dependencies resolved
+- JSON deserialization fixed (mixed-case support)
+- Build configuration updated
+
+✅ **Quality Metrics**
+- 100% API backward compatibility maintained
+- Zero breaking changes
+- All code follows .NET best practices
+- Testable, maintainable codebase
+
+**See "Completed Work" section at bottom for detailed breakdown**
+
+---
+
+## 🎯 Current Focus: Phase 6 - Storage Migration
+
+**Goal:** Migrate from JSON files to SQLite with zero downtime and automatic user migration
+
+**Why SQLite?**
+- ✅ Embedded database (no external server needed)
+- ✅ ACID transactions (no file locking issues)
+- ✅ Better concurrency for multi-user scenarios
+- ✅ Query performance for large datasets
+- ✅ Maintains simplicity - single file database
+- ✅ Still portable and easy to backup
+
+**Critical Requirement:** 100% automatic migration from JSON files - users should not need to manually migrate their configurations
+
+---
+
+## Phase 6: Storage Migration to SQLite 📋
+
+**Status:** PLANNED  
+**Priority:** 🔴 High  
+**Impact:** High - Improves performance, concurrency, and data integrity
+
+### 6.1 Implementation Steps
+
+#### Step 1: SQLite Repository Implementation
+- [ ] Add `Microsoft.EntityFrameworkCore.Sqlite` NuGet package
+- [ ] Create `SQLiteConfigurationRepository<T>` implementing `IConfigurationRepository<T>`
+- [ ] Create Entity Framework DbContext for all configuration entities
+- [ ] Implement CRUD operations with EF Core
+- [ ] Add connection string management in appsettings.json
+
+<details>
+<summary>📝 Implementation Pattern</summary>
+
+```csharp
+// DbContext for all configuration entities
+public class ConfigurationDbContext : DbContext
+{
+    public DbSet<ResourceType> ResourceTypes { get; set; }
+    public DbSet<ResourceLocation> ResourceLocations { get; set; }
+    // ... all other entities
+    
+    protected override void OnConfiguring(DbContextOptionsBuilder options)
+        => options.UseSqlite(connectionString);
+}
+
+// SQLite repository implementation
+public class SQLiteConfigurationRepository<T> : IConfigurationRepository<T> where T : class
+{
+    private readonly ConfigurationDbContext _context;
+    private readonly ICacheService _cacheService;
+    
+    public async Task<List<T>> GetAllAsync()
+    {
+        return await _context.Set<T>().ToListAsync();
+    }
+    
+    public async Task SaveAllAsync(List<T> items)
+    {
+        _context.Set<T>().RemoveRange(_context.Set<T>());
+        _context.Set<T>().AddRange(items);
+        await _context.SaveChangesAsync();
+    }
+}
+```
+
+</details>
+
+#### Step 2: Migration Detection & Automation
+- [ ] Create `IStorageMigrationService` interface
+- [ ] Implement migration detection logic (checks for JSON files + missing SQLite database)
+- [ ] Build automatic migration pipeline
+- [ ] Add migration progress tracking
+- [ ] Implement rollback capability
+
+**Migration Detection Logic:**
+1. On application startup, check storage provider in `appsettings.json`
+2. If SQLite is configured but database doesn't exist → migration needed
+3. If JSON files exist in `/settings` → migration source detected
+4. Automatically trigger migration process
+
+<details>
+<summary>📝 Migration Service Pattern</summary>
+
+```csharp
+public interface IStorageMigrationService
+{
+    Task<bool> IsMigrationNeededAsync();
+    Task<MigrationResult> MigrateFromJsonToSqliteAsync();
+    Task<string> CreateBackupAsync();
+    Task RestoreFromBackupAsync(string backupPath);
+    Task<bool> ValidateMigrationAsync();
+}
+
+public class StorageMigrationService : IStorageMigrationService
+{
+    public async Task<bool> IsMigrationNeededAsync()
+    {
+        // Check if SQLite is configured
+        var provider = _configuration["StorageOptions:Provider"];
+        if (provider != "SQLite") return false;
+        
+        // Check if SQLite database exists
+        var dbExists = File.Exists(_configuration["StorageOptions:SQLite:DatabasePath"]);
+        if (dbExists) return false;
+        
+        // Check if JSON files exist
+        var jsonFilesExist = Directory.Exists("settings") && 
+                            Directory.GetFiles("settings", "*.json").Any();
+        
+        return jsonFilesExist; // Migration needed if JSON exists but SQLite doesn't
+    }
+    
+    public async Task<MigrationResult> MigrateFromJsonToSqliteAsync()
+    {
+        try
+        {
+            _logger.LogInformation("Starting migration from JSON to SQLite");
+            
+            // 1. Create backup of JSON files
+            var backupPath = await CreateBackupAsync();
+            
+            // 2. Initialize SQLite database
+            await _dbContext.Database.EnsureCreatedAsync();
+            
+            // 3. Read all JSON files
+            var jsonRepo = new JsonFileConfigurationRepository<T>(...);
+            
+            // 4. Migrate each entity type
+            var entities = new[]
+            {
+                typeof(ResourceType),
+                typeof(ResourceLocation),
+                typeof(ResourceEnvironment),
+                // ... all entity types
+            };
+            
+            int totalMigrated = 0;
+            foreach (var entityType in entities)
+            {
+                var data = await ReadJsonDataAsync(entityType);
+                await WriteSqliteDataAsync(entityType, data);
+                totalMigrated += data.Count;
+            }
+            
+            // 5. Validate migration
+            var isValid = await ValidateMigrationAsync();
+            if (!isValid)
+            {
+                throw new InvalidOperationException("Migration validation failed");
+            }
+            
+            _logger.LogInformation("Migration completed: {Count} records migrated", totalMigrated);
+            
+            return new MigrationResult
+            {
+                Success = true,
+                ItemsMigrated = totalMigrated,
+                BackupPath = backupPath,
+                Message = "Migration completed successfully"
+            };
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Migration failed");
+            // Rollback handled automatically - JSON files still exist
+            return new MigrationResult
+            {
+                Success = false,
+                Message = $"Migration failed: {ex.Message}"
+            };
+        }
+    }
+}
+```
+
+</details>
+
+#### Step 3: Backup & Rollback Strategy
+- [ ] Automatic backup of `/settings` folder before migration
+- [ ] Timestamp-based backup naming: `settings-backup-YYYYMMDD-HHMMSS.zip`
+- [ ] Keep JSON files intact during migration (safety net)
+- [ ] Automatic rollback if migration fails
+- [ ] Manual rollback option in Admin UI
+
+**Backup Process:**
+1. Before migration starts → Create ZIP of entire `/settings` folder
+2. Store in `/backups` directory with timestamp
+3. If migration fails → SQLite database deleted, JSON files remain
+4. If migration succeeds → JSON files kept for 30 days (configurable)
+
+<details>
+<summary>📝 Backup Implementation</summary>
+
+```csharp
+public async Task<string> CreateBackupAsync()
+{
+    var settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings");
+    var backupDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "backups");
+    Directory.CreateDirectory(backupDir);
+    
+    var timestamp = DateTime.UtcNow.ToString("yyyyMMdd-HHmmss");
+    var backupFile = Path.Combine(backupDir, $"settings-backup-{timestamp}.zip");
+    
+    ZipFile.CreateFromDirectory(settingsPath, backupFile);
+    
+    _logger.LogInformation("Created backup: {Path}", backupFile);
+    return backupFile;
+}
+
+public async Task RestoreFromBackupAsync(string backupPath)
+{
+    var settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings");
+    
+    // Clear current settings
+    if (Directory.Exists(settingsPath))
+    {
+        Directory.Delete(settingsPath, recursive: true);
+    }
+    
+    // Extract backup
+    ZipFile.ExtractToDirectory(backupPath, settingsPath);
+    
+    // Delete SQLite database
+    var dbPath = _configuration["StorageOptions:SQLite:DatabasePath"];
+    if (File.Exists(dbPath))
+    {
+        File.Delete(dbPath);
+    }
+    
+    // Switch back to JSON provider
+    // (requires appsettings.json update or environment variable)
+    
+    _logger.LogInformation("Restored from backup: {Path}", backupPath);
+}
+```
+
+</details>
+
+#### Step 4: Migration Validation
+- [ ] Compare record counts (JSON vs SQLite)
+- [ ] Validate data integrity for critical entities
+- [ ] Check referential integrity
+- [ ] Verify all required fields populated
+- [ ] Log validation results
+
+<details>
+<summary>📝 Validation Logic</summary>
+
+```csharp
+public async Task<bool> ValidateMigrationAsync()
+{
+    try
+    {
+        // Count validation
+        var jsonCount = await CountJsonRecordsAsync();
+        var sqliteCount = await CountSqliteRecordsAsync();
+        
+        if (jsonCount != sqliteCount)
+        {
+            _logger.LogError("Record count mismatch: JSON={JsonCount}, SQLite={SqliteCount}", 
+                jsonCount, sqliteCount);
+            return false;
+        }
+        
+        // Data integrity validation
+        var resourceTypes = await _dbContext.ResourceTypes.ToListAsync();
+        if (!resourceTypes.Any() || resourceTypes.Any(rt => string.IsNullOrEmpty(rt.Resource)))
+        {
+            _logger.LogError("ResourceTypes validation failed");
+            return false;
+        }
+        
+        _logger.LogInformation("Migration validation passed");
+        return true;
+    }
+    catch (Exception ex)
+    {
+        _logger.LogError(ex, "Validation failed");
+        return false;
+    }
+}
+```
+
+</details>
+
+#### Step 5: User Experience & Communication
+- [ ] Add migration status page in Admin UI
+- [ ] Show migration progress (percentage complete)
+- [ ] Display migration logs in real-time
+- [ ] Provide manual backup/restore options
+- [ ] Add "Rollback" button if migration issues occur
+
+**Migration UI Components:**
+- Migration status indicator (Not Started / In Progress / Complete / Failed)
+- Progress bar showing percentage complete
+- Log viewer showing migration steps
+- Backup management (list backups, restore from backup)
+- Storage provider switcher (JSON ↔ SQLite)
+
+#### Step 6: Configuration Management
+- [ ] Add storage provider setting to appsettings.json
+- [ ] Support environment variable override
+- [ ] Add startup logging for storage provider
+- [ ] Document configuration options
+
+<details>
+<summary>📝 Configuration Structure</summary>
+
+```json
+{
+  "StorageOptions": {
+    "Provider": "SQLite",
+    "AutoMigrateOnStartup": true,
+    "BackupBeforeMigration": true,
+    "KeepJsonFilesAfterMigration": true,
+    "JsonFileRetentionDays": 30,
+    
+    "FileSystem": {
+      "SettingsPath": "settings"
+    },
+    
+    "SQLite": {
+      "DatabasePath": "data/azurenamingtool.db",
+      "ConnectionString": "Data Source=data/azurenamingtool.db;Cache=Shared;Pooling=True"
+    }
+  }
+}
+```
+
+</details>
+
+#### Step 7: Testing Strategy
+- [ ] Unit tests for SQLite repository
+- [ ] Integration tests for migration service
+- [ ] Test migration with sample data
+- [ ] Test rollback scenarios
+- [ ] Test validation logic
+- [ ] Performance testing (JSON vs SQLite)
+
+---
+
+### 6.2 Migration User Journey
+
+**Scenario: Existing User Upgrading to New Version**
+
+1. **User downloads new version** with SQLite support
+2. **User starts application** as normal
+3. **Application detects** JSON files exist + SQLite configured
+4. **Auto-migration triggers**:
+   - Backup created: `/backups/settings-backup-20251015-143022.zip`
+   - Migration starts: "Migrating configuration to SQLite..."
+   - Progress shown: "Migrating ResourceTypes... 25% complete"
+   - Migration completes: "Migration successful! 1,234 records migrated"
+5. **Application continues** using SQLite (seamless for user)
+6. **JSON files preserved** in `/settings` for 30 days (safety net)
+
+**If Migration Fails:**
+1. Error logged with details
+2. SQLite database deleted
+3. Application falls back to JSON files (no data loss)
+4. User notified: "Migration failed, using JSON files. Contact support."
+5. Admin can review logs and retry migration
+
+---
+
+### 6.3 Rollback Process
+
+**User wants to revert to JSON files:**
+
+1. Go to Admin → Storage Settings
+2. Click "Revert to JSON Files"
+3. System prompts: "This will restore from backup created on [date]. Continue?"
+4. User confirms
+5. System:
+   - Deletes SQLite database
+   - Restores JSON files from latest backup
+   - Updates appsettings.json to use "FileSystem" provider
+   - Restarts application
+6. Application runs on JSON files again
+
+---
+
+### 6.4 Phase 6 Completion Criteria
+
+- [x] Repository pattern already implemented (Phase 1)
+- [ ] SQLite repository created and tested
+- [ ] Migration service implemented with validation
+- [ ] Automatic migration tested with real data
+- [ ] Backup/restore tested
+- [ ] Rollback tested
+- [ ] Admin UI updated with migration controls
+- [ ] Configuration documented
+- [ ] 100% backward compatibility maintained
+- [ ] Performance benchmarks show improvement
+
+---
+
+## Phase 7: Enhanced Features 📋
+
+**Status:** PLANNED  
+**Priority:** 🟡 Medium  
+**Prerequisites:** Phase 6 (Storage Migration) complete
+
+### 7.1 Health Checks
+- [ ] Storage health check (SQLite connection)
+- [ ] Cache health check
+- [ ] `/health/live` endpoint (liveness probe)
+- [ ] `/health/ready` endpoint (readiness probe)
+- [ ] Health check UI dashboard
+
+**Use Case:** Kubernetes deployments, monitoring systems
+
+### 7.2 API Versioning
+- [ ] Add API versioning support (`/api/v1/`, `/api/v2/`)
+- [ ] Version via URL segment or header
+- [ ] Maintain v1 for backward compatibility
+- [ ] Document versioning strategy
+
+**Use Case:** Future breaking changes without affecting existing integrations
+
+### 7.3 Performance Optimizations
+- [ ] Response compression (Gzip/Brotli)
+- [ ] Output caching for GET endpoints
+- [ ] Query optimization (leverage SQLite indexes)
+- [ ] Cache warming on startup
+
+**Use Case:** High-traffic scenarios, faster page loads
+
+### 7.4 Advanced Logging
+- [ ] Structured logging with Serilog
+- [ ] Log aggregation (Application Insights, Seq, etc.)
+- [ ] Request/response logging middleware
+- [ ] Performance metrics logging
+
+**Use Case:** Production diagnostics, troubleshooting
+
+---
+
+## Phase 8: Advanced Monitoring 📋
+
+**Status:** PLANNED  
+**Priority:** 🟢 Low  
+**Prerequisites:** Phase 7 complete
+
+### 8.1 Application Insights Integration
+- [ ] Telemetry collection
+- [ ] Custom metrics tracking
+- [ ] Dependency tracking
+- [ ] Live metrics dashboard
+
+### 8.2 Metrics & Dashboards
+- [ ] Request count/duration metrics
+- [ ] Cache hit/miss rates
+- [ ] Storage performance metrics
+- [ ] Grafana dashboard templates
+
+---
+
+## 📋 Completed Work (Phases 1-5)
+
+<details>
+<summary>✅ Phase 1: Foundation & Infrastructure (COMPLETE)</summary>
 
 ### Key Achievements
-
-✅ **17 Services Converted** - All services now use DI with async/await patterns  
-✅ **14 Controllers Updated** - All controllers use DI, 100% API compatibility maintained  
-✅ **12 Blazor Components Modernized** - All components use @inject directives  
-✅ **18 Service Interfaces Created** - Complete abstraction layer  
-✅ **30 Unit Tests Written** - 97% passing (29/30), establishes testing patterns  
-✅ **Repository Pattern Implemented** - File-based storage abstracted  
-✅ **Cache Service Modernized** - IMemoryCache with DI  
-✅ **JSON Deserialization Fixed** - Mixed-case support for legacy files  
-✅ **Circular Dependencies Resolved** - Coordinator pattern implemented  
-✅ **Build Configuration Updated** - Repository folder auto-copies  
-
----
-
-## 🎯 Executive Summary
-
-The Azure Naming Tool modernization effort has successfully transformed a legacy static-based architecture into a modern, testable, and maintainable .NET 8 Blazor application. All critical phases (1-5) are complete with 100% backward compatibility maintained.
-
-### Success Metrics - All Achieved ✅
-
-- [x] **Zero Breaking Changes**: All APIs remain compatible
-- [x] **Testability**: 30 unit tests with 97% pass rate
-- [x] **Maintainability**: 100% DI adoption across services, controllers, and components
-- [x] **Performance**: No regressions, improved cache service
-- [x] **Code Quality**: All async/await patterns fixed, circular dependencies resolved
-- [x] **Documentation**: Comprehensive patterns established for future development
-
----
-
-## Phase 1: Foundation & Infrastructure ✅
-
-**Status:** COMPLETE ✅
-
-### 1.1 Service Interfaces ✅
 
 **Created 18 service interfaces** to enable dependency injection and testing:
 
