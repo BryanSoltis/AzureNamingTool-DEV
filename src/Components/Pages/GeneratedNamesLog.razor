@@ -1,7 +1,8 @@
-﻿@page "/generatednameslog"
+@page "/generatednameslog"
 @using AzureNamingTool.Helpers
 @using AzureNamingTool.Models
 @using AzureNamingTool.Services
+@using AzureNamingTool.Services.Interfaces
 @using System.IO
 @using BlazorDownloadFile
 @using Microsoft.AspNetCore.Components.Authorization
@@ -191,6 +192,13 @@
     protected ThemeInfo theme { get; set; } = new();
     [CascadingParameter]
     public IModalService? Modal { get; set; }
+    
+    [Inject]
+    public IGeneratedNamesService? GeneratedNamesService { get; set; }
+    
+    [Inject]
+    public IAdminLogService? AdminLogService { get; set; }
+    
     private bool admin = false;
     private bool dataLoaded = false;
     private bool duplicatenamesallowed = false;
@@ -222,7 +230,7 @@
     private async Task LoadData()
     {
         ServiceResponse serviceResponse = new();
-        serviceResponse = await GeneratedNamesService.GetItems();
+        serviceResponse = await GeneratedNamesService.GetItemsAsync();
         if (serviceResponse.Success)
         {
             if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -254,7 +262,7 @@
         confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will delete the Generated Name and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
         if (confirm)
         {
-            serviceResponse = await GeneratedNamesService.GetItem(Convert.ToInt32(id));
+            serviceResponse = await GeneratedNamesService.GetItemAsync(Convert.ToInt32(id));
             if (serviceResponse.Success)
             {
                 if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -262,13 +270,13 @@
                     GeneratedName generatedname = (GeneratedName)serviceResponse.ResponseObject!;
                     if (GeneralHelper.IsNotNull(generatedname))
                     {
-                        serviceResponse = await GeneratedNamesService.DeleteItem(Convert.ToInt32(generatedname.Id));
+                        serviceResponse = await GeneratedNamesService.DeleteItemAsync(Convert.ToInt32(generatedname.Id));
                         if (serviceResponse.Success)
                         {
                             message.Type = MessageTypesEnum.SUCCESS;
                             message.Message = "Generated name deleted!";
                             toastService.ShowSuccess(message.Message);
-                            AdminLogService.PostItem(new AdminLogMessage() { Source = currentuser, Title = "INFORMATION", Message = "Generated Name (" + generatedname.ResourceName + ") deleted." });
+                            await AdminLogService.PostItemAsync(new AdminLogMessage() { Source = currentuser, Title = "INFORMATION", Message = "Generated Name (" + generatedname.ResourceName + ") deleted." });
                             CacheHelper.InvalidateCacheObject("GeneratedName");
                             await LoadData();
                             state.SetNavReload(true);
@@ -310,7 +318,7 @@
         {
             await LogHelper.PurgeGeneratedNames();
             toastService.ShowSuccess("Generated Names Log purged!");
-            AdminLogService.PostItem(new AdminLogMessage() { Source = currentuser, Title = "INFORMATION", Message = "Generated Names log purged." });
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Source = currentuser, Title = "INFORMATION", Message = "Generated Names log purged." });
             await LoadData();
             StateHasChanged();
         }

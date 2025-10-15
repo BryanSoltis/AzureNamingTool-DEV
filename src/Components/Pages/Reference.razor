@@ -1,7 +1,8 @@
-﻿@page "/reference"
+@page "/reference"
 @using AzureNamingTool.Helpers
 @using AzureNamingTool.Models
 @using AzureNamingTool.Services
+@using AzureNamingTool.Services.Interfaces
 @using System.Text.RegularExpressions
 @inject IJSRuntime JsRuntime
 @inject ILogger<Reference> Logger
@@ -378,6 +379,13 @@
     protected ThemeInfo theme { get; set; } = new();
     [CascadingParameter]
     public IModalService? Modal { get; set; }
+    
+    [Inject]
+    public IResourceTypeService? ResourceTypeService { get; set; }
+    
+    [Inject]
+    public IAdminLogService? AdminLogService { get; set; }
+    
     private ServicesData servicesData = new();
     private ResourceDelimiter? resourceDelimiter = new();
     public string filterData { get; set; } = String.Empty;
@@ -417,7 +425,7 @@
         }
         catch (Exception ex)
         {
-            AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             toastService.ShowError("There was a problem loading the page. Please try again");
         }
     }

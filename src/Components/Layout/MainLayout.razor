@@ -1,4 +1,4 @@
-﻿@using AzureNamingTool.Components.Modals
+@using AzureNamingTool.Components.Modals
 @using AzureNamingTool.Helpers
 @using AzureNamingTool.Models
 @using Blazored.Toast.Configuration
@@ -10,6 +10,7 @@
 @inject ILogger<MainLayout> Logger
 @inject NavigationManager NavigationManager
 @using AzureNamingTool.Services;
+@using AzureNamingTool.Services.Interfaces;
 @using System.Security.Claims;
 @inject ProtectedLocalStorage storage
 @inject ProtectedSessionStorage session
@@ -84,6 +85,10 @@
     [CascadingParameter]
     private IdentityProviderDetails? identityProviderDetails { get; set; }
     [CascadingParameter] public IModalService? Modal { get; set; }
+    
+    [Inject]
+    public IAdminLogService? AdminLogService { get; set; }
+    
     private ThemeInfo theme = new() { ThemeName = "Light", ThemeStyle = "bg-default text-dark" };
     private bool isdarktheme = false;
     private bool admin;
@@ -152,7 +157,7 @@
                                 await session.SetAsync("currentuser", currentuser);
 
                                 // Log the user access
-                                AdminLogService.PostItem(new AdminLogMessage() { Title = "INFORMATION", Message = "User accessed the site.", Source = currentuser });
+                                await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "INFORMATION", Message = "User accessed the site.", Source = currentuser });
 
                                 // CHeck if the user is an admin
                                 admin = await IdentityHelper.IsAdminUser(state, session, currentuser);

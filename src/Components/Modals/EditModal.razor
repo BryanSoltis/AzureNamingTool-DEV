@@ -1,4 +1,4 @@
-﻿@using AzureNamingTool.Helpers
+@using AzureNamingTool.Helpers
 @using AzureNamingTool.Models
 @using AzureNamingTool.Services
 @using Microsoft.AspNetCore.Html
@@ -690,7 +690,7 @@
                 itemShortName = resourceProjAppSvc.ShortName;
                 break;
             case "ResourceType":
-                serviceResponse = await ResourceTypeService.GetItem(id);
+                serviceResponse = await ResourceTypeService.GetItemAsync(id);
                 ResourceType resourceType = servicesData.ResourceTypes!.Find(x => x.Id == id)!;
                 itemName = resourceType.Resource;
                 namelabel = "Resource";
@@ -760,7 +760,7 @@
                         foreach (var customcomponent in customcomponents)
                         {
                             customcomponent.ParentComponent = GeneralHelper.NormalizeName(itemName, true);
-                            serviceResponse = await CustomComponentService.PostItem(customcomponent);
+                            serviceResponse = await CustomComponentService.PostItemAsync(customcomponent);
                         }
                         resourceComponent.Name = itemName;
                         if (resourceComponent.IsCustom)
@@ -795,7 +795,7 @@
                             if (confirm)
                             {
                                 serviceResponse = await CustomComponentService.DeleteByParentComponentId((int)resourceComponent.Id);
-                                serviceResponse = await ResourceComponentService.PostItem(resourceComponent);
+                                serviceResponse = await ResourceComponentService.PostItemAsync(resourceComponent);
                             }
                             else
                             {
@@ -804,7 +804,7 @@
                         }
                         else
                         {
-                            serviceResponse = await ResourceComponentService.PostItem(resourceComponent);
+                            serviceResponse = await ResourceComponentService.PostItemAsync(resourceComponent);
                         }
                     }
                     else
@@ -840,24 +840,24 @@
                                 ResourceEnvironment resourceEnvironment = servicesData.ResourceEnvironments!.Find(x => x.Id == id)!;
                                 resourceEnvironment.Name = itemName;
                                 resourceEnvironment.ShortName = itemShortName;
-                                serviceResponse = await ResourceEnvironmentService.PostItem(resourceEnvironment);
+                                serviceResponse = await ResourceEnvironmentService.PostItemAsync(resourceEnvironment);
                                 break;
                             case "ResourceLocation":
                                 ResourceLocation resourceLocation = servicesData.ResourceLocations!.Find(x => x.Id == id)!;
                                 resourceLocation.ShortName = itemShortName;
-                                serviceResponse = await ResourceLocationService.PostItem(resourceLocation);
+                                serviceResponse = await ResourceLocationService.PostItemAsync(resourceLocation);
                                 break;
                             case "ResourceOrg":
                                 ResourceOrg resourceOrg = servicesData.ResourceOrgs!.Find(x => x.Id == id)!;
                                 resourceOrg.Name = itemName;
                                 resourceOrg.ShortName = itemShortName;
-                                serviceResponse = await ResourceOrgService.PostItem(resourceOrg);
+                                serviceResponse = await ResourceOrgService.PostItemAsync(resourceOrg);
                                 break;
                             case "ResourceProjAppSvc":
                                 ResourceProjAppSvc resourceProjAppSvc = servicesData.ResourceProjAppSvcs!.Find(x => x.Id == id)!;
                                 resourceProjAppSvc.Name = itemName;
                                 resourceProjAppSvc.ShortName = itemShortName;
-                                serviceResponse = await ResourceProjAppSvcService.PostItem(resourceProjAppSvc);
+                                serviceResponse = await ResourceProjAppSvcService.PostItemAsync(resourceProjAppSvc);
                                 break;
                             case "ResourceType":
                                 ResourceType resourceType = servicesData.ResourceTypes!.Find(x => x.Id == id)!;
@@ -921,25 +921,25 @@
                                         }
                                     }
                                 }
-                                serviceResponse = await ResourceTypeService.PostItem(resourceType);
+                                serviceResponse = await ResourceTypeService.PostItemAsync(resourceType);
                                 break;
                             case "ResourceUnitDept":
                                 ResourceUnitDept resourceUnitDept = servicesData.ResourceUnitDepts!.Find(x => x.Id == id)!;
                                 resourceUnitDept.Name = itemName;
                                 resourceUnitDept.ShortName = itemShortName;
-                                serviceResponse = await ResourceUnitDeptService.PostItem(resourceUnitDept);
+                                serviceResponse = await ResourceUnitDeptService.PostItemAsync(resourceUnitDept);
                                 break;
                             case "ResourceFunction":
                                 ResourceFunction resourceFunction = servicesData.ResourceFunctions!.Find(x => x.Id == id)!;
                                 resourceFunction.Name = itemName;
                                 resourceFunction.ShortName = itemShortName;
-                                serviceResponse = await ResourceFunctionService.PostItem(resourceFunction);
+                                serviceResponse = await ResourceFunctionService.PostItemAsync(resourceFunction);
                                 break;
                             case "CustomComponent":
                                 CustomComponent customComponent = servicesData.CustomComponents!.Find(x => x.Id == id)!;
                                 customComponent.Name = itemName;
                                 customComponent.ShortName = itemShortName;
-                                serviceResponse = await CustomComponentService.PostItem(customComponent);
+                                serviceResponse = await CustomComponentService.PostItemAsync(customComponent);
                                 break;
                         }
                     }
@@ -960,7 +960,7 @@
                 {
                     await ModalInstance.CloseAsync();
                     toastService.ShowSuccess(GeneralHelper.NormalizeName(type, false) + " updated!");
-                    AdminLogService.PostItem(new AdminLogMessage() { Title = "SUCCESS", Message = "(" + GeneralHelper.NormalizeName(type, false) + ") " + itemName + " updated!", Source = currentuser });
+                    await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "SUCCESS", Message = "(" + GeneralHelper.NormalizeName(type, false) + ") " + itemName + " updated!", Source = currentuser });
                 }
                 else
                 {
@@ -970,7 +970,7 @@
         }
         catch (Exception ex)
         {
-            AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             toastService.ShowError("There was an error updating the " + GeneralHelper.NormalizeName(type, false) + "! " + ex.Message);
         }
     }
@@ -1049,7 +1049,7 @@
                     }
                     catch (Exception ex)
                     {
-                        AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                        await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                         responseMessage.Type = MessageTypesEnum.ERROR;
                         responseMessage.Message = "There was a problem with the request.";
                     }
@@ -1074,13 +1074,13 @@
                             toastService.ShowError(responseMessage.Message);
                             break;
                     }
-                    AdminLogService.PostItem(new AdminLogMessage() { Title = responseMessage.Type.ToString(), Message = responseMessage.Message, Source = currentuser });
+                    await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = responseMessage.Type.ToString(), Message = responseMessage.Message, Source = currentuser });
                 }
             }
         }
         catch (Exception ex)
         {
-            AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             toastService.ShowError("There was an error with the action! " + ex.Message);
         }
     }
@@ -1134,7 +1134,7 @@
         }
         catch (Exception ex)
         {
-            AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             toastService.ShowError("There was an error updating the " + GeneralHelper.NormalizeName(type, false) + "! " + ex.Message);
         }
     }

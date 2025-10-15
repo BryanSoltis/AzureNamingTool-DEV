@@ -1,4 +1,4 @@
-﻿@page "/adminlog"
+@page "/adminlog"
 @using AzureNamingTool.Helpers
 @using AzureNamingTool.Models
 @using AzureNamingTool.Services
@@ -166,7 +166,7 @@
                 NavigationManager.NavigateTo("");
             }
             ServiceResponse serviceResponse = new();
-            serviceResponse = await AdminLogService.GetItems();
+            serviceResponse = await AdminLogService.GetItemsAsync();
             if (serviceResponse.Success)
             {
                 if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -200,9 +200,9 @@
         {
             await LogHelper.PurgeAdminLog();
             toastService.ShowSuccess("Admin Log purged!");
-            AdminLogService.PostItem(new AdminLogMessage() { Source = currentuser, Title = "INFORMATION", Message = "Admin Log purged." });
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Source = currentuser, Title = "INFORMATION", Message = "Admin Log purged." });
             CacheHelper.InvalidateCacheObject("AdminLogMessage");
-            serviceResponse = await AdminLogService.GetItems();
+            serviceResponse = await AdminLogService.GetItemsAsync();
             if (serviceResponse.Success)
             {
                 if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))

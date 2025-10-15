@@ -1,4 +1,4 @@
-﻿@page "/admin"
+@page "/admin"
 @using AzureNamingTool.Components.Modals
 @using AzureNamingTool.Helpers;
 @using AzureNamingTool.Models;
@@ -1336,7 +1336,7 @@
                 confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will delete the Admin User.</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                 if (confirm)
                 {
-                    serviceResponse = await AdminUserService.DeleteItem(Convert.ToInt32(id));
+                    serviceResponse = await AdminUserService.DeleteItemAsync(Convert.ToInt32(id));
                     if (serviceResponse.Success)
                     {
                         message.Type = MessageTypesEnum.SUCCESS;
@@ -1376,7 +1376,7 @@
                     ConfigurationHelper.SetAppSetting("ConnectivityCheckEnabled", resetconfig.ConnectivityCheckEnabled!, false);
                     ConfigurationHelper.SetAppSetting("GenerationWebhook", String.Empty, true);
                     ConfigurationHelper.SetAppSetting("ShowAdminDataToAllUsers", String.Empty, true);
-                    AdminLogService.PostItem(new AdminLogMessage() { Title = MessageTypesEnum.SUCCESS.ToString(), Message = "Site Settings reset!", Source = currentuser });
+                    await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = MessageTypesEnum.SUCCESS.ToString(), Message = "Site Settings reset!", Source = currentuser });
                     NavigationManager.NavigateTo("admin?reset=true", true);
                 }
                 else
@@ -1407,7 +1407,7 @@
                         toastService.ShowError(message.Message);
                         break;
                 }
-                AdminLogService.PostItem(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
+                await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
             }
         }
 
@@ -1582,7 +1582,7 @@
         }
         catch (Exception ex)
         {
-            AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             message.Message = "There was a problem updating the setting!";
             message.Header = "ERROR";
         }
@@ -1604,7 +1604,7 @@
                     toastService.ShowError(message.Message);
                     break;
             }
-            AdminLogService.PostItem(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
         }
 
         servicesData = await ServicesHelper.LoadServicesData(servicesData, admin);
@@ -1665,7 +1665,7 @@
         }
         catch (Exception ex)
         {
-            AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             message.Message = "There was a problem uploading the custom logo!";
             message.Header = "ERROR";
         }
@@ -1687,7 +1687,7 @@
                     toastService.ShowError(message.Message);
                     break;
             }
-            AdminLogService.PostItem(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
         }
         StateHasChanged();
     }
