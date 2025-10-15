@@ -11,7 +11,7 @@ public interface IResourceOrgService
     /// Retrieves all resource organizations.
     /// </summary>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-    Task<ServiceResponse> GetItemsAsync();
+    Task<ServiceResponse> GetItemsAsync(bool admin = true);
 
     /// <summary>
     /// Retrieves a specific resource organization by ID.

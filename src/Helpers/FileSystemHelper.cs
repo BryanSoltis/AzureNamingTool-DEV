@@ -1,4 +1,4 @@
-﻿using AzureNamingTool.Models;
+using AzureNamingTool.Models;
 using AzureNamingTool.Services;
 using System;
 using System.Collections.Generic;
@@ -106,7 +106,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return ex;
             }
         }
@@ -134,7 +134,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return result;
         }

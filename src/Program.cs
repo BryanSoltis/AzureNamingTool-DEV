@@ -2,6 +2,10 @@ using AzureNamingTool.Attributes;
 using AzureNamingTool.Components;
 using AzureNamingTool.Helpers;
 using AzureNamingTool.Models;
+using AzureNamingTool.Repositories.Implementation.FileSystem;
+using AzureNamingTool.Repositories.Interfaces;
+using AzureNamingTool.Services;
+using AzureNamingTool.Services.Interfaces;
 using BlazorDownloadFile;
 using Blazored.Modal;
 using Blazored.Toast;
@@ -53,6 +57,36 @@ builder.Services.AddBlazoredToast();
 builder.Services.AddBlazoredModal();
 builder.Services.AddMemoryCache();
 builder.Services.AddMvcCore().AddApiExplorer();
+
+// Register Storage Provider
+builder.Services.AddSingleton<IStorageProvider, FileSystemStorageProvider>();
+
+// Register Repositories (Scoped for per-request lifetime)
+builder.Services.AddScoped(typeof(IConfigurationRepository<>), typeof(JsonFileConfigurationRepository<>));
+builder.Services.AddScoped<IConfigurationRepository<AdminLogMessage>, JsonFileConfigurationRepository<AdminLogMessage>>();
+builder.Services.AddScoped<IConfigurationRepository<ResourceDelimiter>, JsonFileConfigurationRepository<ResourceDelimiter>>();
+
+// Register Cache Service (Singleton since it wraps IMemoryCache)
+builder.Services.AddSingleton<ICacheService, CacheService>();
+
+// Register Application Services (Scoped for per-request lifetime)
+builder.Services.AddScoped<IAdminLogService, AdminLogService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IAdminUserService, AdminUserService>();
+builder.Services.AddScoped<ICustomComponentService, CustomComponentService>();
+builder.Services.AddScoped<IGeneratedNamesService, GeneratedNamesService>();
+builder.Services.AddScoped<IImportExportService, ImportExportService>();
+builder.Services.AddScoped<IPolicyService, PolicyService>();
+builder.Services.AddScoped<IResourceComponentService, ResourceComponentService>();
+builder.Services.AddScoped<IResourceDelimiterService, ResourceDelimiterService>();
+builder.Services.AddScoped<IResourceEnvironmentService, ResourceEnvironmentService>();
+builder.Services.AddScoped<IResourceFunctionService, ResourceFunctionService>();
+builder.Services.AddScoped<IResourceLocationService, ResourceLocationService>();
+builder.Services.AddScoped<IResourceNamingRequestService, ResourceNamingRequestService>();
+builder.Services.AddScoped<IResourceOrgService, ResourceOrgService>();
+builder.Services.AddScoped<IResourceProjAppSvcService, ResourceProjAppSvcService>();
+builder.Services.AddScoped<IResourceTypeService, ResourceTypeService>();
+builder.Services.AddScoped<IResourceUnitDeptService, ResourceUnitDeptService>();
 
 var app = builder.Build();
 

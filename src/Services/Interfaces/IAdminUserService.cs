@@ -10,15 +10,16 @@ public interface IAdminUserService
     /// <summary>
     /// Retrieves all administrative users.
     /// </summary>
+    /// <param name="admin">Whether to filter by admin status.</param>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-    Task<ServiceResponse> GetItemsAsync();
+    Task<ServiceResponse> GetItemsAsync(bool admin = true);
 
     /// <summary>
-    /// Retrieves a specific administrative user by ID.
+    /// Retrieves a specific administrative user by name.
     /// </summary>
-    /// <param name="id">The ID of the user.</param>
+    /// <param name="name">The name of the user.</param>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-    Task<ServiceResponse> GetItemAsync(int id);
+    Task<ServiceResponse> GetItemAsync(string name);
 
     /// <summary>
     /// Posts a new administrative user.

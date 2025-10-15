@@ -41,4 +41,25 @@ public interface ICustomComponentService
     /// <param name="items">The list of custom components to configure.</param>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
     Task<ServiceResponse> PostConfigAsync(List<CustomComponent> items);
+
+    /// <summary>
+    /// Retrieves custom components by parent component ID.
+    /// </summary>
+    /// <param name="parentcomponetid">The parent component ID.</param>
+    /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+    Task<ServiceResponse> GetItemsByParentComponentIdAsync(int parentcomponetid);
+
+    /// <summary>
+    /// Retrieves custom components by parent type.
+    /// </summary>
+    /// <param name="parenttype">The parent type.</param>
+    /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+    Task<ServiceResponse> GetItemsByParentTypeAsync(string parenttype);
+
+    /// <summary>
+    /// Deletes custom components by parent component ID.
+    /// </summary>
+    /// <param name="parentcomponentid">The parent component ID.</param>
+    /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+    Task<ServiceResponse> DeleteByParentComponentIdAsync(int parentcomponentid);
 }

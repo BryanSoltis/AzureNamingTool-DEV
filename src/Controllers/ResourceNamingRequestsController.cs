@@ -11,6 +11,7 @@ using System.Text;
 using System.Collections;
 using System.Threading;
 using AzureNamingTool.Services;
+using AzureNamingTool.Services.Interfaces;
 using AzureNamingTool.Attributes;
 
 namespace AzureNamingTool.Controllers
@@ -23,6 +24,20 @@ namespace AzureNamingTool.Controllers
     [ApiKey]
     public class ResourceNamingRequestsController : ControllerBase
     {
+        private readonly IResourceNamingRequestService _resourceNamingRequestService;
+        private readonly IResourceTypeService _resourceTypeService;
+        private readonly IAdminLogService _adminLogService;
+
+        public ResourceNamingRequestsController(
+            IResourceNamingRequestService resourceNamingRequestService,
+            IResourceTypeService resourceTypeService,
+            IAdminLogService adminLogService)
+        {
+            _resourceNamingRequestService = resourceNamingRequestService;
+            _resourceTypeService = resourceTypeService;
+            _adminLogService = adminLogService;
+        }
+
         private ServiceResponse serviceResponse = new();
         // POST api/<ResourceNamingRequestsController>
         /// <summary>
@@ -36,7 +51,7 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                ResourceNameResponse resourceNameRequestResponse = await ResourceNamingRequestService.RequestNameWithComponents(request);
+                ResourceNameResponse resourceNameRequestResponse = await _resourceNamingRequestService.RequestNameWithComponentsAsync(request);
                 if (resourceNameRequestResponse.Success)
                 {
                     return Ok(resourceNameRequestResponse);
@@ -48,7 +63,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex.Message);
             }
         }
@@ -66,7 +81,7 @@ namespace AzureNamingTool.Controllers
             try
             {
                 request.CreatedBy = "API";
-                ResourceNameResponse resourceNameRequestResponse = await ResourceNamingRequestService.RequestName(request);
+                ResourceNameResponse resourceNameRequestResponse = await _resourceNamingRequestService.RequestNameAsync(request);
                 if (resourceNameRequestResponse.Success)
                 {
                     return Ok(resourceNameRequestResponse);
@@ -78,7 +93,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex.Message);
             }
         }
@@ -96,7 +111,7 @@ namespace AzureNamingTool.Controllers
             try
             {
                 // Get the current delimiter
-                serviceResponse = await ResourceTypeService.ValidateResourceTypeName(validateNameRequest);
+                serviceResponse = await _resourceTypeService.ValidateResourceTypeNameAsync(validateNameRequest);
                 if (serviceResponse.Success)
                 {
                     if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -116,7 +131,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex.Message);
             }
         }

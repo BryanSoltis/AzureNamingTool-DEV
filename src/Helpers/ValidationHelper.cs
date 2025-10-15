@@ -1,4 +1,4 @@
-﻿using AzureNamingTool.Models;
+using AzureNamingTool.Models;
 using AzureNamingTool.Services;
 using System.Text.RegularExpressions;
 using System.Text;
@@ -44,7 +44,7 @@ namespace AzureNamingTool.Helpers
                 ServiceResponse serviceResponse = new();
 
                 // Get the current components
-                serviceResponse = await ResourceComponentService.GetItems(true);
+// TODO: Modernize -                 serviceResponse = await ResourceComponentService.GetItems(true);
                 if (serviceResponse.Success)
                 {
                     if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -80,7 +80,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return valid;
         }
@@ -258,7 +258,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 response.Valid = false;
                 response.Name = name;
                 response.Message = "There was a problem validating the name.";

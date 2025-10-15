@@ -11,7 +11,7 @@ public interface IResourceEnvironmentService
     /// Retrieves all resource environments.
     /// </summary>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-    Task<ServiceResponse> GetItemsAsync();
+    Task<ServiceResponse> GetItemsAsync(bool admin = true);
 
     /// <summary>
     /// Retrieves a specific resource environment by ID.

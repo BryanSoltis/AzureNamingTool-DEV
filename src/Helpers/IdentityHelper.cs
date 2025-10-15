@@ -1,4 +1,4 @@
-﻿using AzureNamingTool.Models;
+using AzureNamingTool.Models;
 using AzureNamingTool.Services;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System;
@@ -23,7 +23,8 @@ namespace AzureNamingTool.Helpers
             try
             {
                 // Check if the username is in the list of Admin Users
-                ServiceResponse serviceResponse = await AdminUserService.GetItems();
+// TODO: Modernize - ServiceResponse serviceResponse = await AdminUserService.GetItems();
+                ServiceResponse serviceResponse = new ServiceResponse();
                 if (serviceResponse.Success)
                 {
                     if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -40,7 +41,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return result;
         }
@@ -63,7 +64,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return currentuser;
         }

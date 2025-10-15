@@ -1,4 +1,4 @@
-﻿using AzureNamingTool.Models;
+using AzureNamingTool.Models;
 using AzureNamingTool.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzureNamingTool.Services;
+using AzureNamingTool.Services.Interfaces;
 using AzureNamingTool.Attributes;
 
 namespace AzureNamingTool.Controllers
@@ -19,7 +20,16 @@ namespace AzureNamingTool.Controllers
     [ApiKey]
     public class ResourceUnitDeptsController : ControllerBase
     {
+        private readonly IResourceUnitDeptService _resourceunitdeptService;
+        private readonly IAdminLogService _adminLogService;
         private ServiceResponse serviceResponse = new();
+        public ResourceUnitDeptsController(
+            IResourceUnitDeptService resourceunitdeptService,
+            IAdminLogService adminLogService)
+        {
+            _resourceunitdeptService = resourceunitdeptService;
+            _adminLogService = adminLogService;
+        }
 
         // GET: api/<ResourceUnitDeptsController>
         /// <summary>
@@ -32,7 +42,7 @@ namespace AzureNamingTool.Controllers
             try
             {
                 // Get list of items
-                serviceResponse = await ResourceUnitDeptService.GetItems();
+                serviceResponse = await _resourceunitdeptService.GetItemsAsync();
                 if (serviceResponse.Success)
                 {
                     return Ok(serviceResponse.ResponseObject);
@@ -44,7 +54,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -61,7 +71,7 @@ namespace AzureNamingTool.Controllers
             try
             {
                 // Get list of items
-                serviceResponse = await ResourceUnitDeptService.GetItem(id);
+                serviceResponse = await _resourceunitdeptService.GetItemAsync(id);
                 if (serviceResponse.Success)
                 {
                     return Ok(serviceResponse.ResponseObject);
@@ -73,7 +83,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -89,10 +99,10 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await ResourceUnitDeptService.PostItem(item);
+                serviceResponse = await _resourceunitdeptService.PostItemAsync(item);
                 if (serviceResponse.Success)
                 {
-                    AdminLogService.PostItem(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Unit/Department (" + item.Name + ") added/updated." });
+                    await _adminLogService.PostItemAsync(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Unit/Department (" + item.Name + ") added/updated." });
                     CacheHelper.InvalidateCacheObject("ResourceUnitDept");
                     return Ok(serviceResponse.ResponseObject);
                 }
@@ -103,7 +113,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -120,10 +130,10 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await ResourceUnitDeptService.PostConfig(items);
+                serviceResponse = await _resourceunitdeptService.PostConfigAsync(items);
                 if (serviceResponse.Success)
                 {
-                    AdminLogService.PostItem(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Units/Departments added/updated." });
+                    await _adminLogService.PostItemAsync(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Units/Departments added/updated." });
                     CacheHelper.InvalidateCacheObject("ResourceUnitDept");
                     return Ok(serviceResponse.ResponseObject);
                 }
@@ -134,7 +144,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -151,14 +161,14 @@ namespace AzureNamingTool.Controllers
             try
             {
                 // Get the item details
-                serviceResponse = await ResourceUnitDeptService.GetItem(id);
+                serviceResponse = await _resourceunitdeptService.GetItemAsync(id);
                 if (serviceResponse.Success)
                 {
                     ResourceUnitDept item = (ResourceUnitDept)serviceResponse.ResponseObject!;
-                    serviceResponse = await ResourceUnitDeptService.DeleteItem(id);
+                    serviceResponse = await _resourceunitdeptService.DeleteItemAsync(id);
                     if (serviceResponse.Success)
                     {
-                        AdminLogService.PostItem(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Unit/Department (" + item.Name + ") deleted." });
+                        await _adminLogService.PostItemAsync(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Unit/Department (" + item.Name + ") deleted." });
                         CacheHelper.InvalidateCacheObject("ResourceUnitDept");
                         return Ok("Resource Unit/Department (" + item.Name + ") deleted.");
                     }
@@ -174,7 +184,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }

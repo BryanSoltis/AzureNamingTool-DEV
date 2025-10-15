@@ -1,4 +1,4 @@
-﻿using AzureNamingTool.Models;
+using AzureNamingTool.Models;
 using AzureNamingTool.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzureNamingTool.Services;
+using AzureNamingTool.Services.Interfaces;
 using AzureNamingTool.Attributes;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
@@ -21,7 +22,21 @@ namespace AzureNamingTool.Controllers
     [ApiKey]
     public class AdminController : ControllerBase
     {
+        private readonly IAdminService _adminService;
+        private readonly IAdminLogService _adminLogService;
+        private readonly IGeneratedNamesService _generatedNamesService;
         private readonly SiteConfiguration config = ConfigurationHelper.GetConfigurationData();
+
+        public AdminController(
+            IAdminService adminService,
+            IAdminLogService adminLogService,
+            IGeneratedNamesService generatedNamesService)
+        {
+            _adminService = adminService;
+            _adminLogService = adminLogService;
+            _generatedNamesService = generatedNamesService;
+        }
+
         private ServiceResponse serviceResponse = new();
 
         // POST api/<AdminController>
@@ -41,7 +56,7 @@ namespace AzureNamingTool.Controllers
                 {
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
-                        serviceResponse = await AdminService.UpdatePassword(password);
+                        serviceResponse = await _adminService.UpdatePasswordAsync(password);
                         return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem updating the password."));
                     }
                     else
@@ -57,7 +72,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -79,7 +94,7 @@ namespace AzureNamingTool.Controllers
                 {
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
-                        serviceResponse = await AdminService.UpdateAPIKey(apikey, "fullaccess");
+                        serviceResponse = await _adminService.UpdateAPIKeyAsync(apikey, "fullaccess");
                         return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem updating the Full Access API Key."));
                     }
                     else
@@ -95,7 +110,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -117,7 +132,7 @@ namespace AzureNamingTool.Controllers
                 {
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
-                        serviceResponse = await AdminService.GenerateAPIKey("fullaccess");
+                        serviceResponse = await _adminService.GenerateAPIKeyAsync("fullaccess");
                         return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem generating the Full Access API Key."));
                     }
                     else
@@ -133,7 +148,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -158,7 +173,7 @@ namespace AzureNamingTool.Controllers
                 {
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
-                        serviceResponse = await AdminService.UpdateAPIKey(apikey, "namegeneration");
+                        serviceResponse = await _adminService.UpdateAPIKeyAsync(apikey, "namegeneration");
                         return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem updating the Name Generation API Key."));
                     }
                     else
@@ -174,7 +189,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -195,7 +210,7 @@ namespace AzureNamingTool.Controllers
                 {
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
-                        serviceResponse = await AdminService.GenerateAPIKey("namegeneration");
+                        serviceResponse = await _adminService.GenerateAPIKeyAsync("namegeneration");
                         return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem generating the Name Generation API Key."));
                     }
                     else
@@ -211,7 +226,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -233,7 +248,7 @@ namespace AzureNamingTool.Controllers
                 {
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
-                        serviceResponse = await AdminService.UpdateAPIKey(apikey, "readonly");
+                        serviceResponse = await _adminService.UpdateAPIKeyAsync(apikey, "readonly");
                         return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem updating the Read-Only API Key."));
                     }
                     else
@@ -249,7 +264,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -270,7 +285,7 @@ namespace AzureNamingTool.Controllers
                 {
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
-                        serviceResponse = await AdminService.GenerateAPIKey("readonly");
+                        serviceResponse = await _adminService.GenerateAPIKeyAsync("readonly");
                         return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem generating the Read-Only API Key."));
                     }
                     else
@@ -286,7 +301,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -305,7 +320,7 @@ namespace AzureNamingTool.Controllers
                 {
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
-                        serviceResponse = await AdminLogService.GetItems();
+                        serviceResponse = await _adminLogService.GetItemsAsync();
                         if (serviceResponse.Success)
                         {
                             return Ok(serviceResponse.ResponseObject);
@@ -328,7 +343,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -347,7 +362,7 @@ namespace AzureNamingTool.Controllers
                 {
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
-                        serviceResponse = await AdminLogService.DeleteAllItems();
+                        serviceResponse = await _adminLogService.DeleteAllItemsAsync();
                         if (serviceResponse.Success)
                         {
                             return Ok(serviceResponse.ResponseObject);
@@ -370,7 +385,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -385,7 +400,7 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await GeneratedNamesService.GetItems();
+                serviceResponse = await _generatedNamesService.GetItemsAsync();
                 if (serviceResponse.Success)
                 {
                     return Ok(serviceResponse.ResponseObject);
@@ -397,7 +412,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -414,7 +429,7 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await GeneratedNamesService.GetItem(id);
+                serviceResponse = await _generatedNamesService.GetItemAsync(id);
                 if (serviceResponse.Success)
                 {
                     return Ok(serviceResponse.ResponseObject);
@@ -426,7 +441,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -449,14 +464,14 @@ namespace AzureNamingTool.Controllers
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
                         // Get the item details
-                        serviceResponse = await GeneratedNamesService.GetItem(id);
+                        serviceResponse = await _generatedNamesService.GetItemAsync(id);
                         if (serviceResponse.Success)
                         {
                             GeneratedName item = (GeneratedName)serviceResponse.ResponseObject!;
-                            serviceResponse = await GeneratedNamesService.DeleteItem(id);
+                            serviceResponse = await _generatedNamesService.DeleteItemAsync(id);
                             if (serviceResponse.Success)
                             {
-                                AdminLogService.PostItem(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Generated Name (" + item.ResourceName + ") deleted." });
+                                await _adminLogService.PostItemAsync(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Generated Name (" + item.ResourceName + ") deleted." });
                                 CacheHelper.InvalidateCacheObject("GeneratedName");
                                 return Ok("Generated Name (" + item.ResourceName + ") deleted.");
                             }
@@ -483,7 +498,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -502,7 +517,7 @@ namespace AzureNamingTool.Controllers
                 {
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
-                        serviceResponse = await GeneratedNamesService.DeleteAllItems();
+                        serviceResponse = await _generatedNamesService.DeleteAllItemsAsync();
                         if (serviceResponse.Success)
                         {
                             return Ok(serviceResponse.ResponseObject);
@@ -525,18 +540,18 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
 
         /// <summary>
-        /// This function will reset the site configuration. THIS CANNOT BE UNDONE!
+        /// This function resets the site configuration to the default values.
         /// </summary>
         /// <returns>dttring - Successful operation</returns>
         [HttpPost]
         [Route("[action]")]
-        public IActionResult ResetSiteConfiguration([BindRequired][FromHeader(Name = "AdminPassword")] string adminpassword)
+        public async Task<IActionResult> ResetSiteConfiguration([BindRequired][FromHeader(Name = "AdminPassword")] string adminpassword)
         {
             try
             {
@@ -565,7 +580,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }

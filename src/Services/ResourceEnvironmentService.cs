@@ -1,24 +1,37 @@
-﻿using AzureNamingTool.Helpers;
+using AzureNamingTool.Helpers;
 using AzureNamingTool.Models;
+using AzureNamingTool.Repositories;
+using AzureNamingTool.Repositories.Interfaces;
+using AzureNamingTool.Services.Interfaces;
 
 namespace AzureNamingTool.Services
 {
     /// <summary>
     /// Service for managing resource environments.
     /// </summary>
-    public class ResourceEnvironmentService
+    public class ResourceEnvironmentService : IResourceEnvironmentService
     {
+        private readonly IConfigurationRepository<ResourceEnvironment> _repository;
+        private readonly IAdminLogService _adminLogService;
+
+        public ResourceEnvironmentService(
+            IConfigurationRepository<ResourceEnvironment> repository,
+            IAdminLogService adminLogService)
+        {
+            _repository = repository;
+            _adminLogService = adminLogService;
+        }
         /// <summary>
         /// Retrieves a list of resource environments.
         /// </summary>
         /// <returns>A <see cref="ServiceResponse"/> containing the list of resource environments if found, or an error message if not found.</returns>
-        public static async Task<ServiceResponse> GetItems()
+        public async Task<ServiceResponse> GetItemsAsync(bool admin = true)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceEnvironment>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     serviceResponse.ResponseObject = items.OrderBy(x => x.SortOrder).ToList();
@@ -31,7 +44,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }
@@ -43,13 +56,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="id">The ID of the item to retrieve.</param>
         /// <returns>A <see cref="ServiceResponse"/> containing the retrieved item if found, or an error message if not found.</returns>
-        public static async Task<ServiceResponse> GetItem(int id)
+        public async Task<ServiceResponse> GetItemAsync(int id)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceEnvironment>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     var item = items.Find(x => x.Id == id);
@@ -70,7 +83,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }
@@ -82,7 +95,7 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="item">The item to add or update.</param>
         /// <returns>A <see cref="ServiceResponse"/> indicating the success of the operation.</returns>
-        public static async Task<ServiceResponse> PostItem(ResourceEnvironment item)
+        public async Task<ServiceResponse> PostItemAsync(ResourceEnvironment item)
         {
             ServiceResponse serviceResponse = new();
             try
@@ -96,7 +109,7 @@ namespace AzureNamingTool.Services
                 }
 
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceEnvironment>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     // Set the new id
@@ -170,9 +183,9 @@ namespace AzureNamingTool.Services
                     }
 
                     // Write items to file
-                    await ConfigurationHelper.WriteList<ResourceEnvironment>(items);
+                    await _repository.SaveAllAsync(items);
                     // Get the item
-                    var newitem = (await ResourceEnvironmentService.GetItem((int)item.Id)).ResponseObject;
+                    var newitem = (await GetItemAsync((int)item.Id)).ResponseObject;
                     serviceResponse.ResponseObject = newitem;
                     serviceResponse.Success = true;
                 }
@@ -183,7 +196,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
@@ -195,13 +208,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="id">The ID of the item to delete.</param>
         /// <returns>A <see cref="ServiceResponse"/> indicating the success of the operation.</returns>
-        public static async Task<ServiceResponse> DeleteItem(int id)
+        public async Task<ServiceResponse> DeleteItemAsync(int id)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceEnvironment>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     // Get the specified item
@@ -220,7 +233,7 @@ namespace AzureNamingTool.Services
                         }
 
                         // Write items to file
-                        await ConfigurationHelper.WriteList<ResourceEnvironment>(items);
+                        await _repository.SaveAllAsync(items);
                         serviceResponse.Success = true;
                     }
                     else
@@ -235,7 +248,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
@@ -247,7 +260,7 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="items">The list of resource environments to configure.</param>
         /// <returns>A <see cref="ServiceResponse"/> indicating the success of the operation.</returns>
-        public static async Task<ServiceResponse> PostConfig(List<ResourceEnvironment> items)
+        public async Task<ServiceResponse> PostConfigAsync(List<ResourceEnvironment> items)
         {
             ServiceResponse serviceResponse = new();
             try
@@ -274,12 +287,12 @@ namespace AzureNamingTool.Services
                 }
 
                 // Write items to file
-                await ConfigurationHelper.WriteList<ResourceEnvironment>(newitems);
+                await _repository.SaveAllAsync(newitems);
                 serviceResponse.Success = true;
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }

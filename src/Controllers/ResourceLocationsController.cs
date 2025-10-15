@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzureNamingTool.Services;
+using AzureNamingTool.Services.Interfaces;
 using AzureNamingTool.Attributes;
 
 namespace AzureNamingTool.Controllers
@@ -19,7 +20,18 @@ namespace AzureNamingTool.Controllers
     [ApiKey]
     public class ResourceLocationsController : ControllerBase
     {
+        private readonly IResourceLocationService _resourceLocationService;
+        private readonly IAdminLogService _adminLogService;
         private ServiceResponse serviceResponse = new();
+
+        public ResourceLocationsController(
+            IResourceLocationService resourceLocationService,
+            IAdminLogService adminLogService)
+        {
+            _resourceLocationService = resourceLocationService;
+            _adminLogService = adminLogService;
+        }
+
         // GET: api/<ResourceLocationsController>
         /// <summary>
         /// This function will return the locations data. 
@@ -31,7 +43,7 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await ResourceLocationService.GetItems(admin);
+                serviceResponse = await _resourceLocationService.GetItemsAsync(admin);
                 if (serviceResponse.Success)
                 {
                     return Ok(serviceResponse.ResponseObject);
@@ -43,7 +55,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -59,7 +71,7 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await ResourceLocationService.GetItem(id);
+                serviceResponse = await _resourceLocationService.GetItemAsync(id);
                 if (serviceResponse.Success)
                 {
                     return Ok(serviceResponse.ResponseObject);
@@ -71,7 +83,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -88,10 +100,10 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await ResourceLocationService.PostConfig(items);
+                serviceResponse = await _resourceLocationService.PostConfigAsync(items);
                 if (serviceResponse.Success)
                 {
-                    AdminLogService.PostItem(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Locations added/updated." });
+                    await _adminLogService.PostItemAsync(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Locations added/updated." });
                     CacheHelper.InvalidateCacheObject("ResourceLocation");
                     return Ok(serviceResponse.ResponseObject);
                 }
@@ -102,7 +114,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }

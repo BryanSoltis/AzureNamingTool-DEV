@@ -11,7 +11,7 @@ public interface IResourceProjAppSvcService
     /// Retrieves all resource project/application/services.
     /// </summary>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-    Task<ServiceResponse> GetItemsAsync();
+    Task<ServiceResponse> GetItemsAsync(bool admin = true);
 
     /// <summary>
     /// Retrieves a specific resource project/application/service by ID.

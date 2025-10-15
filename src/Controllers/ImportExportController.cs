@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using AzureNamingTool.Services;
+using AzureNamingTool.Services.Interfaces;
 using AzureNamingTool.Attributes;
 
 namespace AzureNamingTool.Controllers
@@ -19,6 +20,17 @@ namespace AzureNamingTool.Controllers
     [ApiKey]
     public class ImportExportController : ControllerBase
     {
+        private readonly IImportExportService _importExportService;
+        private readonly IAdminLogService _adminLogService;
+
+        public ImportExportController(
+            IImportExportService importExportService,
+            IAdminLogService adminLogService)
+        {
+            _importExportService = importExportService;
+            _adminLogService = adminLogService;
+        }
+
         /// <summary>
         /// Response for controller functions
         /// </summary>
@@ -36,7 +48,7 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await ImportExportService.ExportConfig(includeAdmin);
+                serviceResponse = await _importExportService.ExportConfigAsync(includeAdmin);
                 if (serviceResponse.Success)
                 {
                     return Ok(serviceResponse.ResponseObject);
@@ -48,7 +60,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -65,7 +77,7 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await ImportExportService.PostConfig(configdata);
+                serviceResponse = await _importExportService.PostConfigAsync(configdata);
                 if (serviceResponse.Success)
                 {
                     return Ok(serviceResponse.ResponseObject);
@@ -77,7 +89,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }

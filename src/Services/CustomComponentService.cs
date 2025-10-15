@@ -1,24 +1,41 @@
-﻿using AzureNamingTool.Helpers;
+using AzureNamingTool.Helpers;
 using AzureNamingTool.Models;
+using AzureNamingTool.Repositories;
+using AzureNamingTool.Repositories.Interfaces;
+using AzureNamingTool.Services.Interfaces;
 
 namespace AzureNamingTool.Services
 {
     /// <summary>
     /// Service for managing custom components.
     /// </summary>
-    public class CustomComponentService
+    public class CustomComponentService : ICustomComponentService
     {
+        private readonly IConfigurationRepository<CustomComponent> _repository;
+        private readonly IAdminLogService _adminLogService;
+        private readonly IResourceComponentService _resourceComponentService;
+
+        public CustomComponentService(
+            IConfigurationRepository<CustomComponent> repository,
+            IAdminLogService adminLogService,
+            IResourceComponentService resourceComponentService)
+        {
+            _repository = repository;
+            _adminLogService = adminLogService;
+            _resourceComponentService = resourceComponentService;
+        }
+
         /// <summary>
         /// Retrieves a list of custom component items.
         /// </summary>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-        public static async Task<ServiceResponse> GetItems()
+        public async Task<ServiceResponse> GetItemsAsync(bool admin = true)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<CustomComponent>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     serviceResponse.ResponseObject = items.OrderBy(x => x.SortOrder).ToList();
@@ -31,7 +48,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }
@@ -43,19 +60,19 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="parentcomponetid">The ID of the parent component.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-        public static async Task<ServiceResponse> GetItemsByParentComponentId(int parentcomponetid)
+        public async Task<ServiceResponse> GetItemsByParentComponentIdAsync(int parentcomponetid)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get the parent component details
-                serviceResponse = await ResourceComponentService.GetItem(parentcomponetid);
+                serviceResponse = await _resourceComponentService.GetItemAsync(parentcomponetid);
                 if(serviceResponse.Success)
                 {
                     var component = (ResourceComponent)serviceResponse.ResponseObject!;
 
                     // Get list of items
-                    var items = await ConfigurationHelper.GetList<CustomComponent>();
+                    var items = (await _repository.GetAllAsync()).ToList();
                     if (GeneralHelper.IsNotNull(items))
                     {
                         serviceResponse.ResponseObject = items.Where(x => x.ParentComponent == GeneralHelper.NormalizeName(component.Name, true)).OrderBy(x => x.SortOrder).ToList();
@@ -73,7 +90,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }
@@ -85,13 +102,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="parenttype">The parent type of the custom components.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-        public static async Task<ServiceResponse> GetItemsByParentType(string parenttype)
+        public async Task<ServiceResponse> GetItemsByParentTypeAsync(string parenttype)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<CustomComponent>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     serviceResponse.ResponseObject = items.Where(x => x.ParentComponent == parenttype).OrderBy(x => x.SortOrder).ToList();
@@ -104,7 +121,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }
@@ -116,13 +133,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="id">The ID of the custom component to retrieve.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-        public static async Task<ServiceResponse> GetItem(int id)
+        public async Task<ServiceResponse> GetItemAsync(int id)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<CustomComponent>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     var item = items.Find(x => x.Id == id);
@@ -143,7 +160,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }
@@ -155,7 +172,7 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="item">The custom component item to be posted.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-        public static async Task<ServiceResponse> PostItem(CustomComponent item)
+        public async Task<ServiceResponse> PostItemAsync(CustomComponent item)
         {
             ServiceResponse serviceResponse = new();
             try
@@ -169,7 +186,7 @@ namespace AzureNamingTool.Services
                 }
 
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<CustomComponent>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     // Set the new id
@@ -239,16 +256,16 @@ namespace AzureNamingTool.Services
                     }
 
                     // Write items to file
-                    await ConfigurationHelper.WriteList<CustomComponent>(items);
+                    await _repository.SaveAllAsync(items);
                     // Get the item
-                    var newitem = (await CustomComponentService.GetItem((int)item.Id)).ResponseObject;
+                    var newitem = (await GetItemAsync((int)item.Id)).ResponseObject;
                     serviceResponse.ResponseObject = newitem;
                     serviceResponse.Success = true;
                 }
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
@@ -260,13 +277,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="id">The ID of the custom component to delete.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-        public static async Task<ServiceResponse> DeleteItem(int id)
+        public async Task<ServiceResponse> DeleteItemAsync(int id)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<CustomComponent>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     // Get the specified item
@@ -285,7 +302,7 @@ namespace AzureNamingTool.Services
                         }
 
                         // Write items to file
-                        await ConfigurationHelper.WriteList<CustomComponent>(items);
+                        await _repository.SaveAllAsync(items);
                         serviceResponse.Success = true;
                     }
                     else
@@ -300,7 +317,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
@@ -312,7 +329,7 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="items">The list of custom components to be configured.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-        public static async Task<ServiceResponse> PostConfig(List<CustomComponent> items)
+        public async Task<ServiceResponse> PostConfigAsync(List<CustomComponent> items)
         {
             ServiceResponse serviceResponse = new();
             try
@@ -339,12 +356,12 @@ namespace AzureNamingTool.Services
                 }
 
                 // Write items to file
-                await ConfigurationHelper.WriteList<CustomComponent>(newitems);
+                await _repository.SaveAllAsync(newitems);
                 serviceResponse.Success = true;
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
@@ -356,13 +373,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="componentid">The ID of the parent component.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
-        public static async Task<ServiceResponse> DeleteByParentComponentId(int componentid)
+        public async Task<ServiceResponse> DeleteByParentComponentIdAsync(int componentid)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get the resource component
-                serviceResponse = await ResourceComponentService.GetItem(componentid);
+                serviceResponse = await _resourceComponentService.GetItemAsync(componentid);
                 if (serviceResponse.Success)
                 {
                     var component = serviceResponse.ResponseObject as ResourceComponent;

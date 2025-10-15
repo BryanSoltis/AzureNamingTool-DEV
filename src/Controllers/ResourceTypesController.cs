@@ -8,6 +8,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Web;
 using AzureNamingTool.Services;
+using AzureNamingTool.Services.Interfaces;
 using AzureNamingTool.Attributes;
 
 namespace AzureNamingTool.Controllers
@@ -20,6 +21,17 @@ namespace AzureNamingTool.Controllers
     [ApiKey]
     public class ResourceTypesController : ControllerBase
     {
+        private readonly IResourceTypeService _resourceTypeService;
+        private readonly IAdminLogService _adminLogService;
+
+        public ResourceTypesController(
+            IResourceTypeService resourceTypeService,
+            IAdminLogService adminLogService)
+        {
+            _resourceTypeService = resourceTypeService;
+            _adminLogService = adminLogService;
+        }
+
         private ServiceResponse serviceResponse = new();
 
         // GET: api/<ResourceTypesController>
@@ -34,7 +46,7 @@ namespace AzureNamingTool.Controllers
             try
             {
                 // Get list of items
-                serviceResponse = await ResourceTypeService.GetItems(admin);
+                serviceResponse = await _resourceTypeService.GetItemsAsync(admin);
                 if (serviceResponse.Success)
                 {
                     return Ok(serviceResponse.ResponseObject);
@@ -46,7 +58,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -63,7 +75,7 @@ namespace AzureNamingTool.Controllers
             try
             {
                 // Get list of items
-                serviceResponse = await ResourceTypeService.GetItem(id);
+                serviceResponse = await _resourceTypeService.GetItemAsync(id);
                 if (serviceResponse.Success)
                 {
                     return Ok(serviceResponse.ResponseObject);
@@ -75,7 +87,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -92,10 +104,10 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await ResourceTypeService.PostConfig(items);
+                serviceResponse = await _resourceTypeService.PostConfigAsync(items);
                 if (serviceResponse.Success)
                 {
-                    AdminLogService.PostItem(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Types updated." });
+                    await _adminLogService.PostItemAsync(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Types updated." });
                     CacheHelper.InvalidateCacheObject("ResourceType");
                     return Ok(serviceResponse.ResponseObject);
                 }
@@ -106,7 +118,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }
@@ -124,10 +136,10 @@ namespace AzureNamingTool.Controllers
         {
             try
             {
-                serviceResponse = await ResourceTypeService.UpdateTypeComponents(operation, componentid);
+                serviceResponse = await _resourceTypeService.UpdateTypeComponentsAsync(operation, componentid);
                 if (serviceResponse.Success)
                 {
-                    AdminLogService.PostItem(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Types updated." });
+                    await _adminLogService.PostItemAsync(new AdminLogMessage() { Source = "API", Title = "INFORMATION", Message = "Resource Types updated." });
                     CacheHelper.InvalidateCacheObject("ResourceType");
                     return Ok(serviceResponse.ResponseObject);
                 }
@@ -138,7 +150,7 @@ namespace AzureNamingTool.Controllers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return BadRequest(ex);
             }
         }

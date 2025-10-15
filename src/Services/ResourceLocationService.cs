@@ -1,5 +1,8 @@
-﻿using AzureNamingTool.Helpers;
+using AzureNamingTool.Helpers;
 using AzureNamingTool.Models;
+using AzureNamingTool.Repositories;
+using AzureNamingTool.Repositories.Interfaces;
+using AzureNamingTool.Services.Interfaces;
 using System.Text.Json;
 
 namespace AzureNamingTool.Services
@@ -7,20 +10,31 @@ namespace AzureNamingTool.Services
     /// <summary>
     /// Service for managing resource location items.
     /// </summary>
-    public class ResourceLocationService
+    public class ResourceLocationService : IResourceLocationService
     {
+        private readonly IConfigurationRepository<ResourceLocation> _repository;
+        private readonly IAdminLogService _adminLogService;
+
+        public ResourceLocationService(
+            IConfigurationRepository<ResourceLocation> repository,
+            IAdminLogService adminLogService)
+        {
+            _repository = repository;
+            _adminLogService = adminLogService;
+        }
+
         /// <summary>
         /// Retrieves a list of resource location items.
         /// </summary>
         /// <param name="admin">A flag indicating whether to retrieve all items or only the enabled items.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation. The <see cref="ServiceResponse"/> contains the result of the retrieval operation.</returns>
-        public static async Task<ServiceResponse> GetItems(bool admin = true)
+        public async Task<ServiceResponse> GetItemsAsync(bool admin = true)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceLocation>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     if (!admin)
@@ -40,7 +54,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }
@@ -52,13 +66,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="id">The ID of the resource location item.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation. The <see cref="ServiceResponse"/> contains the result of the retrieval operation.</returns>
-        public static async Task<ServiceResponse> GetItem(int id)
+        public async Task<ServiceResponse> GetItemAsync(int id)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceLocation>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     var item = items.Find(x => x.Id == id);
@@ -79,7 +93,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }
@@ -91,7 +105,7 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="item">The resource location item to be posted.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation. The <see cref="ServiceResponse"/> contains the result of the post operation.</returns>
-        public static async Task<ServiceResponse> PostItem(ResourceLocation item)
+        public async Task<ServiceResponse> PostItemAsync(ResourceLocation item)
         {
             ServiceResponse serviceResponse = new();
             try
@@ -105,7 +119,7 @@ namespace AzureNamingTool.Services
                 }
 
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceLocation>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     // Set the new id
@@ -146,9 +160,9 @@ namespace AzureNamingTool.Services
                     }
 
                     // Write items to file
-                    await ConfigurationHelper.WriteList<ResourceLocation>(items);
+                    await _repository.SaveAllAsync(items);
                     // Get the item
-                    var newitem = (await ResourceLocationService.GetItem((int)item.Id)).ResponseObject;
+                    var newitem = (await GetItemAsync((int)item.Id)).ResponseObject;
                     serviceResponse.ResponseObject = newitem;
                     serviceResponse.Success = true;
                 }
@@ -159,7 +173,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
@@ -171,13 +185,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="id">The ID of the item to delete.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation. The <see cref="ServiceResponse"/> contains the result of the delete operation.</returns>
-        public static async Task<ServiceResponse> DeleteItem(int id)
+        public async Task<ServiceResponse> DeleteItemAsync(int id)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceLocation>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     // Get the specified item
@@ -188,7 +202,7 @@ namespace AzureNamingTool.Services
                         items.Remove(item);
 
                         // Write items to file
-                        await ConfigurationHelper.WriteList<ResourceLocation>(items);
+                        await _repository.SaveAllAsync(items);
                         serviceResponse.Success = true;
                     }
                     else
@@ -203,7 +217,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
@@ -215,7 +229,7 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="items">The list of resource locations to be posted.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation. The <see cref="ServiceResponse"/> contains the result of the post operation.</returns>
-        public static async Task<ServiceResponse> PostConfig(List<ResourceLocation> items)
+        public async Task<ServiceResponse> PostConfigAsync(List<ResourceLocation> items)
         {
             ServiceResponse serviceResponse = new();
             try
@@ -241,12 +255,12 @@ namespace AzureNamingTool.Services
                 }
 
                 // Write items to file
-                await ConfigurationHelper.WriteList<ResourceLocation>(newitems);
+                await _repository.SaveAllAsync(newitems);
                 serviceResponse.Success = true;
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
@@ -259,13 +273,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="shortNameReset">A flag indicating whether to reset the short names of the existing locations.</param>
         /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation. The <see cref="ServiceResponse"/> contains the result of the refresh operation.</returns>
-        public static async Task<ServiceResponse> RefreshResourceLocations(bool shortNameReset = false)
+        public async Task<ServiceResponse> RefreshResourceLocationsAsync(bool shortNameReset = false)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get the existing Resource location items
-                serviceResponse = await ResourceLocationService.GetItems();
+                serviceResponse = await GetItemsAsync();
                 if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
                 {
                     List<ResourceLocation> locations = (List<ResourceLocation>)serviceResponse.ResponseObject!;
@@ -315,7 +329,7 @@ namespace AzureNamingTool.Services
                                 }
 
                                 // Update the settings file
-                                serviceResponse = await PostConfig(locations);
+                                serviceResponse = await PostConfigAsync(locations);
 
                                 // Update the repository file
                                 await FileSystemHelper.WriteFile("resourcelocations.json", refreshdata, "repository/");
@@ -344,12 +358,12 @@ namespace AzureNamingTool.Services
                 else
                 {
                     serviceResponse.ResponseObject = "Resource Locations not found!";
-                    AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = "There was a problem refreshing the resource locations configuration." });
+                    await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = "There was a problem refreshing the resource locations configuration." });
                 }
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }

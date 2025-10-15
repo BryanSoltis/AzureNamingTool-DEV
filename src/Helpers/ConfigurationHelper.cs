@@ -1,4 +1,4 @@
-﻿using AzureNamingTool.Models;
+using AzureNamingTool.Models;
 using AzureNamingTool.Services;
 using System.Collections;
 using System.Data.SqlTypes;
@@ -92,7 +92,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return value;
         }
@@ -122,7 +122,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
         }
 
@@ -163,7 +163,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
         }
 
@@ -220,7 +220,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
         }
 
@@ -273,7 +273,7 @@ namespace AzureNamingTool.Helpers
                             }
                             else
                             {
-                                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = "Connectivity Check Failed:" + response.ReasonPhrase });
+                                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = "Connectivity Check Failed:" + response.ReasonPhrase });
                             }
                         }
                     }
@@ -289,7 +289,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = "There was a problem verifying connectivty. Error: " + ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = "There was a problem verifying connectivty. Error: " + ex.Message });
             }
 
             // Set the result to cache
@@ -339,7 +339,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return items;
         }
@@ -422,7 +422,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
         }
 
@@ -465,7 +465,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return versiondata;
         }
@@ -491,7 +491,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return versiondatajson;
         }
@@ -538,7 +538,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return versiondata;
         }
@@ -585,7 +585,7 @@ namespace AzureNamingTool.Helpers
                 }
                 catch (Exception ex)
                 {
-                    AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                    // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 }
             }
         }
@@ -624,7 +624,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return result;
         }
@@ -665,7 +665,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return result;
         }
@@ -685,7 +685,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return null;
             }
         }
@@ -745,7 +745,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return alert;
         }
@@ -771,7 +771,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
         }
 
@@ -794,16 +794,16 @@ namespace AzureNamingTool.Helpers
                 if (response.IsSuccessStatusCode)
                 {
                     result = true;
-                    AdminLogService.PostItem(new AdminLogMessage() { Title = "INFORMATION", Message = "Generated Name (" + generatedName.ResourceName + ") successfully posted to webhook!" });
+                    // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "INFORMATION", Message = "Generated Name (" + generatedName.ResourceName + ") successfully posted to webhook!" });
                 }
                 else
                 {
-                    AdminLogService.PostItem(new AdminLogMessage() { Title = "INFORMATION", Message = "Generated Name (" + generatedName.ResourceName + ") not successfully posted to webhook! " + response.ReasonPhrase });
+                    // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "INFORMATION", Message = "Generated Name (" + generatedName.ResourceName + ") not successfully posted to webhook! " + response.ReasonPhrase });
                 }
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "INFORMATION", Message = "Generated Name (" + generatedName.ResourceName + ") not successfully posted to webhook! " + ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "INFORMATION", Message = "Generated Name (" + generatedName.ResourceName + ") not successfully posted to webhook! " + ex.Message });
             }
             return result;
         }
@@ -834,7 +834,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return result;
         }
@@ -855,7 +855,7 @@ namespace AzureNamingTool.Helpers
                         // Get all the existing components
                         List<ResourceComponent> currentComponents = [];
                         ServiceResponse serviceResponse = new();
-                        serviceResponse = await ResourceComponentService.GetItems(true);
+                        // TODO: Modernize - serviceResponse = await ResourceComponentService.GetItems(true);
                         if (serviceResponse.Success)
                         {
                             if (GeneralHelper.IsNotNull(serviceResponse))
@@ -907,7 +907,7 @@ namespace AzureNamingTool.Helpers
                                         }
                                         if (update)
                                         {
-                                            await ResourceComponentService.PostItem(newComponent);
+// TODO: Modernize -                                             await ResourceComponentService.PostItem(newComponent);
                                         }
                                     }
                                 }
@@ -918,7 +918,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
         }
 
@@ -939,7 +939,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return result;
         }
@@ -954,7 +954,7 @@ namespace AzureNamingTool.Helpers
             bool nameexists = false;
             // Check if the name already exists
             ServiceResponse serviceResponse = new();
-            serviceResponse = await GeneratedNamesService.GetItems();
+// TODO: Modernize -             serviceResponse = await GeneratedNamesService.GetItems();
             if (serviceResponse.Success)
             {
                 if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -993,28 +993,28 @@ namespace AzureNamingTool.Helpers
                     switch (typeof(T).Name)
                     {
                         case nameof(ResourceEnvironment):
-                            serviceResponse = await ResourceEnvironmentService.PostItem(item);
+                            // TODO: Modernize - serviceResponse = await ResourceEnvironmentService.PostItem(item);
                             break;
                         case nameof(Models.ResourceLocation):
-                            serviceResponse = await ResourceLocationService.PostItem(item);
+                            // TODO: Modernize - serviceResponse = await ResourceLocationService.PostItem(item);
                             break;
                         case nameof(ResourceOrg):
-                            serviceResponse = await ResourceOrgService.PostItem(item);
+                            // TODO: Modernize - serviceResponse = await ResourceOrgService.PostItem(item);
                             break;
                         case nameof(ResourceProjAppSvc):
-                            serviceResponse = await ResourceProjAppSvcService.PostItem(item);
+                            // TODO: Modernize - serviceResponse = await ResourceProjAppSvcService.PostItem(item);
                             break;
                         case nameof(Models.ResourceType):
-                            serviceResponse = await ResourceTypeService.PostItem(item);
+                            // TODO: Modernize - serviceResponse = await ResourceTypeService.PostItem(item);
                             break;
                         case nameof(ResourceUnitDept):
-                            serviceResponse = await ResourceUnitDeptService.PostItem(item);
+                            // TODO: Modernize - serviceResponse = await ResourceUnitDeptService.PostItem(item);
                             break;
                         case nameof(ResourceFunction):
-                            serviceResponse = await ResourceFunctionService.PostItem(item);
+                            // TODO: Modernize - serviceResponse = await ResourceFunctionService.PostItem(item);
                             break;
                         case nameof(CustomComponent):
-                            serviceResponse = await CustomComponentService.PostItem(item);
+                            // TODO: Modernize - serviceResponse = await CustomComponentService.PostItem(item);
                             break;
                     }
                     if (!serviceResponse.Success)
@@ -1025,7 +1025,7 @@ namespace AzureNamingTool.Helpers
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return serviceResponse;
         }

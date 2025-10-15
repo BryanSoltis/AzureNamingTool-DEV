@@ -1,24 +1,38 @@
-﻿using AzureNamingTool.Helpers;
+using AzureNamingTool.Helpers;
 using AzureNamingTool.Models;
+using AzureNamingTool.Repositories;
+using AzureNamingTool.Repositories.Interfaces;
+using AzureNamingTool.Services.Interfaces;
 
 namespace AzureNamingTool.Services
 {
     /// <summary>
     /// Service for managing ResourceProjAppSvc items.
     /// </summary>
-    public class ResourceProjAppSvcService
+    public class ResourceProjAppSvcService : IResourceProjAppSvcService
     {
+        private readonly IConfigurationRepository<ResourceProjAppSvc> _repository;
+        private readonly IAdminLogService _adminLogService;
+
+        public ResourceProjAppSvcService(
+            IConfigurationRepository<ResourceProjAppSvc> repository,
+            IAdminLogService adminLogService)
+        {
+            _repository = repository;
+            _adminLogService = adminLogService;
+        }
+
         /// <summary>
         /// Retrieves a list of ResourceProjAppSvc items.
         /// </summary>
         /// <returns>A ServiceResponse containing the list of items.</returns>
-        public static async Task<ServiceResponse> GetItems()
+        public async Task<ServiceResponse> GetItemsAsync(bool admin = true)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceProjAppSvc>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     serviceResponse.ResponseObject = items.OrderBy(x => x.SortOrder).ToList();
@@ -31,7 +45,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }
@@ -43,13 +57,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="id">The ID of the item to retrieve.</param>
         /// <returns>A ServiceResponse containing the retrieved item.</returns>
-        public static async Task<ServiceResponse> GetItem(int id)
+        public async Task<ServiceResponse> GetItemAsync(int id)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceProjAppSvc>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     var item = items.Find(x => x.Id == id);
@@ -70,7 +84,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.Success = false;
                 serviceResponse.ResponseObject = ex;
             }
@@ -82,7 +96,7 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="item">The item to be posted.</param>
         /// <returns>A ServiceResponse indicating the success of the operation.</returns>
-        public static async Task<ServiceResponse> PostItem(ResourceProjAppSvc item)
+        public async Task<ServiceResponse> PostItemAsync(ResourceProjAppSvc item)
         {
             ServiceResponse serviceResponse = new();
             try
@@ -96,7 +110,7 @@ namespace AzureNamingTool.Services
                 }
 
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceProjAppSvc>();
+                var items = (await _repository.GetAllAsync()).ToList();
 
                 if (GeneralHelper.IsNotNull(items))
                 {
@@ -171,9 +185,9 @@ namespace AzureNamingTool.Services
                     }
 
                     // Write items to file
-                    await ConfigurationHelper.WriteList<ResourceProjAppSvc>(items);
+                    await _repository.SaveAllAsync(items);
                     // Get the item
-                    var newitem = (await ResourceProjAppSvcService.GetItem((int)item.Id)).ResponseObject;
+                    var newitem = (await GetItemAsync((int)item.Id)).ResponseObject;
                     serviceResponse.ResponseObject = newitem;
                     serviceResponse.Success = true;
                 }
@@ -184,7 +198,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
@@ -196,13 +210,13 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="id">The ID of the item to be deleted.</param>
         /// <returns>A ServiceResponse indicating the success of the operation.</returns>
-        public static async Task<ServiceResponse> DeleteItem(int id)
+        public async Task<ServiceResponse> DeleteItemAsync(int id)
         {
             ServiceResponse serviceResponse = new();
             try
             {
                 // Get list of items
-                var items = await ConfigurationHelper.GetList<ResourceProjAppSvc>();
+                var items = (await _repository.GetAllAsync()).ToList();
                 if (GeneralHelper.IsNotNull(items))
                 {
                     // Get the specified item
@@ -221,7 +235,7 @@ namespace AzureNamingTool.Services
                         }
 
                         // Write items to file
-                        await ConfigurationHelper.WriteList<ResourceProjAppSvc>(items);
+                        await _repository.SaveAllAsync(items);
                         serviceResponse.Success = true;
                     }
                     else
@@ -236,7 +250,7 @@ namespace AzureNamingTool.Services
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
@@ -248,7 +262,7 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="items">The list of ResourceProjAppSvc items to be configured.</param>
         /// <returns>A ServiceResponse indicating the success of the operation.</returns>
-        public static async Task<ServiceResponse> PostConfig(List<ResourceProjAppSvc> items)
+        public async Task<ServiceResponse> PostConfigAsync(List<ResourceProjAppSvc> items)
         {
             ServiceResponse serviceResponse = new();
             try
@@ -275,12 +289,12 @@ namespace AzureNamingTool.Services
                 }
 
                 // Write items to file
-                await ConfigurationHelper.WriteList<ResourceProjAppSvc>(newitems);
+                await _repository.SaveAllAsync(newitems);
                 serviceResponse.Success = true;
             }
             catch (Exception ex)
             {
-                AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 serviceResponse.ResponseObject = ex;
                 serviceResponse.Success = false;
             }
