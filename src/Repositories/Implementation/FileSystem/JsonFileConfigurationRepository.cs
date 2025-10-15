@@ -42,7 +42,13 @@ namespace AzureNamingTool.Repositories.Implementation.FileSystem
                     return Enumerable.Empty<T>();
                 }
 
-                var items = JsonSerializer.Deserialize<List<T>>(json);
+                // Use case-insensitive deserialization with camelCase policy to support existing user JSON files
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNameCaseInsensitive = true
+                };
+                var items = JsonSerializer.Deserialize<List<T>>(json, options);
                 
                 _logger.LogDebug("Loaded {Count} items from {FileName}", items?.Count ?? 0, _fileName);
                 return items ?? Enumerable.Empty<T>();
@@ -121,8 +127,10 @@ namespace AzureNamingTool.Repositories.Implementation.FileSystem
         {
             try
             {
+                // Use case-insensitive options to match GetAllAsync behavior
                 var options = new JsonSerializerOptions
                 {
+                    PropertyNameCaseInsensitive = true,
                     WriteIndented = true,
                     DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
                 };

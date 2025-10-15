@@ -88,6 +88,12 @@ builder.Services.AddScoped<IResourceProjAppSvcService, ResourceProjAppSvcService
 builder.Services.AddScoped<IResourceTypeService, ResourceTypeService>();
 builder.Services.AddScoped<IResourceUnitDeptService, ResourceUnitDeptService>();
 
+// Register coordinator to break circular dependencies between ResourceComponent and ResourceType
+builder.Services.AddScoped<IResourceConfigurationCoordinator, ResourceConfigurationCoordinator>();
+
+// Register Helpers
+builder.Services.AddScoped<ServicesHelper>();
+
 var app = builder.Build();
 
 app.MapHealthChecks("/healthcheck/ping");

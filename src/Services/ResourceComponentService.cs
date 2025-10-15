@@ -15,19 +15,16 @@ namespace AzureNamingTool.Services
     {
         private readonly IConfigurationRepository<ResourceComponent> _repository;
         private readonly IAdminLogService _adminLogService;
-        private readonly IResourceTypeService _resourceTypeService;
-        private readonly ICustomComponentService _customComponentService;
+        private readonly IResourceConfigurationCoordinator _coordinator;
 
         public ResourceComponentService(
             IConfigurationRepository<ResourceComponent> repository,
             IAdminLogService adminLogService,
-            IResourceTypeService resourceTypeService,
-            ICustomComponentService customComponentService)
+            IResourceConfigurationCoordinator coordinator)
         {
             _repository = repository;
             _adminLogService = adminLogService;
-            _resourceTypeService = resourceTypeService;
-            _customComponentService = customComponentService;
+            _coordinator = coordinator;
         }
 
         /// <summary>
@@ -221,60 +218,27 @@ namespace AzureNamingTool.Services
                     var item = items.Find(x => x.Id == id && x.IsCustom == true);
                     if (GeneralHelper.IsNotNull(item))
                     {
-                        // Delete any resource type settings for the component
-                        List<string> currentvalues = [];
-                        serviceResponse = await _resourceTypeService.GetItemsAsync();
-                        if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                        // Delete any resource type settings for the component using coordinator
+                        await _coordinator.UpdateTypesOnComponentDeleteAsync(item.Name);
+
+                        // Delete any custom components for this resource component using coordinator
+                        await _coordinator.DeleteCustomComponentsByParentIdAsync(id);
+
+                        // Remove the item from the collection
+                        items.Remove(item);
+
+                        // Update all the sort order values to reflect the removal
+                        int position = 1;
+                        foreach (ResourceComponent thisitem in items.OrderBy(x => x.SortOrder).ToList())
                         {
-                            List<Models.ResourceType> resourceTypes = (List<Models.ResourceType>)serviceResponse.ResponseObject!;
-                            if (GeneralHelper.IsNotNull(resourceTypes))
-                            {
-                                foreach (Models.ResourceType currenttype in resourceTypes)
-                                {
-                                    currentvalues = new List<string>(currenttype.Optional.Split(','));
-                                    if (currentvalues.Contains(GeneralHelper.NormalizeName(item.Name, false)))
-                                    {
-                                        currentvalues.Remove(GeneralHelper.NormalizeName(item.Name, false));
-                                        currenttype.Optional = String.Join(",", [.. currentvalues]);
-                                    }
-
-                                    currentvalues = new List<string>(currenttype.Exclude.Split(','));
-                                    if (currentvalues.Contains(GeneralHelper.NormalizeName(item.Name, false)))
-                                    {
-                                        currentvalues.Remove(GeneralHelper.NormalizeName(item.Name, false));
-                                        currenttype.Exclude = String.Join(",", [.. currentvalues]);
-                                    }
-                                    await _resourceTypeService.PostItemAsync(currenttype);
-                                }
-
-                                // Delete any custom components for this resource component
-                                await _customComponentService.DeleteByParentComponentIdAsync(id);
-
-                                // Remove the item from the collection
-                                items.Remove(item);
-
-                                // Update all the sort order values to reflect the removal
-                                int position = 1;
-                                foreach (ResourceComponent thisitem in items.OrderBy(x => x.SortOrder).ToList())
-                                {
-                                    thisitem.SortOrder = position;
-                                    thisitem.Id = position;
-                                    position += 1;
-                                }
-
-                                // Write items to file
-                                await _repository.SaveAllAsync(items);
-                                serviceResponse.Success = true;
-                                if (!serviceResponse.Success)
-                                { 
-                                    serviceResponse.ResponseObject = "Custom Component deletion failed! Please check the Admin log for details.";
-                                }
-                            }
-                            else
-                            {
-                                serviceResponse.ResponseObject = "Resource Types not found!";
-                            }
+                            thisitem.SortOrder = position;
+                            thisitem.Id = position;
+                            position += 1;
                         }
+
+                        // Write items to file
+                        await _repository.SaveAllAsync(items);
+                        serviceResponse.Success = true;
                     }
                     else
                     {

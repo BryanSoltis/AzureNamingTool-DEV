@@ -21,18 +21,18 @@ namespace AzureNamingTool.Services
     {
         private readonly IConfigurationRepository<ResourceType> _repository;
         private readonly IAdminLogService _adminLogService;
-        private readonly IResourceComponentService _resourceComponentService;
+        private readonly IResourceConfigurationCoordinator _coordinator;
         private readonly IResourceDelimiterService _resourceDelimiterService;
 
         public ResourceTypeService(
             IConfigurationRepository<ResourceType> repository,
             IAdminLogService adminLogService,
-            IResourceComponentService resourceComponentService,
+            IResourceConfigurationCoordinator coordinator,
             IResourceDelimiterService resourceDelimiterService)
         {
             _repository = repository;
             _adminLogService = adminLogService;
-            _resourceComponentService = resourceComponentService;
+            _coordinator = coordinator;
             _resourceDelimiterService = resourceDelimiterService;
         }
 
@@ -275,8 +275,14 @@ namespace AzureNamingTool.Services
             ServiceResponse serviceResponse = new();
             List<string> categories = [];
 
+            if (types == null)
+            {
+                return categories;
+            }
+
             foreach (ResourceType type in types)
             {
+                if (type == null) continue;
 
                 string category = type.Resource;
                 if (!String.IsNullOrEmpty(category))
@@ -313,11 +319,11 @@ namespace AzureNamingTool.Services
             // Filter out resource types that should have name generation
             if (!String.IsNullOrEmpty(filter))
             {
-                currenttypes = types.Where(x => x.Resource.StartsWith(filter + "/", StringComparison.CurrentCultureIgnoreCase) && !x.Property.Equals("display name", StringComparison.CurrentCultureIgnoreCase) && !String.IsNullOrEmpty(x.ShortName)).ToList();
+                currenttypes = types.Where(x => x != null && x.Resource != null && x.Resource.StartsWith(filter + "/", StringComparison.CurrentCultureIgnoreCase) && !x.Property.Equals("display name", StringComparison.CurrentCultureIgnoreCase) && !String.IsNullOrEmpty(x.ShortName)).ToList();
             }
             else
             {
-                currenttypes = types;
+                currenttypes = types.Where(x => x != null).ToList();
             }
             return currenttypes;
         }
@@ -435,7 +441,7 @@ namespace AzureNamingTool.Services
             ServiceResponse serviceResponse = new();
             try
             {
-                serviceResponse = await _resourceComponentService.GetItemAsync(componentid);
+                serviceResponse = await _coordinator.GetComponentForTypeValidationAsync(componentid);
                 if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
                 {
                     ResourceComponent resourceComponent = (ResourceComponent)serviceResponse.ResponseObject!;
