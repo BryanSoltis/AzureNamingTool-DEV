@@ -2204,14 +2204,14 @@
                                                     <div class="card-body @theme.ThemeStyle">
                                                         <p>Upload a SQLite database file (.db) to restore your complete configuration.</p>
                                                         <p><strong class="text-danger">WARNING:</strong> This will replace your current database and cannot be undone!</p>
-                                                        <InputFile OnChange="HandleSQLiteDatabaseUpload" class="form-control @theme.ThemeStyle mb-2" accept=".db" />
+                                                        <InputFile OnChange="HandleSQLiteDatabaseUpload" class="@($"form-control {theme.ThemeStyle}")" accept=".db" />
                                                         @if (sqliteBackupFile != null)
                                                         {
                                                             <div class="alert alert-info mt-2">
                                                                 <small>Selected: @sqliteBackupFile.Name (@FormatFileSize(sqliteBackupFile.Size))</small>
                                                             </div>
                                                         }
-                                                        <button type="button" class="btn btn-warning" @onclick="RestoreFromSQLiteBackup" disabled="@(sqliteBackupFile == null)" title="Restore Database">
+                                                        <button type="button" class="btn btn-warning mt-2" @onclick="RestoreFromSQLiteBackup" disabled="@(sqliteBackupFile == null)" title="Restore Database">
                                                             <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Restore Database
                                                         </button>
                                                     </div>
@@ -2225,8 +2225,8 @@
                                                     <div class="card-body @theme.ThemeStyle">
                                                         <p>Enter JSON configuration below or upload a JSON file to import Global Configuration.</p>
                                                         <p><strong class="text-danger">NOTE:</strong> This will update all existing configurations and cannot be undone!</p>
-                                                        <textarea title="Configuration" class="form-control @theme.ThemeStyle mb-2" rows="6" type="text" @onchange="@((ui) => { SetFormValue("newGlobalConfig",(string)ui.Value!);})" />
-                                                        <button type="button" class="btn btn-success" @onclick="@(e => FormAction("Global",0,"update"))" title="Import">
+                                                        <textarea title="Configuration" class="@($"form-control {theme.ThemeStyle}")" rows="6" type="text" @onchange="@((ui) => { SetFormValue("newGlobalConfig",(string)ui.Value!);})" />
+                                                        <button type="button" class="btn btn-success mt-2" @onclick="@(e => FormAction("Global",0,"update"))" title="Import">
                                                             <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import JSON
                                                         </button>
                                                     </div>

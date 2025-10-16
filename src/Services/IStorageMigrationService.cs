@@ -36,6 +36,11 @@ namespace AzureNamingTool.Services
         /// Gets migration status and history
         /// </summary>
         Task<MigrationStatus> GetMigrationStatusAsync();
+
+        /// <summary>
+        /// Loads repository JSON files into SQLite database for new installations
+        /// </summary>
+        Task<MigrationResult> LoadRepositoryDataIntoSQLiteAsync();
     }
 
     /// <summary>

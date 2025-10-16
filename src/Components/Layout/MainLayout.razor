@@ -249,8 +249,46 @@
                 return; // User chose to keep JSON
             }
 
-            // Check if migration is needed (JSON files exist but no SQLite DB)
+            // Check migration status
             var migrationStatus = await MigrationService.GetMigrationStatusAsync();
+            
+            // NEW INSTALL SCENARIO: No JSON files in settings folder
+            // This means it's a fresh install - automatically configure SQLite and load repository data
+            if (!migrationStatus.JsonFilesExist && !migrationStatus.IsMigrated)
+            {
+                Logger.LogInformation("New installation detected - configuring SQLite storage and loading repository data");
+                
+                // Load repository JSON files into SQLite database
+                var result = await MigrationService.LoadRepositoryDataIntoSQLiteAsync();
+                
+                if (result.Success)
+                {
+                    // Update configuration to use SQLite
+                    config.StorageProvider = "SQLite";
+                    await ConfigurationHelper.UpdateSettings(config);
+                    
+                    Logger.LogInformation("New installation configured with SQLite storage successfully");
+                    
+                    // Restart to use SQLite provider
+                    toastService.ShowSuccess("Initial configuration complete. Restarting application...", settings =>
+                    {
+                        settings.Timeout = 3;
+                    });
+                    
+                    await Task.Delay(3000);
+                    NavigationManager.NavigateTo("/", true);
+                }
+                else
+                {
+                    Logger.LogError("Failed to configure new installation: {Message}", result.Message);
+                    toastService.ShowError("Failed to initialize configuration. Please check logs.");
+                }
+                
+                return;
+            }
+            
+            // EXISTING INSTALL SCENARIO: JSON files exist but not migrated yet
+            // Show the migration prompt to let user decide
             if (migrationStatus.JsonFilesExist && !migrationStatus.IsMigrated)
             {
                 // Show the migration prompt

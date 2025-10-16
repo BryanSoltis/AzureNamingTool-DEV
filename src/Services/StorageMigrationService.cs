@@ -410,5 +410,111 @@ namespace AzureNamingTool.Services
                 return status;
             }
         }
+
+        /// <summary>
+        /// Loads repository JSON files into SQLite database for new installations
+        /// </summary>
+        /// <returns>Migration result with success status and details</returns>
+        public async Task<MigrationResult> LoadRepositoryDataIntoSQLiteAsync()
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var result = new MigrationResult();
+
+            try
+            {
+                _logger.LogInformation("Loading repository data into SQLite for new installation");
+
+                // Repository path (contains default JSON files)
+                var repositoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "repository");
+
+                if (!Directory.Exists(repositoryPath))
+                {
+                    result.Success = false;
+                    result.Message = "Repository folder not found";
+                    _logger.LogError("Repository folder not found at {RepositoryPath}", repositoryPath);
+                    return result;
+                }
+
+                // Ensure database is created
+                await _dbContext.Database.EnsureCreatedAsync();
+
+                // Load each entity type from repository folder (using plural filenames)
+                await LoadEntityFromRepositoryAsync<ResourceType>("resourcetypes.json", repositoryPath, result);
+                await LoadEntityFromRepositoryAsync<ResourceLocation>("resourcelocations.json", repositoryPath, result);
+                await LoadEntityFromRepositoryAsync<ResourceEnvironment>("resourceenvironments.json", repositoryPath, result);
+                await LoadEntityFromRepositoryAsync<ResourceOrg>("resourceorgs.json", repositoryPath, result);
+                await LoadEntityFromRepositoryAsync<ResourceProjAppSvc>("resourceprojappsvcs.json", repositoryPath, result);
+                await LoadEntityFromRepositoryAsync<ResourceUnitDept>("resourceunitdepts.json", repositoryPath, result);
+                await LoadEntityFromRepositoryAsync<ResourceFunction>("resourcefunctions.json", repositoryPath, result);
+                await LoadEntityFromRepositoryAsync<ResourceDelimiter>("resourcedelimiters.json", repositoryPath, result);
+                await LoadEntityFromRepositoryAsync<ResourceComponent>("resourcecomponents.json", repositoryPath, result);
+                await LoadEntityFromRepositoryAsync<CustomComponent>("customcomponents.json", repositoryPath, result);
+                await LoadEntityFromRepositoryAsync<AdminUser>("adminusers.json", repositoryPath, result);
+
+                stopwatch.Stop();
+                result.Duration = stopwatch.Elapsed;
+                result.Success = true;
+                result.Message = $"Repository data loaded successfully. {result.EntitiesMigrated} entities loaded in {result.Duration.TotalSeconds:F2} seconds.";
+
+                _logger.LogInformation(result.Message);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                stopwatch.Stop();
+                result.Success = false;
+                result.Duration = stopwatch.Elapsed;
+                result.Message = $"Failed to load repository data: {ex.Message}";
+                result.Errors.Add(ex.ToString());
+
+                _logger.LogError(ex, "Failed to load repository data after {Duration}ms", stopwatch.ElapsedMilliseconds);
+                return result;
+            }
+        }
+
+        private async Task LoadEntityFromRepositoryAsync<TEntity>(string fileName, string repositoryPath, MigrationResult result) where TEntity : class
+        {
+            try
+            {
+                var filePath = Path.Combine(repositoryPath, fileName);
+                
+                if (!File.Exists(filePath))
+                {
+                    _logger.LogDebug("Repository file {FileName} does not exist, skipping", fileName);
+                    return;
+                }
+
+                var json = await File.ReadAllTextAsync(filePath);
+                if (string.IsNullOrWhiteSpace(json) || json == "[]")
+                {
+                    _logger.LogDebug("Repository file {FileName} is empty, skipping", fileName);
+                    return;
+                }
+
+                var entities = JsonSerializer.Deserialize<List<TEntity>>(json, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                if (entities == null || !entities.Any())
+                {
+                    _logger.LogDebug("No entities deserialized from {FileName}", fileName);
+                    return;
+                }
+
+                // Add entities to the database
+                _dbContext.Set<TEntity>().AddRange(entities);
+                await _dbContext.SaveChangesAsync();
+
+                result.EntitiesMigrated += entities.Count;
+                _logger.LogDebug("Loaded {Count} entities from {FileName}", entities.Count, fileName);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading entities from {FileName}", fileName);
+                result.Errors.Add($"{fileName}: {ex.Message}");
+                throw;
+            }
+        }
     }
 }
