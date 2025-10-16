@@ -83,6 +83,14 @@ builder.Services.AddHealthChecks()
 
 // Always register DbContext (needed by StorageMigrationService even when using FileSystem)
 var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, storageOptions.DatabasePath);
+
+// Ensure the database directory exists (e.g., /settings for container persistence)
+var dbDirectory = Path.GetDirectoryName(dbPath);
+if (!string.IsNullOrEmpty(dbDirectory) && !Directory.Exists(dbDirectory))
+{
+    Directory.CreateDirectory(dbDirectory);
+}
+
 var connectionString = $"Data Source={dbPath}";
 builder.Services.AddDbContext<ConfigurationDbContext>(options =>
     options.UseSqlite(connectionString));

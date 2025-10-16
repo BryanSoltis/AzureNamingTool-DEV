@@ -5066,14 +5066,16 @@
     {
         try
         {
-            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "azurenamingtool.db");
+            // Get the database path from configuration (e.g., "settings/azurenamingtool.db")
+            string dbRelativePath = _config.GetValue<string>("StorageOptions:DatabasePath") ?? "settings/azurenamingtool.db";
+            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dbRelativePath);
             
             if (!File.Exists(dbPath))
             {
                 await InvokeAsync(() =>
                 {
                     ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
-                        "Database file not found. Ensure you are using SQLite storage.", "", admin);
+                        $"Database file not found at: {dbPath}. Ensure you are using SQLite storage.", "", admin);
                     StateHasChanged();
                 });
                 return;
@@ -5219,8 +5221,18 @@
 
         try
         {
-            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "azurenamingtool.db");
-            string backupPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"azurenamingtool-prerestore-{DateTime.Now:yyyyMMdd-HHmmss}.db");
+            // Get the database path from configuration (e.g., "settings/azurenamingtool.db")
+            string dbRelativePath = _config.GetValue<string>("StorageOptions:DatabasePath") ?? "settings/azurenamingtool.db";
+            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dbRelativePath);
+            
+            // Ensure the settings directory exists
+            string dbDirectory = Path.GetDirectoryName(dbPath)!;
+            if (!Directory.Exists(dbDirectory))
+            {
+                Directory.CreateDirectory(dbDirectory);
+            }
+            
+            string backupPath = Path.Combine(dbDirectory, $"azurenamingtool-prerestore-{DateTime.Now:yyyyMMdd-HHmmss}.db");
 
             // Create a backup of the current database before restoring
             if (File.Exists(dbPath))
