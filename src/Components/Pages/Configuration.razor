@@ -20,6 +20,7 @@
 @implements IDisposable
 @inject NavigationManager NavigationManager
 @inject ServicesHelper ServicesHelper
+@inject IHostApplicationLifetime AppLifetime
 
 <PageTitle>Azure Naming Tool - Configuration</PageTitle>
 <div class="card @theme!.ThemeStyle">
@@ -5364,9 +5365,9 @@
                 StateHasChanged();
             });
 
-            // Restart the application - the restore will complete on startup
+            // Trigger application restart - the restore will complete on startup
             await Task.Delay(3000);
-            NavigationManager!.NavigateTo("/", true);
+            AppLifetime.StopApplication();
         }
         catch (Exception ex)
         {

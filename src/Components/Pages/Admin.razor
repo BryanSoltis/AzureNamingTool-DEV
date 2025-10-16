@@ -17,6 +17,7 @@
 @inject ProtectedSessionStorage session
 @inject IToastService toastService
 @inject NavigationManager NavigationManager
+@inject IHostApplicationLifetime AppLifetime
 @inject ProtectedLocalStorage storage
 @inject ServicesHelper ServicesHelper
 @inject IStorageMigrationService MigrationService
@@ -1163,9 +1164,9 @@
                     Message = $"Migrated to SQLite storage successfully. Pre-migration backup: {preMigrationBackupFileName}"
                 });
 
-                // Restart the application
+                // Trigger application restart
                 await Task.Delay(3000);
-                NavigationManager.NavigateTo("/", true);
+                AppLifetime.StopApplication();
             }
             else
             {
