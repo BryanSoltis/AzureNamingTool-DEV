@@ -5094,7 +5094,14 @@
                 await sourceConnection.OpenAsync();
                 await backupConnection.OpenAsync();
                 sourceConnection.BackupDatabase(backupConnection);
+                
+                // Explicitly close connections before reading the file
+                await backupConnection.CloseAsync();
+                await sourceConnection.CloseAsync();
             }
+            
+            // Small delay to ensure file handles are released
+            await Task.Delay(100);
             
             // Read the backup file
             byte[] fileBytes = await File.ReadAllBytesAsync(tempBackupPath);
