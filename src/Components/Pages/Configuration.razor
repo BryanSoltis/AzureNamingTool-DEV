@@ -2686,20 +2686,24 @@
                                     }
                                     break;
                                 case "reset":
-                                    confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Components Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                    confirm = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Components Configuration to the default repository values and cannot be undone!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                     if (confirm)
                                     {
                                         var resetResult = await ResetConfigurationData<ResourceComponent>("resourcecomponents.json", ResourceComponentService!.PostConfigAsync);
                                         if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Components configuration reset!";
+                                            message.Message = "Components configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
                                             message.Message = resetResult.Message;
-                                            message.MessageDetails = resetResult.Details;
+                                            message.MessageDetails = resetResult.Details ?? string.Empty;
                                         }
                                     }
                                     break;
@@ -2820,20 +2824,24 @@
                                     }
                                     break;
                                 case "reset":
-                                    confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will update the reset Delimiters Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                    confirm = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Delimiters Configuration to the default repository values and cannot be undone!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                     if (confirm)
                                     {
                                         var resetResult = await ResetConfigurationData<ResourceDelimiter>("resourcedelimiters.json", ResourceDelimiterService!.PostConfigAsync);
                                         if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Delimiters configuration reset!";
+                                            message.Message = "Delimiters configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
                                             message.Message = resetResult.Message;
-                                            message.MessageDetails = resetResult.Details;
+                                            message.MessageDetails = resetResult.Details ?? string.Empty;
                                         }
                                     }
                                     break;
@@ -3027,20 +3035,24 @@
                                     }
                                     break;
                                 case "reset":
-                                    confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Environments Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                    confirm = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Environments Configuration to the default repository values and cannot be undone!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                     if (confirm)
                                     {
                                         var resetResult = await ResetConfigurationData<ResourceEnvironment>("resourceenvironments.json", ResourceEnvironmentService!.PostConfigAsync);
                                         if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Environments configuration reset!";
+                                            message.Message = "Environments configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
                                             message.Message = resetResult.Message;
-                                            message.MessageDetails = resetResult.Details;
+                                            message.MessageDetails = resetResult.Details ?? string.Empty;
                                         }
                                     }
                                     break;
@@ -3257,20 +3269,24 @@
                                     }
                                     break;
                                 case "reset":
-                                    confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Functions Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                    confirm = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Functions Configuration to the default repository values and cannot be undone!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                     if (confirm)
                                     {
                                         var resetResult = await ResetConfigurationData<ResourceFunction>("resourcefunctions.json", ResourceFunctionService!.PostConfigAsync);
                                         if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Functions configuration reset!";
+                                            message.Message = "Functions configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
                                             message.Message = resetResult.Message;
-                                            message.MessageDetails = resetResult.Details;
+                                            message.MessageDetails = resetResult.Details ?? string.Empty;
                                         }
                                     }
                                     break;
@@ -3492,20 +3508,24 @@
                                     }
                                     break;
                                 case "reset":
-                                    confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Locations Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                    confirm = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Locations Configuration to the default repository values and cannot be undone!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                     if (confirm)
                                     {
                                         var resetResult = await ResetConfigurationData<AzureNamingTool.Models.ResourceLocation>("resourcelocations.json", ResourceLocationService!.PostConfigAsync);
                                         if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Locations configuration reset!";
+                                            message.Message = "Locations configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
                                             message.Message = resetResult.Message;
-                                            message.MessageDetails = resetResult.Details;
+                                            message.MessageDetails = resetResult.Details ?? string.Empty;
                                         }
                                     }
                                     break;
@@ -3722,20 +3742,24 @@
                                     }
                                     break;
                                 case "reset":
-                                    confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Orgs Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                    confirm = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Orgs Configuration to the default repository values and cannot be undone!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                     if (confirm)
                                     {
                                         var resetResult = await ResetConfigurationData<ResourceOrg>("resourceorgs.json", ResourceOrgService!.PostConfigAsync);
                                         if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Orgs configuration reset!";
+                                            message.Message = "Orgs configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
                                             message.Message = resetResult.Message;
-                                            message.MessageDetails = resetResult.Details;
+                                            message.MessageDetails = resetResult.Details ?? string.Empty;
                                         }
                                     }
                                     break;
@@ -3952,20 +3976,24 @@
                                     }
                                     break;
                                 case "reset":
-                                    confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Projects/Apps/Services Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                    confirm = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Projects/Apps/Services Configuration to the default repository values and cannot be undone!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                     if (confirm)
                                     {
                                         var resetResult = await ResetConfigurationData<ResourceProjAppSvc>("resourceprojappsvcs.json", ResourceProjAppSvcService!.PostConfigAsync);
                                         if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Projects/Apps/Services configuration reset!";
+                                            message.Message = "Projects/Apps/Services configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
                                             message.Message = resetResult.Message;
-                                            message.MessageDetails = resetResult.Details;
+                                            message.MessageDetails = resetResult.Details ?? string.Empty;
                                         }
                                     }
                                     break;
@@ -4194,20 +4222,24 @@
                                     }
                                     break;
                                 case "reset":
-                                    confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Types Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                    confirm = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Types Configuration to the default repository values and cannot be undone!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                     if (confirm)
                                     {
                                         var resetResult = await ResetConfigurationData<ResourceType>("resourcetypes.json", ResourceTypeService!.PostConfigAsync);
                                         if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Types configuration reset!";
+                                            message.Message = "Types configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
                                             message.Message = resetResult.Message;
-                                            message.MessageDetails = resetResult.Details;
+                                            message.MessageDetails = resetResult.Details ?? string.Empty;
                                         }
                                     }
                                     break;
@@ -4425,20 +4457,24 @@
                                     }
                                     break;
                                 case "reset":
-                                    confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Units/Depts Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                    confirm = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Units/Depts Configuration to the default repository values and cannot be undone!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                     if (confirm)
                                     {
                                         var resetResult = await ResetConfigurationData<ResourceUnitDept>("resourceunitdepts.json", ResourceUnitDeptService!.PostConfigAsync);
                                         if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Units/Depts configuration reset!";
+                                            message.Message = "Units/Depts configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
                                             message.Message = resetResult.Message;
-                                            message.MessageDetails = resetResult.Details;
+                                            message.MessageDetails = resetResult.Details ?? string.Empty;
                                         }
                                     }
                                     break;
@@ -4686,20 +4722,24 @@
                                     }
                                     break;
                                 case "reset":
-                                    confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Custom Components Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                    confirm = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Custom Components Configuration to the default repository values and cannot be undone!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                     if (confirm)
                                     {
                                         var resetResult = await ResetConfigurationData<CustomComponent>("customcomponents.json", CustomComponentService!.PostConfigAsync);
                                         if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Custom Components configuration reset!";
+                                            message.Message = "Custom Components configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
                                             message.Message = resetResult.Message;
-                                            message.MessageDetails = resetResult.Details;
+                                            message.MessageDetails = resetResult.Details ?? string.Empty;
                                         }
                                     }
                                     break;
@@ -4833,13 +4873,17 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Global Configuration for all settings and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        bool confirmglobalreset = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\"><span class=\"fw-bold\">Every setting of the site will be reset if you continue!</span></div><div class=\"my-4\">It is recommended you take a backup of the configuration before proceeding!</div><div class=\"my-4\">Continue?</div>", "bg-danger", theme);
+                                        bool confirmglobalreset = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\"><span class=\"fw-bold\">Every setting of the site will be reset if you continue!</span></div><div class=\"my-4\">It is recommended you take a backup of the configuration before proceeding!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                         if (confirmglobalreset)
                                         {
                                             if (ConfigurationHelper.ResetSiteConfiguration())
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
-                                                message.Message = "Global configuration reset!";
+                                                message.Message = "Global configuration reset! Page will refresh in 2 seconds...";
+                                            
+                                            // Force page refresh to show updated data
+                                            await Task.Delay(2000);
+                                            NavigationManager!.NavigateTo("/configuration", true);
                                             }
                                             else
                                             {
@@ -5318,7 +5362,7 @@
             Modal!, 
             "Confirm Database Restore", 
             confirmMessage, 
-            "RESTORE", 
+            "CONFIRM", 
             "bg-warning", 
             theme
         );
@@ -5584,6 +5628,14 @@
             {
                 // For SQLite: Load from repository JSON and save to database
                 var repositoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "repository", repositoryFileName);
+                
+                // Log the reset attempt
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                { 
+                    Title = "INFORMATION", 
+                    Message = $"Reset configuration attempt for: {repositoryFileName}, Path: {repositoryPath}" 
+                });
+                
                 if (File.Exists(repositoryPath))
                 {
                     var jsonContent = await File.ReadAllTextAsync(repositoryPath);
@@ -5594,7 +5646,20 @@
                     var resetItems = JsonSerializer.Deserialize<List<T>>(jsonContent, options);
                     if (resetItems != null)
                     {
+                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                        { 
+                            Title = "INFORMATION", 
+                            Message = $"Loaded {resetItems.Count} items from {repositoryFileName}. Calling PostConfigAsync..." 
+                        });
+                        
                         var serviceResponse = await postConfigAsync(resetItems);
+                        
+                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                        { 
+                            Title = serviceResponse.Success ? "SUCCESS" : "ERROR", 
+                            Message = $"PostConfigAsync result: Success={serviceResponse.Success}, Message={serviceResponse.ResponseMessage}" 
+                        });
+                        
                         if (serviceResponse.Success)
                         {
                             return (true, "Configuration reset successfully!", null);
@@ -5611,7 +5676,7 @@
                 }
                 else
                 {
-                    return (false, "Configuration reset failed! Repository file not found.", null);
+                    return (false, $"Configuration reset failed! Repository file not found: {repositoryPath}", null);
                 }
             }
             else
@@ -5629,10 +5694,17 @@
         }
         catch (Exception ex)
         {
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+            { 
+                Title = "ERROR", 
+                Message = $"Reset configuration exception: {ex.Message}\nStackTrace: {ex.StackTrace}" 
+            });
             return (false, $"Configuration reset failed: {ex.Message}", ex.StackTrace);
         }
     }
 }
+
+
 
 
 
