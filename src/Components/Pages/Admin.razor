@@ -1180,15 +1180,26 @@
                 rollbackPath = backupPath;
             }
 
-            if (string.IsNullOrEmpty(rollbackPath))
+            bool result;
+            
+            if (!string.IsNullOrEmpty(rollbackPath))
             {
-                migrationErrorMessage = "No backup path found. Cannot perform rollback.";
-                toastService.ShowError("Rollback failed: No backup path available.");
-                return;
+                // Execute rollback with backup restoration
+                result = await MigrationService.RollbackMigrationAsync(rollbackPath);
             }
-
-            // Execute the rollback
-            var result = await MigrationService.RollbackMigrationAsync(rollbackPath);
+            else
+            {
+                // No backup available - just switch back to FileSystem
+                // This handles the case where JSON files still exist but no backup was created
+                // The SQLite database file will remain but won't be used
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                { 
+                    Title = "WARNING", 
+                    Message = "No backup path found. Switching to FileSystem provider without restoring from backup. Existing JSON files will be used." 
+                });
+                
+                result = true; // Consider successful since we're just switching providers
+            }
 
             if (result)
             {
@@ -1199,12 +1210,12 @@
                 migrationDate = String.Empty;
                 backupPath = String.Empty;
 
-                toastService.ShowSuccess("Rollback to JSON files completed successfully! Please restart the application for changes to take effect.");
+                toastService.ShowSuccess("Switched back to JSON file storage! Please restart the application for changes to take effect.");
                 
                 await AdminLogService!.PostItemAsync(new AdminLogMessage() 
                 { 
                     Title = "SUCCESS", 
-                    Message = "Rolled back to JSON file storage successfully" 
+                    Message = "Switched back to JSON file storage successfully" 
                 });
             }
             else
