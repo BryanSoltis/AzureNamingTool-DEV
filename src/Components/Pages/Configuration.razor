@@ -5064,6 +5064,7 @@
 
     private async Task DownloadDatabaseFile()
     {
+        string? tempBackupPath = null;
         try
         {
             // Get the database path from configuration (e.g., "settings/azurenamingtool.db")
@@ -5081,7 +5082,22 @@
                 return;
             }
 
-            byte[] fileBytes = await File.ReadAllBytesAsync(dbPath);
+            // Create a temporary copy to avoid file lock issues
+            // SQLite maintains locks on the database file while in use
+            string dbDirectory = Path.GetDirectoryName(dbPath)!;
+            tempBackupPath = Path.Combine(dbDirectory, $"temp_backup_{Guid.NewGuid()}.db");
+            
+            // Use SQLite's backup command to create a consistent copy
+            using (var sourceConnection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={dbPath}"))
+            using (var backupConnection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={tempBackupPath}"))
+            {
+                await sourceConnection.OpenAsync();
+                await backupConnection.OpenAsync();
+                sourceConnection.BackupDatabase(backupConnection);
+            }
+            
+            // Read the backup file
+            byte[] fileBytes = await File.ReadAllBytesAsync(tempBackupPath);
             string fileName = $"azurenamingtool-backup-{DateTime.Now:yyyyMMdd-HHmmss}.db";
             
             await BlazorDownloadFileService!.DownloadFile(fileName, fileBytes, "application/x-sqlite3");
@@ -5116,6 +5132,21 @@
                 Message = $"Database backup download failed: {ex.Message}"
             };
             await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+        finally
+        {
+            // Clean up temporary backup file
+            if (!string.IsNullOrEmpty(tempBackupPath) && File.Exists(tempBackupPath))
+            {
+                try
+                {
+                    File.Delete(tempBackupPath);
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogWarning(ex, "Failed to delete temporary backup file: {TempPath}", tempBackupPath);
+                }
+            }
         }
     }
 
