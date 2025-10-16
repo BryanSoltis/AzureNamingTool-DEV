@@ -4876,19 +4876,142 @@
                                         bool confirmglobalreset = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\"><span class=\"fw-bold\">Every setting of the site will be reset if you continue!</span></div><div class=\"my-4\">It is recommended you take a backup of the configuration before proceeding!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
                                         if (confirmglobalreset)
                                         {
-                                            if (ConfigurationHelper.ResetSiteConfiguration())
+                                            try
                                             {
-                                                message.Type = MessageTypesEnum.SUCCESS;
-                                                message.Message = "Global configuration reset! Page will refresh in 2 seconds...";
-                                            
-                                            // Force page refresh to show updated data
-                                            await Task.Delay(2000);
-                                            NavigationManager!.NavigateTo("/configuration", true);
+                                                // Log the global reset attempt
+                                                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                                { 
+                                                    Title = "INFORMATION", 
+                                                    Message = $"Global configuration reset started. Storage mode: {currentStorageProvider}" 
+                                                });
+
+                                                if (isUsingSQLite)
+                                                {
+                                                    // For SQLite: Load all configuration from repository JSON files and save to database
+                                                    var repositoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "repository");
+                                                    
+                                                    // Reset all components using ImportExportService
+                                                    // This loads from repository files and saves to database
+                                                    var configData = new ConfigurationData();
+                                                    
+                                                    // Load each configuration type from repository
+                                                    JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+                                                    {
+                                                        PropertyNameCaseInsensitive = true
+                                                    };
+                                                    
+                                                    // Load resource components
+                                                    var componentsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourcecomponents.json"));
+                                                    configData.ResourceComponents = JsonSerializer.Deserialize<List<ResourceComponent>>(componentsJson, jsonOptions)!;
+                                                    
+                                                    // Load resource delimiters
+                                                    var delimitersJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourcedelimiters.json"));
+                                                    configData.ResourceDelimiters = JsonSerializer.Deserialize<List<ResourceDelimiter>>(delimitersJson, jsonOptions)!;
+                                                    
+                                                    // Load resource environments
+                                                    var environmentsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourceenvironments.json"));
+                                                    configData.ResourceEnvironments = JsonSerializer.Deserialize<List<ResourceEnvironment>>(environmentsJson, jsonOptions)!;
+                                                    
+                                                    // Load resource functions
+                                                    var functionsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourcefunctions.json"));
+                                                    configData.ResourceFunctions = JsonSerializer.Deserialize<List<ResourceFunction>>(functionsJson, jsonOptions)!;
+                                                    
+                                                    // Load resource locations
+                                                    var locationsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourcelocations.json"));
+                                                    configData.ResourceLocations = JsonSerializer.Deserialize<List<AzureNamingTool.Models.ResourceLocation>>(locationsJson, jsonOptions)!;
+                                                    
+                                                    // Load resource orgs
+                                                    var orgsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourceorgs.json"));
+                                                    configData.ResourceOrgs = JsonSerializer.Deserialize<List<ResourceOrg>>(orgsJson, jsonOptions)!;
+                                                    
+                                                    // Load resource project/app/services
+                                                    var projappsvcJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourceprojappsvcs.json"));
+                                                    configData.ResourceProjAppSvcs = JsonSerializer.Deserialize<List<ResourceProjAppSvc>>(projappsvcJson, jsonOptions)!;
+                                                    
+                                                    // Load resource types
+                                                    var typesJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourcetypes.json"));
+                                                    configData.ResourceTypes = JsonSerializer.Deserialize<List<ResourceType>>(typesJson, jsonOptions)!;
+                                                    
+                                                    // Load resource unit/depts
+                                                    var unitdeptsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourceunitdepts.json"));
+                                                    configData.ResourceUnitDepts = JsonSerializer.Deserialize<List<ResourceUnitDept>>(unitdeptsJson, jsonOptions)!;
+                                                    
+                                                    // Load custom components
+                                                    var customcomponentsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "customcomponents.json"));
+                                                    configData.CustomComponents = JsonSerializer.Deserialize<List<CustomComponent>>(customcomponentsJson, jsonOptions)!;
+                                                    
+                                                    await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                                    { 
+                                                        Title = "INFORMATION", 
+                                                        Message = $"Global reset: Loaded all configuration from repository. Calling PostConfigAsync to save to database..." 
+                                                    });
+                                                    
+                                                    // Save all configuration to database
+                                                    var postResponse = await ImportExportService!.PostConfigAsync(configData);
+                                                    
+                                                    if (postResponse.Success)
+                                                    {
+                                                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                                        { 
+                                                            Title = "SUCCESS", 
+                                                            Message = "Global reset: All configuration saved to database successfully" 
+                                                        });
+                                                        
+                                                        message.Type = MessageTypesEnum.SUCCESS;
+                                                        message.Message = "Global configuration reset! Page will refresh in 2 seconds...";
+                                                        
+                                                        // Force page refresh to show updated data
+                                                        await Task.Delay(2000);
+                                                        NavigationManager!.NavigateTo("/configuration", true);
+                                                    }
+                                                    else
+                                                    {
+                                                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                                        { 
+                                                            Title = "ERROR", 
+                                                            Message = $"Global reset failed: {postResponse.ResponseMessage}" 
+                                                        });
+                                                        
+                                                        message.Type = MessageTypesEnum.ERROR;
+                                                        message.Message = "Global configuration reset failed! Please check the Admin Log for details.";
+                                                        message.MessageDetails = postResponse.ResponseMessage;
+                                                    }
+                                                }
+                                                else
+                                                {
+                                                    // For FileSystem: Use existing method which copies files and clears cache
+                                                    if (ConfigurationHelper.ResetSiteConfiguration())
+                                                    {
+                                                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                                        { 
+                                                            Title = "SUCCESS", 
+                                                            Message = "Global reset (FileSystem): Files copied and cache cleared" 
+                                                        });
+                                                        
+                                                        message.Type = MessageTypesEnum.SUCCESS;
+                                                        message.Message = "Global configuration reset! Page will refresh in 2 seconds...";
+                                                        
+                                                        // Force page refresh to show updated data
+                                                        await Task.Delay(2000);
+                                                        NavigationManager!.NavigateTo("/configuration", true);
+                                                    }
+                                                    else
+                                                    {
+                                                        message.Type = MessageTypesEnum.ERROR;
+                                                        message.Message = "Global configuration reset failed! Please check the Admin Log for details.";
+                                                    }
+                                                }
                                             }
-                                            else
+                                            catch (Exception ex)
                                             {
+                                                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                                { 
+                                                    Title = "ERROR", 
+                                                    Message = $"Global reset exception: {ex.Message}\nStackTrace: {ex.StackTrace}" 
+                                                });
+                                                
                                                 message.Type = MessageTypesEnum.ERROR;
-                                                message.Message = "Global configuration reset failed! Please check the Admin Log for details.";
+                                                message.Message = $"Global configuration reset failed: {ex.Message}";
                                             }
                                         }
                                     }
