@@ -5273,14 +5273,34 @@
             return;
         }
 
-        // Show confirmation modal
-        string confirmMessage = $"<div class=\"my-4\"><p>You are about to restore the database from:</p>" +
+        // Show text confirmation modal (user must type RESTORE to confirm)
+        string confirmMessage = $"<div class=\"my-4\">" +
+            $"<p>You are about to restore the database from:</p>" +
             $"<p><strong>{sqliteBackupFile.Name}</strong> ({FormatFileSize(sqliteBackupFile.Size)})</p>" +
-            $"<p class=\"text-danger\"><strong>WARNING:</strong> This will completely replace your current database. All current data will be lost!</p>" +
-            $"<p>The application will restart automatically after the restore completes.</p>" +
-            $"<p>Do you want to proceed?</p></div>";
+            $"<p class=\"text-danger mt-3\"><strong>⚠️ WARNING:</strong> This will completely replace your current database!</p>" +
+            $"<ul class=\"text-danger text-start\">" +
+            $"<li>All current data will be lost</li>" +
+            $"<li>A pre-restore backup will be created automatically</li>" +
+            $"<li>The application will restart immediately</li>" +
+            $"<li><strong>All active users will be disconnected</strong></li>" +
+            $"</ul>" +
+            $"<p class=\"text-info mt-3\"><i class=\"bi bi-info-circle\"></i> The restore process will:</p>" +
+            $"<ol class=\"text-start\">" +
+            $"<li>Create a backup of your current database</li>" +
+            $"<li>Prepare the uploaded database for restore</li>" +
+            $"<li>Automatically restart the application</li>" +
+            $"<li>Complete the restore on startup</li>" +
+            $"</ol>" +
+            $"<p class=\"mt-3\">This is a critical administrative operation.</p></div>";
 
-        bool confirmed = await ModalHelper.ShowConfirmationModal(Modal!, "Confirm Database Restore", confirmMessage, "bg-warning", theme);
+        bool confirmed = await ModalHelper.ShowTextConfirmationModal(
+            Modal!, 
+            "Confirm Database Restore", 
+            confirmMessage, 
+            "RESTORE", 
+            "bg-warning", 
+            theme
+        );
 
         if (!confirmed)
         {
@@ -5300,6 +5320,8 @@
                 Directory.CreateDirectory(dbDirectory);
             }
             
+            // Save uploaded file as pending restore
+            string pendingRestorePath = Path.Combine(dbDirectory, "azurenamingtool-pending-restore.db");
             string backupPath = Path.Combine(dbDirectory, $"azurenamingtool-prerestore-{DateTime.Now:yyyyMMdd-HHmmss}.db");
 
             // Create a backup of the current database before restoring
@@ -5308,33 +5330,41 @@
                 File.Copy(dbPath, backupPath, true);
             }
 
-            // Read the uploaded file
+            // Save the uploaded file as pending restore
             using (var stream = sqliteBackupFile.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024)) // 50MB max
             {
-                using (var fileStream = new FileStream(dbPath, FileMode.Create))
+                using (var fileStream = new FileStream(pendingRestorePath, FileMode.Create))
                 {
                     await stream.CopyToAsync(fileStream);
                 }
             }
+            
+            // Create a flag file to indicate pending restore
+            string flagPath = Path.Combine(dbDirectory, "restore-pending.flag");
+            await File.WriteAllTextAsync(flagPath, $"Restore from: {sqliteBackupFile.Name}\nTimestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\nBackup: {Path.GetFileName(backupPath)}");
 
-            // Log the restore
+            // Log the restore preparation
             AdminLogMessage adminLogMessage = new()
             {
                 Title = "INFORMATION",
-                Message = $"Database restored from: {sqliteBackupFile.Name} (Size: {FormatFileSize(sqliteBackupFile.Size)}). Pre-restore backup saved to: {Path.GetFileName(backupPath)}"
+                Message = $"Database restore prepared from: {sqliteBackupFile.Name} (Size: {FormatFileSize(sqliteBackupFile.Size)}). Pre-restore backup saved. Restart required."
             };
             await AdminLogService!.PostItemAsync(adminLogMessage);
 
             await InvokeAsync(() =>
             {
-                ModalHelper.ShowInformationModal(Modal!, theme, "bg-success", "SUCCESS", 
-                    $"<div class=\"my-4\"><p>Database restored successfully!</p>" +
-                    $"<p>A pre-restore backup was saved to: {Path.GetFileName(backupPath)}</p>" +
-                    $"<p>The application will restart in 3 seconds...</p></div>", "", admin);
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-success", "RESTORE PREPARED", 
+                    $"<div class=\"my-4\">" +
+                    $"<p><i class=\"bi bi-check-circle\"></i> Database restore has been prepared successfully!</p>" +
+                    $"<p class=\"text-info\"><strong>Pre-restore backup:</strong> {Path.GetFileName(backupPath)}</p>" +
+                    $"<hr class=\"my-3\"/>" +
+                    $"<p><i class=\"bi bi-arrow-repeat\"></i> <strong>The application will restart automatically in 3 seconds...</strong></p>" +
+                    $"<p class=\"text-muted small\">The database restore will complete during startup.</p></div>", 
+                    "", admin);
                 StateHasChanged();
             });
 
-            // Restart the application
+            // Restart the application - the restore will complete on startup
             await Task.Delay(3000);
             NavigationManager!.NavigateTo("/", true);
         }
