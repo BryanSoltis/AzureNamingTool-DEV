@@ -12,6 +12,7 @@ using BlazorDownloadFile;
 using Blazored.Modal;
 using Blazored.Toast;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
 
@@ -68,6 +69,17 @@ builder.Services.AddMvcCore().AddApiExplorer();
 
 // Register Cache Service (Singleton since it wraps IMemoryCache)
 builder.Services.AddSingleton<ICacheService, CacheService>();
+
+// Register Health Checks
+builder.Services.AddHealthChecks()
+    .AddCheck<AzureNamingTool.HealthChecks.StorageHealthCheck>(
+        "storage",
+        failureStatus: HealthStatus.Unhealthy,
+        tags: new[] { "ready", "storage" })
+    .AddCheck<AzureNamingTool.HealthChecks.CacheHealthCheck>(
+        "cache",
+        failureStatus: HealthStatus.Degraded,
+        tags: new[] { "ready", "cache" });
 
 // Always register DbContext (needed by StorageMigrationService even when using FileSystem)
 var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, storageOptions.DatabasePath);
@@ -153,8 +165,6 @@ var app = builder.Build();
 // Users can migrate via the modal prompt (first run) or Admin page (ongoing management)
 // The StorageProvider setting in SiteConfiguration.json determines which provider is active
 
-app.MapHealthChecks("/healthcheck/ping");
-
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -177,6 +187,40 @@ app.MapRazorComponents<App>()
 app.UseStatusCodePagesWithRedirects("/404");
 
 app.MapControllers();
+
+// Map Health Check Endpoints
+// Basic ping endpoint (backward compatibility)
+app.MapHealthChecks("/healthcheck/ping");
+
+// Liveness probe - checks if application is running
+app.MapHealthChecks("/health/live", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = _ => false // Don't run any checks, just return 200 if app is running
+});
+
+// Readiness probe - checks if application is ready to serve requests
+app.MapHealthChecks("/health/ready", new Microsoft.AspNetCore.Diagnostics.HealthChecks.HealthCheckOptions
+{
+    Predicate = check => check.Tags.Contains("ready"), // Run all checks tagged with "ready"
+    ResponseWriter = async (context, report) =>
+    {
+        context.Response.ContentType = "application/json";
+        var result = System.Text.Json.JsonSerializer.Serialize(new
+        {
+            status = report.Status.ToString(),
+            checks = report.Entries.Select(e => new
+            {
+                name = e.Key,
+                status = e.Value.Status.ToString(),
+                description = e.Value.Description,
+                duration = e.Value.Duration.TotalMilliseconds,
+                data = e.Value.Data
+            })
+        });
+        await context.Response.WriteAsync(result);
+    }
+});
+
 app.Run();
 
 
