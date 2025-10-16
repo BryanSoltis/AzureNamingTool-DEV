@@ -1071,6 +1071,22 @@
 
     private async Task InitiateMigration()
     {
+        // Show confirmation modal
+        var confirm = await ModalHelper.ShowConfirmationModal(
+            Modal!, 
+            "ATTENTION", 
+            "<div class=\"my-4\">This will migrate your configuration data from JSON files to an embedded SQLite database for improved performance and reliability.</div>" +
+            "<div class=\"my-4\">Your data will be backed up before migration. The application will need to be restarted after migration.</div>" +
+            "<div class=\"my-4\">Are you sure you want to proceed?</div>", 
+            "bg-warning", 
+            theme
+        );
+
+        if (!confirm)
+        {
+            return;
+        }
+
         try
         {
             isMigrating = true;
@@ -1135,79 +1151,83 @@
     private async Task InitiateRollback()
     {
         // Show confirmation modal
-        var parameters = new ModalParameters()
-            .Add(nameof(ConfirmationModal.title), "Confirm Rollback to JSON Files")
-            .Add(nameof(ConfirmationModal.message), "Are you sure you want to rollback to JSON file storage? This will restore the backup files and disable SQLite. The application will need to be restarted after rollback.");
-        
-        var options = new ModalOptions() { HideCloseButton = false };
-        var confirmModal = Modal!.Show<ConfirmationModal>("Confirm Rollback", parameters, options);
-        var confirmResult = await confirmModal.Result;
+        var confirm = await ModalHelper.ShowConfirmationModal(
+            Modal!, 
+            "ATTENTION", 
+            "<div class=\"my-4\">This will delete the SQLite database and restore from the last backup.</div>" +
+            "<div class=\"my-4\">Any changes made after migration will be lost. The application will need to be restarted.</div>" +
+            "<div class=\"my-4\">Are you sure you want to rollback to JSON file storage?</div>", 
+            "bg-danger", 
+            theme
+        );
 
-        if (!confirmResult.Cancelled)
+        if (!confirm)
         {
-            try
+            return;
+        }
+
+        try
+        {
+            isRollingBack = true;
+            migrationErrorMessage = String.Empty;
+            StateHasChanged();
+
+            // Get the backup path from configuration
+            string rollbackPath = ConfigurationHelper.GetAppSetting("LastMigrationBackupPath");
+            if (string.IsNullOrEmpty(rollbackPath))
             {
-                isRollingBack = true;
-                migrationErrorMessage = String.Empty;
-                StateHasChanged();
-
-                // Get the backup path from configuration
-                string rollbackPath = ConfigurationHelper.GetAppSetting("LastMigrationBackupPath");
-                if (string.IsNullOrEmpty(rollbackPath))
-                {
-                    // Fallback to the stored backupPath variable
-                    rollbackPath = backupPath;
-                }
-
-                if (string.IsNullOrEmpty(rollbackPath))
-                {
-                    migrationErrorMessage = "No backup path found. Cannot perform rollback.";
-                    toastService.ShowError("Rollback failed: No backup path available.");
-                    return;
-                }
-
-                // Execute the rollback
-                var result = await MigrationService.RollbackMigrationAsync(rollbackPath);
-
-                if (result)
-                {
-                    // Update configuration to use FileSystem
-                    ConfigurationHelper.SetAppSetting("StorageProvider", "FileSystem");
-                    ConfigurationHelper.SetAppSetting("LastMigrationBackupPath", "");
-                    currentStorageProvider = "FileSystem";
-                    migrationDate = String.Empty;
-                    backupPath = String.Empty;
-
-                    toastService.ShowSuccess("Rollback to JSON files completed successfully! Please restart the application for changes to take effect.");
-                    
-                    await AdminLogService!.PostItemAsync(new AdminLogMessage() 
-                    { 
-                        Title = "SUCCESS", 
-                        Message = "Rolled back to JSON file storage successfully" 
-                    });
-                }
-                else
-                {
-                    migrationErrorMessage = "Rollback failed. Check the admin logs for details.";
-                    toastService.ShowError("Rollback to JSON files failed. Please check the logs for details.");
-                }
+                // Fallback to the stored backupPath variable
+                rollbackPath = backupPath;
             }
-            catch (Exception ex)
+
+            if (string.IsNullOrEmpty(rollbackPath))
             {
-                migrationErrorMessage = "Rollback error: " + ex.Message;
-                toastService.ShowError("Rollback failed: " + ex.Message);
+                migrationErrorMessage = "No backup path found. Cannot perform rollback.";
+                toastService.ShowError("Rollback failed: No backup path available.");
+                return;
+            }
+
+            // Execute the rollback
+            var result = await MigrationService.RollbackMigrationAsync(rollbackPath);
+
+            if (result)
+            {
+                // Update configuration to use FileSystem
+                ConfigurationHelper.SetAppSetting("StorageProvider", "FileSystem");
+                ConfigurationHelper.SetAppSetting("LastMigrationBackupPath", "");
+                currentStorageProvider = "FileSystem";
+                migrationDate = String.Empty;
+                backupPath = String.Empty;
+
+                toastService.ShowSuccess("Rollback to JSON files completed successfully! Please restart the application for changes to take effect.");
                 
                 await AdminLogService!.PostItemAsync(new AdminLogMessage() 
                 { 
-                    Title = "ERROR", 
-                    Message = "Rollback to JSON files failed: " + ex.Message 
+                    Title = "SUCCESS", 
+                    Message = "Rolled back to JSON file storage successfully" 
                 });
             }
-            finally
+            else
             {
-                isRollingBack = false;
-                StateHasChanged();
+                migrationErrorMessage = "Rollback failed. Check the admin logs for details.";
+                toastService.ShowError("Rollback to JSON files failed. Please check the logs for details.");
             }
+        }
+        catch (Exception ex)
+        {
+            migrationErrorMessage = "Rollback error: " + ex.Message;
+            toastService.ShowError("Rollback failed: " + ex.Message);
+            
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+            { 
+                Title = "ERROR", 
+                Message = "Rollback to JSON files failed: " + ex.Message 
+            });
+        }
+        finally
+        {
+            isRollingBack = false;
+            StateHasChanged();
         }
     }
 
