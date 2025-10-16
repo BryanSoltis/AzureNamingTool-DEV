@@ -15,6 +15,7 @@
 @inject ProtectedLocalStorage storage
 @inject ProtectedSessionStorage session
 @inject IHttpContextAccessor httpContextAccessor
+@inject IStorageMigrationService MigrationService
 
 <PageTitle>Azure Naming Tool</PageTitle>
 <BlazoredToasts Position="ToastPosition.BottomRight" ShowProgressBar="true" />
@@ -81,6 +82,12 @@
     </PasswordModal>
 }
 
+@if (MigrationPromptModalOpen)
+{
+    <MigrationPromptModal OnClose="@OnMigrationPromptModalClose">
+    </MigrationPromptModal>
+}
+
 @code {
     [CascadingParameter]
     private IdentityProviderDetails? identityProviderDetails { get; set; }
@@ -99,6 +106,7 @@
     private string? details = String.Empty;
 
     public bool PasswordModalOpen { get; set; }
+    public bool MigrationPromptModalOpen { get; set; }
     public Type? PageType { get; set; }
 
     protected override void OnParametersSet()
@@ -193,7 +201,11 @@
             if (admin)
             {
                 feedbackurl = await ConfigurationHelper.GetProgramSetting("FeedbackURL");
+                
+                // Check if SQLite migration prompt should be shown (only for admin users)
+                await CheckMigrationPrompt();
             }
+
             StateHasChanged();
         }
     }
@@ -212,6 +224,59 @@
     private void OnPasswordModalClose(bool accepted)
     {
         PasswordModalOpen = false;
+    }
+
+    private async Task CheckMigrationPrompt()
+    {
+        try
+        {
+            // Only check if password is set (don't show migration prompt before password is set)
+            if (!state.Password || PasswordModalOpen)
+            {
+                return;
+            }
+
+            var config = ConfigurationHelper.GetConfigurationData();
+            
+            // If user has already chosen (either migrated or dismissed), don't show prompt
+            if (!String.IsNullOrEmpty(config.StorageProvider) && config.StorageProvider != "FileSystem")
+            {
+                return; // Already using SQLite
+            }
+
+            if (config.MigrationPromptDismissed == "True")
+            {
+                return; // User chose to keep JSON
+            }
+
+            // Check if migration is needed (JSON files exist but no SQLite DB)
+            var migrationStatus = await MigrationService.GetMigrationStatusAsync();
+            if (migrationStatus.JsonFilesExist && !migrationStatus.IsMigrated)
+            {
+                // Show the migration prompt
+                MigrationPromptModalOpen = true;
+                StateHasChanged();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error checking migration prompt");
+        }
+    }
+
+    private async void OnMigrationPromptModalClose(MigrationPromptModal.MigrationChoice choice)
+    {
+        MigrationPromptModalOpen = false;
+        StateHasChanged();
+
+        if (choice == MigrationPromptModal.MigrationChoice.Migrated)
+        {
+            // Migration completed - need to restart the app
+            toastService.ShowWarning("Please restart the application to complete the migration.", settings =>
+            {
+                settings.Timeout = 10;
+            });
+        }
     }
 
     private async void MagicReset()

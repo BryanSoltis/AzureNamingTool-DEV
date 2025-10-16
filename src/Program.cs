@@ -69,18 +69,23 @@ builder.Services.AddMvcCore().AddApiExplorer();
 // Register Cache Service (Singleton since it wraps IMemoryCache)
 builder.Services.AddSingleton<ICacheService, CacheService>();
 
-// Configure Storage Provider based on configuration
-var provider = storageOptions.Provider?.ToLower() ?? "filesystem";
+// Always register DbContext (needed by StorageMigrationService even when using FileSystem)
+var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, storageOptions.DatabasePath);
+var connectionString = $"Data Source={dbPath}";
+builder.Services.AddDbContext<ConfigurationDbContext>(options =>
+    options.UseSqlite(connectionString));
+
+// Always register Migration Service (needed by MainLayout and Admin page)
+builder.Services.AddScoped<IStorageMigrationService, StorageMigrationService>();
+
+// Configure Storage Provider based on SiteConfiguration.StorageProvider setting
+// This allows users to switch between FileSystem and SQLite via the Admin page
+var siteConfig = ConfigurationHelper.GetConfigurationData();
+var provider = siteConfig.StorageProvider?.ToLower() ?? "filesystem";
 
 if (provider == "sqlite")
 {
     // SQLite Configuration
-    var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, storageOptions.DatabasePath);
-    var connectionString = $"Data Source={dbPath}";
-    
-    // Register DbContext
-    builder.Services.AddDbContext<ConfigurationDbContext>(options =>
-        options.UseSqlite(connectionString));
     
     // Register SQLite Storage Provider
     builder.Services.AddSingleton<IStorageProvider>(sp =>
@@ -91,9 +96,6 @@ if (provider == "sqlite")
     
     // Register SQLite Repositories
     builder.Services.AddScoped(typeof(IConfigurationRepository<>), typeof(SQLiteConfigurationRepository<>));
-    
-    // Register Migration Service
-    builder.Services.AddScoped<IStorageMigrationService, StorageMigrationService>();
     
     builder.Logging.AddConsole().SetMinimumLevel(LogLevel.Information);
     Console.WriteLine($"[Storage] Using SQLite provider: {dbPath}");
@@ -147,94 +149,9 @@ builder.Services.AddScoped<ServicesHelper>();
 
 var app = builder.Build();
 
-// Perform automatic migration if configured
-if (storageOptions?.Provider?.Equals("SQLite", StringComparison.OrdinalIgnoreCase) == true && 
-    storageOptions.EnableAutoMigration)
-{
-    Console.WriteLine("Auto-migration enabled. Checking migration status...");
-    
-    using (var scope = app.Services.CreateScope())
-    {
-        var migrationService = scope.ServiceProvider.GetService<IStorageMigrationService>();
-        
-        if (migrationService != null)
-        {
-            try
-            {
-                var isNeeded = await migrationService.IsMigrationNeededAsync();
-                
-                if (isNeeded)
-                {
-                    Console.WriteLine("Migration needed. Starting automatic migration from JSON to SQLite...");
-                    
-                    var result = await migrationService.MigrateToSQLiteAsync();
-                    
-                    if (result.Success)
-                    {
-                        Console.WriteLine($"✓ Migration completed successfully in {result.Duration.TotalSeconds:F2} seconds");
-                        Console.WriteLine($"  - Entities migrated: {result.EntitiesMigrated}");
-                        Console.WriteLine($"  - Backup location: {result.BackupPath}");
-                        
-                        if (result.EntityCounts != null && result.EntityCounts.Any())
-                        {
-                            Console.WriteLine("  - Entity counts:");
-                            foreach (var kvp in result.EntityCounts)
-                            {
-                                Console.WriteLine($"    • {kvp.Key}: {kvp.Value}");
-                            }
-                        }
-                        
-                        // Log to admin log
-                        var adminLogService = scope.ServiceProvider.GetService<IAdminLogService>();
-                        if (adminLogService != null)
-                        {
-                            await adminLogService.PostItemAsync(new AdminLogMessage
-                            {
-                                Title = "Automatic Migration Completed",
-                                Message = $"Successfully migrated {result.EntitiesMigrated} entity types from JSON to SQLite in {result.Duration.TotalSeconds:F2} seconds. Backup saved to: {result.BackupPath}"
-                            });
-                        }
-                    }
-                    else
-                    {
-                        Console.WriteLine($"✗ Migration failed: {result.Message}");
-                        
-                        if (result.Errors != null && result.Errors.Any())
-                        {
-                            Console.WriteLine("  - Errors:");
-                            foreach (var error in result.Errors)
-                            {
-                                Console.WriteLine($"    • {error}");
-                            }
-                        }
-                        
-                        // Log to admin log
-                        var adminLogService = scope.ServiceProvider.GetService<IAdminLogService>();
-                        if (adminLogService != null)
-                        {
-                            await adminLogService.PostItemAsync(new AdminLogMessage
-                            {
-                                Title = "Automatic Migration Failed",
-                                Message = $"Migration from JSON to SQLite failed: {result.Message}. Errors: {string.Join("; ", result.Errors ?? new List<string>())}"
-                            });
-                        }
-                        
-                        Console.WriteLine("Application will continue using FileSystem storage provider as fallback.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Migration not needed. SQLite database already populated or no JSON files found.");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"✗ Error during migration check: {ex.Message}");
-                Console.WriteLine("Application will continue using configured storage provider.");
-            }
-        }
-    }
-}
+// Note: Automatic migration has been removed in favor of user-initiated migration
+// Users can migrate via the modal prompt (first run) or Admin page (ongoing management)
+// The StorageProvider setting in SiteConfiguration.json determines which provider is active
 
 app.MapHealthChecks("/healthcheck/ping");
 

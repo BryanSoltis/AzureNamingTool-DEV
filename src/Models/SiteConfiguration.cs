@@ -124,5 +124,15 @@
         /// Gets or sets a value indicating whether to display admin data to all admin users.
         /// </summary>
         public string? ShowAdminDetailsToAllUsers { get; set; } = "True";
+
+        /// <summary>
+        /// Gets or sets the storage provider for configuration data (FileSystem or SQLite).
+        /// </summary>
+        public string? StorageProvider { get; set; } = "FileSystem";
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the user has dismissed the SQLite migration prompt.
+        /// </summary>
+        public string? MigrationPromptDismissed { get; set; } = "False";
     }
 }

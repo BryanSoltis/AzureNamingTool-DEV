@@ -859,7 +859,7 @@
             {
                 if ((!String.IsNullOrEmpty(itemName)) && (!String.IsNullOrEmpty(itemShortName)))
                 {
-                    if (await ValidationHelper.ValidateShortName(type, itemShortName, this.parentcomponent))
+                    if (await ValidationHelper.ValidateShortName(ResourceComponentService!, type, itemShortName, this.parentcomponent))
                     {
                         try
                         {

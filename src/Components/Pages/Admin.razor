@@ -18,6 +18,7 @@
 @inject NavigationManager NavigationManager
 @inject ProtectedLocalStorage storage
 @inject ServicesHelper ServicesHelper
+@inject IStorageMigrationService MigrationService
 
 <PageTitle>Azure Naming Tool - Admin</PageTitle>
 <div class="card  @theme.ThemeStyle">
@@ -368,6 +369,100 @@
                             <p>
                                 This section allows you to configure the site settings for the Azure Naming Tool.
                             </p>
+                            <div class="card mb-3" style="width:auto;">
+                                <div class="card-header bg-default text-dark">
+                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#storageprovider" role="button" aria-expanded="false" aria-controls="storageprovider">
+                                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Storage Provider
+                                    </a>
+                                </div>
+                                <div class="collapse show card card-body @theme.ThemeStyle" id="storageprovider">
+                                    <div class="mb-3">
+                                        <h6><i class="bi bi-info-circle"></i> Current Provider</h6>
+                                        <div class="alert @(currentStorageProvider == "SQLite" ? "alert-success" : "alert-info")">
+                                            <strong>@currentStorageProvider</strong>
+                                            @if (currentStorageProvider == "SQLite")
+                                            {
+                                                <span class="ms-2"><i class="bi bi-check-circle"></i> Using SQLite database</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="ms-2"><i class="bi bi-file-earmark-text"></i> Using JSON files</span>
+                                            }
+                                        </div>
+                                    </div>
+
+                                    @if (currentStorageProvider == "FileSystem")
+                                    {
+                                        <div class="mb-3">
+                                            <h6><i class="bi bi-arrow-up-circle"></i> Upgrade to SQLite</h6>
+                                            <p>
+                                                Migrate your configuration data from JSON files to an embedded SQLite database for improved performance and reliability.
+                                            </p>
+                                            <div class="alert alert-warning">
+                                                <i class="bi bi-exclamation-triangle"></i>
+                                                <strong>Important:</strong> Your data will be backed up before migration. The application will need to be restarted after migration.
+                                            </div>
+                                            <button type="button" class="btn btn-primary" @onclick="@(e => InitiateMigration())" disabled="@isMigrating" title="Migrate to SQLite">
+                                                @if (isMigrating)
+                                                {
+                                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                    <span>Migrating...</span>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-database-gear"></i>
+                                                    <span>Migrate to SQLite</span>
+                                                }
+                                            </button>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="mb-3">
+                                            <h6><i class="bi bi-info-circle"></i> Migration Status</h6>
+                                            @if (!String.IsNullOrEmpty(migrationDate))
+                                            {
+                                                <p>Migrated on: <strong>@migrationDate</strong></p>
+                                            }
+                                            @if (!String.IsNullOrEmpty(backupPath))
+                                            {
+                                                <p>JSON backup location: <code>@backupPath</code></p>
+                                            }
+                                        </div>
+
+                                        <div class="mb-3">
+                                            <h6><i class="bi bi-arrow-counterclockwise"></i> Rollback Migration</h6>
+                                            <p>
+                                                Revert to JSON file storage. This will restore your backed-up JSON files and switch the application back to FileSystem provider.
+                                            </p>
+                                            <div class="alert alert-danger">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                                <strong>Warning:</strong> This will delete the SQLite database and restore from the last backup. Any changes made after migration will be lost. The application will need to be restarted.
+                                            </div>
+                                            <button type="button" class="btn btn-danger" @onclick="@(e => InitiateRollback())" disabled="@isRollingBack" title="Rollback to JSON">
+                                                @if (isRollingBack)
+                                                {
+                                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                    <span>Rolling back...</span>
+                                                }
+                                                else
+                                                {
+                                                    <i class="bi bi-arrow-counterclockwise"></i>
+                                                    <span>Rollback to JSON Files</span>
+                                                }
+                                            </button>
+                                        </div>
+                                    }
+
+                                    @if (!String.IsNullOrEmpty(migrationErrorMessage))
+                                    {
+                                        <div class="alert alert-danger mt-3">
+                                            <i class="bi bi-exclamation-triangle-fill"></i>
+                                            <strong>Error:</strong> @migrationErrorMessage
+                                        </div>
+                                    }
+                                </div>
+                            </div>
                             <div class="card mb-3" style="width:auto;">
                                 <div class="card-header bg-default text-dark">
                                     <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#duplicatenames" role="button" aria-expanded="false" aria-controls="duplicatenames">
@@ -871,6 +966,14 @@
     private List<KeyValuePair<string, string>> environmentvariables = new();
     private string releasenotesurl = String.Empty;
     private long maxFileSize = 2000000;
+    
+    // Storage migration related variables
+    private string currentStorageProvider = "FileSystem";
+    private bool isMigrating = false;
+    private bool isRollingBack = false;
+    private string migrationDate = String.Empty;
+    private string backupPath = String.Empty;
+    private string migrationErrorMessage = String.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -917,6 +1020,36 @@
                     }
                 }
                 environmentvariables = ConfigurationHelper.GetEnvironmentVariables();
+                
+                // Load migration status
+                currentStorageProvider = ConfigurationHelper.GetAppSetting("StorageProvider");
+                if (string.IsNullOrEmpty(currentStorageProvider))
+                {
+                    currentStorageProvider = "FileSystem";
+                }
+                
+                // Get migration status details if using SQLite
+                if (currentStorageProvider == "SQLite")
+                {
+                    try
+                    {
+                        var migrationStatus = await MigrationService.GetMigrationStatusAsync();
+                        if (migrationStatus.LastMigrationDate.HasValue)
+                        {
+                            migrationDate = migrationStatus.LastMigrationDate.Value.ToString("yyyy-MM-dd HH:mm:ss");
+                        }
+                        // Try to get backup path from configuration
+                        backupPath = ConfigurationHelper.GetAppSetting("LastMigrationBackupPath");
+                    }
+                    catch (Exception ex)
+                    {
+                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                        { 
+                            Title = "ERROR", 
+                            Message = "Error loading migration status: " + ex.Message 
+                        });
+                    }
+                }
             }
 
             await storage.SetAsync("apptheme", theme.ThemeStyle);
@@ -933,6 +1066,148 @@
                 }
             }
 
+        }
+    }
+
+    private async Task InitiateMigration()
+    {
+        try
+        {
+            isMigrating = true;
+            migrationErrorMessage = String.Empty;
+            StateHasChanged();
+
+            // Execute the migration
+            var result = await MigrationService.MigrateToSQLiteAsync();
+
+            if (result.Success)
+            {
+                // Update configuration to use SQLite
+                ConfigurationHelper.SetAppSetting("StorageProvider", "SQLite");
+                currentStorageProvider = "SQLite";
+
+                // Store backup path in configuration for later retrieval
+                if (!string.IsNullOrEmpty(result.BackupPath))
+                {
+                    ConfigurationHelper.SetAppSetting("LastMigrationBackupPath", result.BackupPath);
+                    backupPath = result.BackupPath;
+                }
+
+                // Get migration date
+                var migrationStatus = await MigrationService.GetMigrationStatusAsync();
+                if (migrationStatus.LastMigrationDate.HasValue)
+                {
+                    migrationDate = migrationStatus.LastMigrationDate.Value.ToString("yyyy-MM-dd HH:mm:ss");
+                }
+
+                toastService.ShowSuccess("Migration to SQLite completed successfully! Please restart the application for changes to take effect.");
+                
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                { 
+                    Title = "SUCCESS", 
+                    Message = "Migrated to SQLite storage successfully. " + result.Message + " Backup created at: " + backupPath 
+                });
+            }
+            else
+            {
+                migrationErrorMessage = "Migration failed: " + result.Message;
+                toastService.ShowError("Migration to SQLite failed. " + result.Message);
+            }
+        }
+        catch (Exception ex)
+        {
+            migrationErrorMessage = "Migration error: " + ex.Message;
+            toastService.ShowError("Migration failed: " + ex.Message);
+            
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+            { 
+                Title = "ERROR", 
+                Message = "Migration to SQLite failed: " + ex.Message 
+            });
+        }
+        finally
+        {
+            isMigrating = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task InitiateRollback()
+    {
+        // Show confirmation modal
+        var parameters = new ModalParameters()
+            .Add(nameof(ConfirmationModal.title), "Confirm Rollback to JSON Files")
+            .Add(nameof(ConfirmationModal.message), "Are you sure you want to rollback to JSON file storage? This will restore the backup files and disable SQLite. The application will need to be restarted after rollback.");
+        
+        var options = new ModalOptions() { HideCloseButton = false };
+        var confirmModal = Modal!.Show<ConfirmationModal>("Confirm Rollback", parameters, options);
+        var confirmResult = await confirmModal.Result;
+
+        if (!confirmResult.Cancelled)
+        {
+            try
+            {
+                isRollingBack = true;
+                migrationErrorMessage = String.Empty;
+                StateHasChanged();
+
+                // Get the backup path from configuration
+                string rollbackPath = ConfigurationHelper.GetAppSetting("LastMigrationBackupPath");
+                if (string.IsNullOrEmpty(rollbackPath))
+                {
+                    // Fallback to the stored backupPath variable
+                    rollbackPath = backupPath;
+                }
+
+                if (string.IsNullOrEmpty(rollbackPath))
+                {
+                    migrationErrorMessage = "No backup path found. Cannot perform rollback.";
+                    toastService.ShowError("Rollback failed: No backup path available.");
+                    return;
+                }
+
+                // Execute the rollback
+                var result = await MigrationService.RollbackMigrationAsync(rollbackPath);
+
+                if (result)
+                {
+                    // Update configuration to use FileSystem
+                    ConfigurationHelper.SetAppSetting("StorageProvider", "FileSystem");
+                    ConfigurationHelper.SetAppSetting("LastMigrationBackupPath", "");
+                    currentStorageProvider = "FileSystem";
+                    migrationDate = String.Empty;
+                    backupPath = String.Empty;
+
+                    toastService.ShowSuccess("Rollback to JSON files completed successfully! Please restart the application for changes to take effect.");
+                    
+                    await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                    { 
+                        Title = "SUCCESS", 
+                        Message = "Rolled back to JSON file storage successfully" 
+                    });
+                }
+                else
+                {
+                    migrationErrorMessage = "Rollback failed. Check the admin logs for details.";
+                    toastService.ShowError("Rollback to JSON files failed. Please check the logs for details.");
+                }
+            }
+            catch (Exception ex)
+            {
+                migrationErrorMessage = "Rollback error: " + ex.Message;
+                toastService.ShowError("Rollback failed: " + ex.Message);
+                
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                { 
+                    Title = "ERROR", 
+                    Message = "Rollback to JSON files failed: " + ex.Message 
+                });
+            }
+            finally
+            {
+                isRollingBack = false;
+                StateHasChanged();
+            }
         }
     }
 
