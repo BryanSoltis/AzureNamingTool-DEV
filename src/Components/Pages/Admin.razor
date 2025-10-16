@@ -6,6 +6,7 @@
 @using AzureNamingTool.Services
 @using AzureNamingTool.Services.Interfaces;
 @using Blazored.Toast.Configuration;
+@using BlazorDownloadFile
 @using Microsoft.AspNetCore.Html
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.Extensions.Logging
@@ -398,59 +399,65 @@
                                             <p>
                                                 Migrate your configuration data from JSON files to an embedded SQLite database for improved performance and reliability.
                                             </p>
-                                            <div class="alert alert-warning">
-                                                <i class="bi bi-exclamation-triangle"></i>
-                                                <strong>Important:</strong> Your data will be backed up before migration. The application will need to be restarted after migration.
-                                            </div>
-                                            <button type="button" class="btn btn-primary" @onclick="@(e => InitiateMigration())" disabled="@isMigrating" title="Migrate to SQLite">
-                                                @if (isMigrating)
-                                                {
-                                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                    <span>Migrating...</span>
-                                                }
-                                                else
-                                                {
-                                                    <i class="bi bi-database-gear"></i>
-                                                    <span>Migrate to SQLite</span>
-                                                }
-                                            </button>
+                                            
+                                            @if (!preMigrationBackupCompleted)
+                                            {
+                                                <div class="alert alert-warning">
+                                                    <i class="bi bi-exclamation-triangle"></i>
+                                                    <strong>Step 1: Backup Required</strong><br />
+                                                    Before migrating to SQLite, you must create a backup of your current configuration. This backup will allow you to restore your data if needed.
+                                                </div>
+                                                <button type="button" class="btn btn-primary" @onclick="@(e => CreatePreMigrationBackup())" title="Create Backup">
+                                                    <i class="bi bi-download"></i>
+                                                    <span>Create Backup (Step 1)</span>
+                                                </button>
+                                            }
+                                            else
+                                            {
+                                                <div class="alert alert-success">
+                                                    <i class="bi bi-check-circle"></i>
+                                                    <strong>Backup Complete!</strong><br />
+                                                    Backup file: <code>@preMigrationBackupFileName</code><br />
+                                                    You can now proceed with the migration.
+                                                </div>
+                                                
+                                                <div class="alert alert-danger mt-3">
+                                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                                    <strong>IMPORTANT: Migration is one-way only!</strong>
+                                                    <ul class="mb-0 mt-2">
+                                                        <li>This migration cannot be automatically reversed</li>
+                                                        <li>Your JSON files will be preserved for manual restoration if needed</li>
+                                                        <li>After migration, use the Configuration page to create SQLite backups</li>
+                                                        <li>The application will restart after migration</li>
+                                                    </ul>
+                                                </div>
+                                                
+                                                <button type="button" class="btn btn-warning" @onclick="@(e => InitiateMigration())" disabled="@isMigrating" title="Migrate to SQLite">
+                                                    @if (isMigrating)
+                                                    {
+                                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                                        <span>Migrating...</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <i class="bi bi-database-gear"></i>
+                                                        <span>Migrate to SQLite (Step 2)</span>
+                                                    }
+                                                </button>
+                                            }
                                         </div>
                                     }
                                     else
                                     {
                                         <div class="mb-3">
-                                            <h6><i class="bi bi-info-circle"></i> Migration Status</h6>
-                                            @if (!String.IsNullOrEmpty(migrationDate))
-                                            {
-                                                <p>Migrated on: <strong>@migrationDate</strong></p>
-                                            }
-                                            @if (!String.IsNullOrEmpty(backupPath))
-                                            {
-                                                <p>JSON backup location: <code>@backupPath</code></p>
-                                            }
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <h6><i class="bi bi-arrow-counterclockwise"></i> Rollback Migration</h6>
+                                            <h6><i class="bi bi-check-circle text-success"></i> SQLite Storage Active</h6>
                                             <p>
-                                                Revert to JSON file storage. This will restore your backed-up JSON files and switch the application back to FileSystem provider.
+                                                Your configuration is stored in an embedded SQLite database.
                                             </p>
-                                            <div class="alert alert-danger">
-                                                <i class="bi bi-exclamation-triangle-fill"></i>
-                                                <strong>Warning:</strong> This will delete the SQLite database and restore from the last backup. Any changes made after migration will be lost. The application will need to be restarted.
+                                            <div class="alert alert-info">
+                                                <i class="bi bi-info-circle"></i>
+                                                <strong>Backup & Restore:</strong> Use the <a href="/configuration" class="alert-link">Configuration page</a> to backup and restore your SQLite database or import/export JSON configurations.
                                             </div>
-                                            <button type="button" class="btn btn-danger" @onclick="@(e => InitiateRollback())" disabled="@isRollingBack" title="Rollback to JSON">
-                                                @if (isRollingBack)
-                                                {
-                                                    <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                                                    <span>Rolling back...</span>
-                                                }
-                                                else
-                                                {
-                                                    <i class="bi bi-arrow-counterclockwise"></i>
-                                                    <span>Rollback to JSON Files</span>
-                                                }
-                                            </button>
                                         </div>
                                     }
 
@@ -930,6 +937,12 @@
     [Inject]
     public IAdminLogService? AdminLogService { get; set; }
     
+    [Inject]
+    public IImportExportService? ImportExportService { get; set; }
+    
+    [Inject]
+    public IBlazorDownloadFileService? BlazorDownloadFileService { get; set; }
+    
     private ServicesData servicesData = new();
     private string currentpassword = String.Empty;
     private string newpassword = String.Empty;
@@ -970,10 +983,9 @@
     // Storage migration related variables
     private string currentStorageProvider = "FileSystem";
     private bool isMigrating = false;
-    private bool isRollingBack = false;
-    private string migrationDate = String.Empty;
-    private string backupPath = String.Empty;
     private string migrationErrorMessage = String.Empty;
+    private bool preMigrationBackupCompleted = false;
+    private string preMigrationBackupFileName = String.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -1021,34 +1033,11 @@
                 }
                 environmentvariables = ConfigurationHelper.GetEnvironmentVariables();
                 
-                // Load migration status
+                // Load current storage provider
                 currentStorageProvider = ConfigurationHelper.GetAppSetting("StorageProvider");
                 if (string.IsNullOrEmpty(currentStorageProvider))
                 {
                     currentStorageProvider = "FileSystem";
-                }
-                
-                // Get migration status details if using SQLite
-                if (currentStorageProvider == "SQLite")
-                {
-                    try
-                    {
-                        var migrationStatus = await MigrationService.GetMigrationStatusAsync();
-                        if (migrationStatus.LastMigrationDate.HasValue)
-                        {
-                            migrationDate = migrationStatus.LastMigrationDate.Value.ToString("yyyy-MM-dd HH:mm:ss");
-                        }
-                        // Try to get backup path from configuration
-                        backupPath = ConfigurationHelper.GetAppSetting("LastMigrationBackupPath");
-                    }
-                    catch (Exception ex)
-                    {
-                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
-                        { 
-                            Title = "ERROR", 
-                            Message = "Error loading migration status: " + ex.Message 
-                        });
-                    }
                 }
             }
 
@@ -1069,20 +1058,82 @@
         }
     }
 
+    private async Task CreatePreMigrationBackup()
+    {
+        try
+        {
+            var response = await ImportExportService!.ExportConfigAsync(true); // Include admin data
+            if (!response.Success || response.ResponseObject == null)
+            {
+                toastService.ShowError("Failed to create backup: " + response.ResponseMessage);
+                return;
+            }
+
+            string jsonData = System.Text.Json.JsonSerializer.Serialize(response.ResponseObject);
+            preMigrationBackupFileName = $"azurenamingtool-pre-migration-{DateTime.Now:yyyyMMdd-HHmmss}.json";
+            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            
+            await BlazorDownloadFileService!.DownloadFile(preMigrationBackupFileName, fileBytes, "application/json");
+            
+            preMigrationBackupCompleted = true;
+            StateHasChanged();
+            
+            toastService.ShowSuccess($"Backup created successfully! File: {preMigrationBackupFileName}");
+            
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+            { 
+                Title = "INFORMATION", 
+                Message = $"Pre-migration backup created: {preMigrationBackupFileName} (Size: {FormatFileSize(fileBytes.Length)})"
+            });
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("Failed to create backup: " + ex.Message);
+            
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+            { 
+                Title = "ERROR", 
+                Message = "Pre-migration backup failed: " + ex.Message 
+            });
+        }
+    }
+
     private async Task InitiateMigration()
     {
-        // Show confirmation modal
-        var confirm = await ModalHelper.ShowConfirmationModal(
+        // First confirmation
+        var confirm1 = await ModalHelper.ShowConfirmationModal(
             Modal!, 
-            "ATTENTION", 
-            "<div class=\"my-4\">This will migrate your configuration data from JSON files to an embedded SQLite database for improved performance and reliability.</div>" +
-            "<div class=\"my-4\">Your data will be backed up before migration. The application will need to be restarted after migration.</div>" +
-            "<div class=\"my-4\">Are you sure you want to proceed?</div>", 
+            "ATTENTION - Migration Confirmation (Step 1 of 2)", 
+            "<div class=\"my-4\"><p><strong>You are about to migrate to SQLite storage.</strong></p>" +
+            "<p class=\"text-danger\"><strong>IMPORTANT: This migration is ONE-WAY and cannot be automatically reversed!</strong></p>" +
+            "<ul>" +
+            "<li>Your JSON backup has been created and downloaded</li>" +
+            "<li>JSON files will be preserved but no longer used</li>" +
+            "<li>To restore from backup later, use the Configuration page</li>" +
+            "<li>The application will restart after migration</li>" +
+            "</ul>" +
+            "<p>Do you understand and want to proceed to Step 2?</p></div>", 
             "bg-warning", 
             theme
         );
 
-        if (!confirm)
+        if (!confirm1)
+        {
+            return;
+        }
+
+        // Second confirmation (text input required - simulated for now, will use TextConfirmationModal later)
+        var confirm2 = await ModalHelper.ShowConfirmationModal(
+            Modal!, 
+            "FINAL CONFIRMATION - Type MIGRATE to proceed (Step 2 of 2)", 
+            "<div class=\"my-4\"><p class=\"text-danger\"><strong>FINAL WARNING: This action cannot be undone!</strong></p>" +
+            "<p>Please confirm you want to migrate to SQLite.</p>" +
+            "<p><strong>Note:</strong> In the next update, you will need to type 'MIGRATE' to confirm. For now, click Yes to proceed.</p></div>", 
+            "bg-danger", 
+            theme
+        );
+
+        if (!confirm2)
         {
             return;
         }
@@ -1102,32 +1153,28 @@
                 ConfigurationHelper.SetAppSetting("StorageProvider", "SQLite");
                 currentStorageProvider = "SQLite";
 
-                // Store backup path in configuration for later retrieval
-                if (!string.IsNullOrEmpty(result.BackupPath))
-                {
-                    ConfigurationHelper.SetAppSetting("LastMigrationBackupPath", result.BackupPath);
-                    backupPath = result.BackupPath;
-                }
-
-                // Get migration date
-                var migrationStatus = await MigrationService.GetMigrationStatusAsync();
-                if (migrationStatus.LastMigrationDate.HasValue)
-                {
-                    migrationDate = migrationStatus.LastMigrationDate.Value.ToString("yyyy-MM-dd HH:mm:ss");
-                }
-
-                toastService.ShowSuccess("Migration to SQLite completed successfully! Please restart the application for changes to take effect.");
+                toastService.ShowSuccess("Migration to SQLite completed successfully! The application will restart in 3 seconds...");
                 
                 await AdminLogService!.PostItemAsync(new AdminLogMessage() 
                 { 
                     Title = "SUCCESS", 
-                    Message = "Migrated to SQLite storage successfully. " + result.Message + " Backup created at: " + backupPath 
+                    Message = $"Migrated to SQLite storage successfully. Pre-migration backup: {preMigrationBackupFileName}"
                 });
+
+                // Restart the application
+                await Task.Delay(3000);
+                NavigationManager.NavigateTo("/", true);
             }
             else
             {
                 migrationErrorMessage = "Migration failed: " + result.Message;
                 toastService.ShowError("Migration to SQLite failed. " + result.Message);
+                
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                { 
+                    Title = "ERROR", 
+                    Message = "Migration to SQLite failed: " + result.Message 
+                });
             }
         }
         catch (Exception ex)
@@ -1148,99 +1195,17 @@
         }
     }
 
-    private async Task InitiateRollback()
+    private string FormatFileSize(long bytes)
     {
-        // Show confirmation modal
-        var confirm = await ModalHelper.ShowConfirmationModal(
-            Modal!, 
-            "ATTENTION", 
-            "<div class=\"my-4\">This will switch back to JSON file storage.</div>" +
-            "<div class=\"my-4\">If a backup exists, files will be restored from it. Otherwise, existing JSON files will be used.</div>" +
-            "<div class=\"my-4\">The application will need to be restarted after switching.</div>" +
-            "<div class=\"my-4\">Are you sure you want to switch back to JSON file storage?</div>", 
-            "bg-danger", 
-            theme
-        );
-
-        if (!confirm)
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
         {
-            return;
+            order++;
+            len = len / 1024;
         }
-
-        try
-        {
-            isRollingBack = true;
-            migrationErrorMessage = String.Empty;
-            StateHasChanged();
-
-            // Get the backup path from configuration
-            string rollbackPath = ConfigurationHelper.GetAppSetting("LastMigrationBackupPath");
-            if (string.IsNullOrEmpty(rollbackPath))
-            {
-                // Fallback to the stored backupPath variable
-                rollbackPath = backupPath;
-            }
-
-            bool result;
-            
-            if (!string.IsNullOrEmpty(rollbackPath))
-            {
-                // Execute rollback with backup restoration
-                result = await MigrationService.RollbackMigrationAsync(rollbackPath);
-            }
-            else
-            {
-                // No backup available - just switch back to FileSystem
-                // This handles the case where JSON files still exist but no backup was created
-                // The SQLite database file will remain but won't be used
-                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
-                { 
-                    Title = "WARNING", 
-                    Message = "No backup path found. Switching to FileSystem provider without restoring from backup. Existing JSON files will be used." 
-                });
-                
-                result = true; // Consider successful since we're just switching providers
-            }
-
-            if (result)
-            {
-                // Update configuration to use FileSystem
-                ConfigurationHelper.SetAppSetting("StorageProvider", "FileSystem");
-                ConfigurationHelper.SetAppSetting("LastMigrationBackupPath", "");
-                currentStorageProvider = "FileSystem";
-                migrationDate = String.Empty;
-                backupPath = String.Empty;
-
-                toastService.ShowSuccess("Switched back to JSON file storage! Please restart the application for changes to take effect.");
-                
-                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
-                { 
-                    Title = "SUCCESS", 
-                    Message = "Switched back to JSON file storage successfully" 
-                });
-            }
-            else
-            {
-                migrationErrorMessage = "Rollback failed. Check the admin logs for details.";
-                toastService.ShowError("Rollback to JSON files failed. Please check the logs for details.");
-            }
-        }
-        catch (Exception ex)
-        {
-            migrationErrorMessage = "Rollback error: " + ex.Message;
-            toastService.ShowError("Rollback failed: " + ex.Message);
-            
-            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
-            { 
-                Title = "ERROR", 
-                Message = "Rollback to JSON files failed: " + ex.Message 
-            });
-        }
-        finally
-        {
-            isRollingBack = false;
-            StateHasChanged();
-        }
+        return $"{len:0.##} {sizes[order]}";
     }
 
     private async void AdminFormAction(string action, int id = 0)
