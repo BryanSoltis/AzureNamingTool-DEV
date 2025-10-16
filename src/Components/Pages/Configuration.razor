@@ -5359,11 +5359,35 @@
                     $"<p><i class=\"bi bi-check-circle\"></i> Database restore has been prepared successfully!</p>" +
                     $"<p class=\"text-info\"><strong>Pre-restore backup:</strong> {Path.GetFileName(backupPath)}</p>" +
                     $"<hr class=\"my-3\"/>" +
-                    $"<p><i class=\"bi bi-arrow-repeat\"></i> <strong>The application will restart automatically in 3 seconds...</strong></p>" +
-                    $"<p class=\"text-muted small\">The database restore will complete during startup.</p></div>", 
+                    $"<p><i class=\"bi bi-arrow-repeat\"></i> <strong>The application will restart in 3 seconds...</strong></p>" +
+                    $"<p class=\"text-warning\"><i class=\"bi bi-exclamation-triangle\"></i> <strong>Development Mode:</strong></p>" +
+                    $"<ul class=\"text-start text-warning\">" +
+                    $"<li>The application will stop</li>" +
+                    $"<li>Restart it manually with: <code>dotnet run</code></li>" +
+                    $"<li>Then refresh this page</li>" +
+                    $"</ul>" +
+                    $"<p class=\"text-muted small\"><strong>Production Mode:</strong> The application will restart automatically and this page will reload.</p></div>", 
                     "", admin);
                 StateHasChanged();
             });
+
+            // Add JavaScript to attempt auto-reload when server comes back
+            await JsRuntime.InvokeVoidAsync("eval", @"
+                setTimeout(function() {
+                    var checkInterval = setInterval(function() {
+                        fetch('/')
+                            .then(function(response) {
+                                if (response.ok) {
+                                    clearInterval(checkInterval);
+                                    window.location.href = '/';
+                                }
+                            })
+                            .catch(function() {
+                                // Server still down, keep checking
+                            });
+                    }, 2000);
+                }, 3000);
+            ");
 
             // Trigger application restart - the restore will complete on startup
             await Task.Delay(3000);

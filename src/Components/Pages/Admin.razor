@@ -1164,6 +1164,24 @@
                     Message = $"Migrated to SQLite storage successfully. Pre-migration backup: {preMigrationBackupFileName}"
                 });
 
+                // Add JavaScript to attempt auto-reload when server comes back
+                await JsRuntime.InvokeVoidAsync("eval", @"
+                    setTimeout(function() {
+                        var checkInterval = setInterval(function() {
+                            fetch('/')
+                                .then(function(response) {
+                                    if (response.ok) {
+                                        clearInterval(checkInterval);
+                                        window.location.href = '/';
+                                    }
+                                })
+                                .catch(function() {
+                                    // Server still down, keep checking
+                                });
+                        }, 2000);
+                    }, 3000);
+                ");
+
                 // Trigger application restart
                 await Task.Delay(3000);
                 AppLifetime.StopApplication();
