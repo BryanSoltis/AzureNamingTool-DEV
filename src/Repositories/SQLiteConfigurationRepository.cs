@@ -64,7 +64,7 @@ namespace AzureNamingTool.Repositories
                 var item = allItems.FirstOrDefault(x =>
                 {
                     var itemId = idProperty.GetValue(x);
-                    return itemId != null && Convert.ToInt32(itemId) == id;
+                    return itemId != null && Convert.ToInt64(itemId) == id;
                 });
 
                 if (item != null)
@@ -74,7 +74,7 @@ namespace AzureNamingTool.Repositories
             }
 
             // If not in cache, try database directly
-            return await _dbSet.FindAsync(id);
+            return await _dbSet.FindAsync((long)id);
         }
 
         /// <summary>
@@ -93,8 +93,8 @@ namespace AzureNamingTool.Repositories
                 throw new InvalidOperationException($"Type {typeof(T).Name} does not have an Id property");
             }
 
-            var id = Convert.ToInt32(idProperty.GetValue(entity));
-            var existing = await _dbSet.FindAsync(id);
+            var idValue = idProperty.GetValue(entity);
+            var existing = await _dbSet.FindAsync(idValue);
 
             if (existing != null)
             {
@@ -116,7 +116,7 @@ namespace AzureNamingTool.Repositories
         /// </summary>
         public async Task DeleteAsync(int id)
         {
-            var entity = await _dbSet.FindAsync(id);
+            var entity = await _dbSet.FindAsync((long)id);
             if (entity != null)
             {
                 _dbSet.Remove(entity);
