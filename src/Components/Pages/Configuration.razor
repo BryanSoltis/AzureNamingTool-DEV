@@ -5083,28 +5083,42 @@
             }
 
             // Create a temporary copy to avoid file lock issues
-            // SQLite maintains locks on the database file while in use
+            // Use SQLite's VACUUM INTO command which creates a clean backup
             string dbDirectory = Path.GetDirectoryName(dbPath)!;
             tempBackupPath = Path.Combine(dbDirectory, $"temp_backup_{Guid.NewGuid()}.db");
             
-            // Use SQLite's backup command to create a consistent copy
-            using (var sourceConnection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={dbPath}"))
-            using (var backupConnection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={tempBackupPath}"))
+            // Use VACUUM INTO to create a backup copy
+            // This command creates a clean, defragmented copy of the database
+            using (var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={dbPath}"))
             {
-                await sourceConnection.OpenAsync();
-                await backupConnection.OpenAsync();
-                sourceConnection.BackupDatabase(backupConnection);
-                
-                // Explicitly close connections before reading the file
-                await backupConnection.CloseAsync();
-                await sourceConnection.CloseAsync();
+                await connection.OpenAsync();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"VACUUM INTO '{tempBackupPath.Replace("\\", "\\\\")}'";
+                    await command.ExecuteNonQueryAsync();
+                }
+                await connection.CloseAsync();
             }
             
-            // Small delay to ensure file handles are released
-            await Task.Delay(100);
+            // Wait for file system to release handles
+            await Task.Delay(500);
             
-            // Read the backup file
-            byte[] fileBytes = await File.ReadAllBytesAsync(tempBackupPath);
+            // Read the backup file with retry logic
+            byte[] fileBytes;
+            int retryCount = 0;
+            while (true)
+            {
+                try
+                {
+                    fileBytes = await File.ReadAllBytesAsync(tempBackupPath);
+                    break;
+                }
+                catch (IOException) when (retryCount < 5)
+                {
+                    retryCount++;
+                    await Task.Delay(200);
+                }
+            }
             string fileName = $"azurenamingtool-backup-{DateTime.Now:yyyyMMdd-HHmmss}.db";
             
             await BlazorDownloadFileService!.DownloadFile(fileName, fileBytes, "application/x-sqlite3");
@@ -5142,16 +5156,32 @@
         }
         finally
         {
-            // Clean up temporary backup file
+            // Clean up temporary backup file with retry logic
             if (!string.IsNullOrEmpty(tempBackupPath) && File.Exists(tempBackupPath))
             {
-                try
+                // Try to delete with retries (file handles may still be releasing)
+                for (int i = 0; i < 5; i++)
                 {
-                    File.Delete(tempBackupPath);
-                }
-                catch (Exception ex)
-                {
-                    Logger.LogWarning(ex, "Failed to delete temporary backup file: {TempPath}", tempBackupPath);
+                    try
+                    {
+                        // Force garbage collection to release any lingering handles
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        
+                        await Task.Delay(200);
+                        File.Delete(tempBackupPath);
+                        break; // Success
+                    }
+                    catch (IOException) when (i < 4)
+                    {
+                        // File still locked, wait and retry
+                        await Task.Delay(500);
+                    }
+                    catch (Exception ex) when (i == 4)
+                    {
+                        // Final attempt failed, log but don't throw
+                        Logger.LogWarning(ex, "Failed to delete temporary backup file after {Attempts} attempts: {TempPath}", i + 1, tempBackupPath);
+                    }
                 }
             }
         }
