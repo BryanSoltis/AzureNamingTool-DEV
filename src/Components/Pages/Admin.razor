@@ -1154,9 +1154,10 @@
         var confirm = await ModalHelper.ShowConfirmationModal(
             Modal!, 
             "ATTENTION", 
-            "<div class=\"my-4\">This will delete the SQLite database and restore from the last backup.</div>" +
-            "<div class=\"my-4\">Any changes made after migration will be lost. The application will need to be restarted.</div>" +
-            "<div class=\"my-4\">Are you sure you want to rollback to JSON file storage?</div>", 
+            "<div class=\"my-4\">This will switch back to JSON file storage.</div>" +
+            "<div class=\"my-4\">If a backup exists, files will be restored from it. Otherwise, existing JSON files will be used.</div>" +
+            "<div class=\"my-4\">The application will need to be restarted after switching.</div>" +
+            "<div class=\"my-4\">Are you sure you want to switch back to JSON file storage?</div>", 
             "bg-danger", 
             theme
         );
