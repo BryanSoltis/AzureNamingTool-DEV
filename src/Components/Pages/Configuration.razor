@@ -5681,14 +5681,64 @@
             }
             else
             {
-                // For FileSystem: Use existing file copy method
+                // For FileSystem: Copy file from repository and reload data
                 if (FileSystemHelper.ResetConfiguration(repositoryFileName))
                 {
-                    return (true, "Configuration reset successfully!", null);
+                    // Now load the reset data and refresh the cache via PostConfigAsync
+                    var settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings", repositoryFileName);
+                    
+                    await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                    { 
+                        Title = "INFORMATION", 
+                        Message = $"FileSystem reset: File copied. Loading from: {settingsPath}" 
+                    });
+                    
+                    if (File.Exists(settingsPath))
+                    {
+                        var jsonContent = await File.ReadAllTextAsync(settingsPath);
+                        JsonSerializerOptions options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        };
+                        var resetItems = JsonSerializer.Deserialize<List<T>>(jsonContent, options);
+                        if (resetItems != null)
+                        {
+                            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                            { 
+                                Title = "INFORMATION", 
+                                Message = $"FileSystem reset: Loaded {resetItems.Count} items. Calling PostConfigAsync to refresh cache..." 
+                            });
+                            
+                            var serviceResponse = await postConfigAsync(resetItems);
+                            
+                            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                            { 
+                                Title = serviceResponse.Success ? "SUCCESS" : "ERROR", 
+                                Message = $"FileSystem reset PostConfigAsync result: Success={serviceResponse.Success}, Message={serviceResponse.ResponseMessage}" 
+                            });
+                            
+                            if (serviceResponse.Success)
+                            {
+                                return (true, "Configuration reset successfully!", null);
+                            }
+                            else
+                            {
+                                return (false, "Configuration reset failed during cache refresh! Please check the Admin Log for details.", serviceResponse.ResponseMessage);
+                            }
+                        }
+                        else
+                        {
+                            return (false, "Configuration reset failed! Could not deserialize settings data.", null);
+                        }
+                    }
+                    else
+                    {
+                        return (false, $"Configuration reset failed! Settings file not found after copy: {settingsPath}", null);
+                    }
                 }
                 else
                 {
-                    return (false, "Configuration reset failed! Please check the Admin Log for details.", null);
+                    return (false, "Configuration reset failed! Could not copy repository file. Please check the Admin Log for details.", null);
                 }
             }
         }

@@ -123,6 +123,61 @@ if (File.Exists(flagPath) && File.Exists(pendingRestorePath))
         Console.WriteLine("Cleaning up restore flag...");
         File.Delete(flagPath);
         
+        // Clean up old pre-restore backup files (keep only the 5 most recent)
+        Console.WriteLine("Cleaning up old pre-restore backup files...");
+        try
+        {
+            var backupFiles = Directory.GetFiles(dbDirectory!, "azurenamingtool-prerestore-*.db")
+                .Select(f => new FileInfo(f))
+                .OrderByDescending(f => f.LastWriteTime)
+                .ToList();
+            
+            if (backupFiles.Count > 5)
+            {
+                var filesToDelete = backupFiles.Skip(5);
+                foreach (var fileToDelete in filesToDelete)
+                {
+                    Console.WriteLine($"Deleting old backup: {fileToDelete.Name}");
+                    fileToDelete.Delete();
+                }
+                Console.WriteLine($"Deleted {backupFiles.Count - 5} old backup file(s).");
+            }
+            else
+            {
+                Console.WriteLine($"Found {backupFiles.Count} backup file(s). No cleanup needed (keeping max 5).");
+            }
+        }
+        catch (Exception cleanupEx)
+        {
+            Console.WriteLine($"Warning: Failed to clean up old backups: {cleanupEx.Message}");
+            // Don't fail the restore if cleanup fails
+        }
+        
+        // Clean up any temporary backup files left from export operations
+        Console.WriteLine("Cleaning up temporary backup files...");
+        try
+        {
+            var tempBackupFiles = Directory.GetFiles(dbDirectory!, "temp_backup_*.db");
+            if (tempBackupFiles.Length > 0)
+            {
+                foreach (var tempFile in tempBackupFiles)
+                {
+                    Console.WriteLine($"Deleting temp backup: {Path.GetFileName(tempFile)}");
+                    File.Delete(tempFile);
+                }
+                Console.WriteLine($"Deleted {tempBackupFiles.Length} temporary backup file(s).");
+            }
+            else
+            {
+                Console.WriteLine("No temporary backup files found.");
+            }
+        }
+        catch (Exception cleanupEx)
+        {
+            Console.WriteLine($"Warning: Failed to clean up temp backups: {cleanupEx.Message}");
+            // Don't fail the restore if cleanup fails
+        }
+        
         Console.WriteLine("=== DATABASE RESTORE COMPLETED SUCCESSFULLY ===");
     }
     catch (Exception ex)
