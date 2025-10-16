@@ -23,6 +23,12 @@ namespace AzureNamingTool.Services
         private readonly IResourceComponentService _resourceComponentService;
         private readonly IResourceDelimiterService _resourceDelimiterService;
         private readonly IResourceTypeService _resourceTypeService;
+        private readonly IResourceEnvironmentService _resourceEnvironmentService;
+        private readonly IResourceLocationService _resourceLocationService;
+        private readonly IResourceOrgService _resourceOrgService;
+        private readonly IResourceProjAppSvcService _resourceProjAppSvcService;
+        private readonly IResourceUnitDeptService _resourceUnitDeptService;
+        private readonly IResourceFunctionService _resourceFunctionService;
         private readonly ICustomComponentService _customComponentService;
         private readonly IGeneratedNamesService _generatedNamesService;
         private readonly IAdminLogService _adminLogService;
@@ -31,6 +37,12 @@ namespace AzureNamingTool.Services
             IResourceComponentService resourceComponentService,
             IResourceDelimiterService resourceDelimiterService,
             IResourceTypeService resourceTypeService,
+            IResourceEnvironmentService resourceEnvironmentService,
+            IResourceLocationService resourceLocationService,
+            IResourceOrgService resourceOrgService,
+            IResourceProjAppSvcService resourceProjAppSvcService,
+            IResourceUnitDeptService resourceUnitDeptService,
+            IResourceFunctionService resourceFunctionService,
             ICustomComponentService customComponentService,
             IGeneratedNamesService generatedNamesService,
             IAdminLogService adminLogService)
@@ -38,6 +50,12 @@ namespace AzureNamingTool.Services
             _resourceComponentService = resourceComponentService;
             _resourceDelimiterService = resourceDelimiterService;
             _resourceTypeService = resourceTypeService;
+            _resourceEnvironmentService = resourceEnvironmentService;
+            _resourceLocationService = resourceLocationService;
+            _resourceOrgService = resourceOrgService;
+            _resourceProjAppSvcService = resourceProjAppSvcService;
+            _resourceUnitDeptService = resourceUnitDeptService;
+            _resourceFunctionService = resourceFunctionService;
             _customComponentService = customComponentService;
             _generatedNamesService = generatedNamesService;
             _adminLogService = adminLogService;
@@ -298,8 +316,14 @@ namespace AzureNamingTool.Services
                     return resourceNameResponse;
                 }
 
-                // Get the specified resource type
-                var resourceTypes = await ConfigurationHelper.GetList<ResourceType>();
+                // Get the specified resource type - use service layer for SQLite/FileSystem compatibility
+                serviceResponse = await _resourceTypeService.GetItemsAsync();
+                List<ResourceType>? resourceTypes = null;
+                if (serviceResponse.Success && GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                {
+                    resourceTypes = (List<ResourceType>)serviceResponse.ResponseObject!;
+                }
+                
                 if (GeneralHelper.IsNotNull(resourceTypes))
                 {
                     var resourceTypesByShortName = resourceTypes.FindAll(x => x.ShortName == request.ResourceType);
@@ -360,6 +384,49 @@ namespace AzureNamingTool.Services
                         return resourceNameResponse;
                     }
 
+                    // Load all component data once for validation (SQLite/FileSystem compatibility)
+                    List<ResourceEnvironment>? environments = null;
+                    serviceResponse = await _resourceEnvironmentService.GetItemsAsync();
+                    if (serviceResponse.Success && GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                    {
+                        environments = (List<ResourceEnvironment>)serviceResponse.ResponseObject!;
+                    }
+
+                    List<ResourceLocation>? locations = null;
+                    serviceResponse = await _resourceLocationService.GetItemsAsync();
+                    if (serviceResponse.Success && GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                    {
+                        locations = (List<ResourceLocation>)serviceResponse.ResponseObject!;
+                    }
+
+                    List<ResourceOrg>? orgs = null;
+                    serviceResponse = await _resourceOrgService.GetItemsAsync();
+                    if (serviceResponse.Success && GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                    {
+                        orgs = (List<ResourceOrg>)serviceResponse.ResponseObject!;
+                    }
+
+                    List<ResourceProjAppSvc>? projappsvcs = null;
+                    serviceResponse = await _resourceProjAppSvcService.GetItemsAsync();
+                    if (serviceResponse.Success && GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                    {
+                        projappsvcs = (List<ResourceProjAppSvc>)serviceResponse.ResponseObject!;
+                    }
+
+                    List<ResourceUnitDept>? unitdepts = null;
+                    serviceResponse = await _resourceUnitDeptService.GetItemsAsync();
+                    if (serviceResponse.Success && GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                    {
+                        unitdepts = (List<ResourceUnitDept>)serviceResponse.ResponseObject!;
+                    }
+
+                    List<ResourceFunction>? functions = null;
+                    serviceResponse = await _resourceFunctionService.GetItemsAsync();
+                    if (serviceResponse.Success && GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                    {
+                        functions = (List<ResourceFunction>)serviceResponse.ResponseObject!;
+                    }
+
                     // Make sure the passed custom component names are normalized
                     if (GeneralHelper.IsNotNull(request.CustomComponents))
                     {
@@ -411,10 +478,9 @@ namespace AzureNamingTool.Services
                                                         switch (component.Name.ToLower())
                                                         {
                                                             case "resourcetype":
-                                                                var types = await ConfigurationHelper.GetList<ResourceType>();
-                                                                if (GeneralHelper.IsNotNull(types))
+                                                                if (GeneralHelper.IsNotNull(resourceTypes))
                                                                 {
-                                                                    var type = types.Find(x => x.ShortName == value);
+                                                                    var type = resourceTypes.Find(x => x.ShortName == value);
                                                                     if (!GeneralHelper.IsNotNull(type))
                                                                     {
                                                                         valid = false;
@@ -423,7 +489,6 @@ namespace AzureNamingTool.Services
                                                                 }
                                                                 break;
                                                             case "resourceenvironment":
-                                                                var environments = await ConfigurationHelper.GetList<ResourceEnvironment>();
                                                                 if (GeneralHelper.IsNotNull(environments))
                                                                 {
                                                                     var environment = environments.Find(x => x.ShortName == value);
@@ -435,7 +500,6 @@ namespace AzureNamingTool.Services
                                                                 }
                                                                 break;
                                                             case "resourcelocation":
-                                                                var locations = await ConfigurationHelper.GetList<ResourceLocation>();
                                                                 if (GeneralHelper.IsNotNull(locations))
                                                                 {
                                                                     var location = locations.Find(x => x.ShortName == value);
@@ -447,7 +511,6 @@ namespace AzureNamingTool.Services
                                                                 }
                                                                 break;
                                                             case "resourceorg":
-                                                                var orgs = await ConfigurationHelper.GetList<ResourceOrg>();
                                                                 if (GeneralHelper.IsNotNull(orgs))
                                                                 {
                                                                     var org = orgs.Find(x => x.ShortName == value);
@@ -459,7 +522,6 @@ namespace AzureNamingTool.Services
                                                                 }
                                                                 break;
                                                             case "resourceprojappsvc":
-                                                                var projappsvcs = await ConfigurationHelper.GetList<ResourceProjAppSvc>();
                                                                 if (GeneralHelper.IsNotNull(projappsvcs))
                                                                 {
                                                                     var projappsvc = projappsvcs.Find(x => x.ShortName == value);
@@ -471,7 +533,6 @@ namespace AzureNamingTool.Services
                                                                 }
                                                                 break;
                                                             case "resourceunitdept":
-                                                                var unitdepts = await ConfigurationHelper.GetList<ResourceUnitDept>();
                                                                 if (GeneralHelper.IsNotNull(unitdepts))
                                                                 {
                                                                     var unitdept = unitdepts.Find(x => x.ShortName == value);
@@ -483,7 +544,6 @@ namespace AzureNamingTool.Services
                                                                 }
                                                                 break;
                                                             case "resourcefunction":
-                                                                var functions = await ConfigurationHelper.GetList<ResourceFunction>();
                                                                 if (GeneralHelper.IsNotNull(functions))
                                                                 {
                                                                     var function = functions.Find(x => x.ShortName == value);

@@ -101,6 +101,17 @@ namespace AzureNamingTool.Helpers
                 bool valid = true;
                 StringBuilder sbMessage = new();
 
+                // Check if resourceType has Regx property populated
+                if (String.IsNullOrEmpty(resourceType.Regx))
+                {
+                    sbMessage.Append("Resource Type validation failed - Regex pattern is not configured. Please reset configuration to repository defaults.");
+                    sbMessage.Append(Environment.NewLine);
+                    response.Message = sbMessage.ToString();
+                    response.Valid = false;
+                    response.Name = name;
+                    return response;
+                }
+
                 // Check if the resource type only allows lowercase
                 if (!resourceType.Regx.Contains("A-Z"))
                 {
