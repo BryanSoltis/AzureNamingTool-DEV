@@ -91,6 +91,48 @@ if (!string.IsNullOrEmpty(dbDirectory) && !Directory.Exists(dbDirectory))
     Directory.CreateDirectory(dbDirectory);
 }
 
+// Check for pending database restore (before DbContext initialization)
+var flagPath = Path.Combine(dbDirectory!, "restore-pending.flag");
+var pendingRestorePath = Path.Combine(dbDirectory!, "azurenamingtool-pending-restore.db");
+
+if (File.Exists(flagPath) && File.Exists(pendingRestorePath))
+{
+    try
+    {
+        Console.WriteLine("=== DATABASE RESTORE DETECTED ===");
+        Console.WriteLine($"Flag file: {flagPath}");
+        Console.WriteLine($"Restore file: {pendingRestorePath}");
+        Console.WriteLine($"Target database: {dbPath}");
+        
+        // Read flag file for logging
+        var flagContent = File.ReadAllText(flagPath);
+        Console.WriteLine($"Restore details:\n{flagContent}");
+        
+        // Delete the current database (if it exists)
+        if (File.Exists(dbPath))
+        {
+            Console.WriteLine("Deleting current database...");
+            File.Delete(dbPath);
+        }
+        
+        // Move the pending restore file to the active database location
+        Console.WriteLine("Restoring database from backup...");
+        File.Move(pendingRestorePath, dbPath);
+        
+        // Delete the flag file
+        Console.WriteLine("Cleaning up restore flag...");
+        File.Delete(flagPath);
+        
+        Console.WriteLine("=== DATABASE RESTORE COMPLETED SUCCESSFULLY ===");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"ERROR during database restore: {ex.Message}");
+        Console.WriteLine($"Stack trace: {ex.StackTrace}");
+        // Don't delete flag file so restore can be retried
+    }
+}
+
 var connectionString = $"Data Source={dbPath}";
 builder.Services.AddDbContext<ConfigurationDbContext>(options =>
     options.UseSqlite(connectionString));
