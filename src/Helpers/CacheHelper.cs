@@ -30,8 +30,7 @@ namespace AzureNamingTool.Helpers
                     return (object)encodedCache;
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return null;
             }
@@ -54,8 +53,7 @@ namespace AzureNamingTool.Helpers
                 };
                 memoryCache.Set(cachekey, cachedata, cacheItemPolicy);
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
         }
@@ -71,8 +69,7 @@ namespace AzureNamingTool.Helpers
                 ObjectCache memoryCache = MemoryCache.Default;
                 memoryCache.Remove(cachekey);
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
         }
@@ -93,8 +90,7 @@ namespace AzureNamingTool.Helpers
                     data.Append("<p><span class=\"fw-bold\">" + key + "</span></p><div class=\"alert alert-secondary\" style=\"word-wrap:break-word;\">" + MemoryCache.Default[key].ToString() + "</div>");
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 data.Append("<p><span class=\"fw-bold\">No data currently cached.</span></p>");
             }
@@ -115,8 +111,7 @@ namespace AzureNamingTool.Helpers
                     memoryCache.Remove(cacheKey);
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
         }

@@ -49,8 +49,7 @@ namespace AzureNamingTool.Helpers
                     }
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return response;
@@ -93,8 +92,7 @@ namespace AzureNamingTool.Helpers
                     var displaymodal = modal.Show<InformationModal>("Instructions", parameters, options);
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
         }
@@ -151,8 +149,7 @@ namespace AzureNamingTool.Helpers
                     }
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return response;
@@ -201,8 +198,7 @@ namespace AzureNamingTool.Helpers
                     var result = await displaymodal.Result;
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return response;

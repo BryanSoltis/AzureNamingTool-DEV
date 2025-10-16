@@ -1,3 +1,4 @@
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 using AzureNamingTool.Models;
 using AzureNamingTool.Helpers;
 using Microsoft.AspNetCore.Mvc;
@@ -189,3 +190,4 @@ namespace AzureNamingTool.Controllers
         }
     }
 }
+#pragma warning restore CS1591

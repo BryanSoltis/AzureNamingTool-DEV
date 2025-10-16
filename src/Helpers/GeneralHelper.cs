@@ -30,8 +30,7 @@ namespace AzureNamingTool.Helpers
             {
                 return SourceData!.GetType()!.GetProperty(propName)!.GetValue(SourceData, null);
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 return null;
             }
@@ -120,8 +119,7 @@ namespace AzureNamingTool.Helpers
                 HttpClient httpClient = new();
                 data = await httpClient.GetStringAsync(url);
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 data = "";
             }
@@ -206,8 +204,7 @@ namespace AzureNamingTool.Helpers
                     }
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return returntype;

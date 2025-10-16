@@ -34,7 +34,7 @@ namespace AzureNamingTool.Attributes
                     minResponseRateFeature.MinDataRate = new MinDataRate(bytesPerSecond: 100, gracePeriod: TimeSpan.FromSeconds(10));
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // TODO: Modernize - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }

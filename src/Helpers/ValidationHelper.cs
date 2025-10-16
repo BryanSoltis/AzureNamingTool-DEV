@@ -78,8 +78,7 @@ namespace AzureNamingTool.Helpers
                     }
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return valid;
@@ -256,8 +255,7 @@ namespace AzureNamingTool.Helpers
                 response.Name = name;
                 response.Message = sbMessage.ToString();
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
                 response.Valid = false;
                 response.Name = name;

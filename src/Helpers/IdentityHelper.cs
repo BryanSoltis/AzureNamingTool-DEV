@@ -39,8 +39,7 @@ namespace AzureNamingTool.Helpers
                     }
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return result;
@@ -62,8 +61,7 @@ namespace AzureNamingTool.Helpers
                     currentuser = currentuservalue.Value;
                 }
             }
-            catch (Exception ex)
-            {
+            catch (Exception) {
                 // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
             }
             return currentuser;

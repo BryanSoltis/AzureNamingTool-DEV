@@ -1,3 +1,4 @@
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 using AzureNamingTool.Models;
 using AzureNamingTool.Services;
 using AzureNamingTool.Services.Interfaces;
@@ -100,3 +101,5 @@ namespace AzureNamingTool.Helpers
         }
     }
 }
+
+#pragma warning restore CS1591
