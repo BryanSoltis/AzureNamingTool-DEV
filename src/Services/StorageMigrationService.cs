@@ -140,20 +140,20 @@ namespace AzureNamingTool.Services
                 // Ensure database is created
                 await _dbContext.Database.EnsureCreatedAsync();
 
-                // Migrate each entity type
-                await MigrateEntityAsync<ResourceType>("resourcetype.json", result);
-                await MigrateEntityAsync<ResourceLocation>("resourcelocation.json", result);
-                await MigrateEntityAsync<ResourceEnvironment>("resourceenvironment.json", result);
-                await MigrateEntityAsync<ResourceOrg>("resourceorg.json", result);
-                await MigrateEntityAsync<ResourceProjAppSvc>("resourceprojappsvc.json", result);
-                await MigrateEntityAsync<ResourceUnitDept>("resourceunitdept.json", result);
-                await MigrateEntityAsync<ResourceFunction>("resourcefunction.json", result);
-                await MigrateEntityAsync<ResourceDelimiter>("resourcedelimiter.json", result);
-                await MigrateEntityAsync<ResourceComponent>("resourcecomponent.json", result);
-                await MigrateEntityAsync<CustomComponent>("customcomponent.json", result);
-                await MigrateEntityAsync<AdminUser>("adminuser.json", result);
-                await MigrateEntityAsync<AdminLogMessage>("adminlogmessage.json", result);
-                await MigrateEntityAsync<GeneratedName>("generatedname.json", result);
+                // Migrate each entity type (using plural filenames as they exist in settings)
+                await MigrateEntityAsync<ResourceType>("resourcetypes.json", result);
+                await MigrateEntityAsync<ResourceLocation>("resourcelocations.json", result);
+                await MigrateEntityAsync<ResourceEnvironment>("resourceenvironments.json", result);
+                await MigrateEntityAsync<ResourceOrg>("resourceorgs.json", result);
+                await MigrateEntityAsync<ResourceProjAppSvc>("resourceprojappsvcs.json", result);
+                await MigrateEntityAsync<ResourceUnitDept>("resourceunitdepts.json", result);
+                await MigrateEntityAsync<ResourceFunction>("resourcefunctions.json", result);
+                await MigrateEntityAsync<ResourceDelimiter>("resourcedelimiters.json", result);
+                await MigrateEntityAsync<ResourceComponent>("resourcecomponents.json", result);
+                await MigrateEntityAsync<CustomComponent>("customcomponents.json", result);
+                await MigrateEntityAsync<AdminUser>("adminusers.json", result);
+                await MigrateEntityAsync<AdminLogMessage>("adminlogmessages.json", result);
+                await MigrateEntityAsync<GeneratedName>("generatednames.json", result);
 
                 stopwatch.Stop();
                 result.Duration = stopwatch.Elapsed;

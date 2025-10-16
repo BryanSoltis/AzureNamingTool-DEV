@@ -99,8 +99,8 @@ if (provider == "sqlite")
 {
     // SQLite Configuration
     
-    // Register SQLite Storage Provider
-    builder.Services.AddSingleton<IStorageProvider>(sp =>
+    // Register SQLite Storage Provider (Scoped because it depends on DbContext)
+    builder.Services.AddScoped<IStorageProvider>(sp =>
     {
         var dbContext = sp.GetRequiredService<ConfigurationDbContext>();
         return new SQLiteStorageProvider(dbContext, dbPath);
@@ -115,7 +115,7 @@ if (provider == "sqlite")
 else
 {
     // FileSystem (JSON) Configuration - DEFAULT
-    builder.Services.AddSingleton<IStorageProvider, FileSystemStorageProvider>();
+    builder.Services.AddScoped<IStorageProvider, FileSystemStorageProvider>();
     
     // Register JSON File Repositories
     builder.Services.AddScoped(typeof(IConfigurationRepository<>), typeof(JsonFileConfigurationRepository<>));
