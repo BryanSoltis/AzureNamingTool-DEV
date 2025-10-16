@@ -2094,28 +2094,79 @@
                             </a>
                         </h5>
                         <div class="collapse card card-body @theme.ThemeStyle" id="global">
-                            <div class="card w-auto mb-3">
-                                <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                    Export the current Global Configuration
+                            @if (isUsingSQLite)
+                            {
+                                <div class="card w-auto mb-3">
+                                    <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                        Export the current Global Configuration
+                                    </div>
+                                    <div class="card card-body @theme.ThemeStyle">
+                                        <p>
+                                            Export the current Global Configuration using one of the options below. This includes all components, options, and tool settings.
+                                        </p>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card mb-3">
+                                                    <div class="card-header bg-light text-dark">
+                                                        <span class="oi oi-hard-drive" aria-hidden="true"></span> Download Database File
+                                                    </div>
+                                                    <div class="card-body @theme.ThemeStyle">
+                                                        <p>Download the complete SQLite database file (azurenamingtool.db) for backup purposes.</p>
+                                                        <button type="button" class="btn btn-primary" @onclick="DownloadDatabaseFile" title="Download Database">
+                                                            <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Download Database
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card mb-3">
+                                                    <div class="card-header bg-light text-dark">
+                                                        <span class="oi oi-document" aria-hidden="true"></span> Export as JSON
+                                                    </div>
+                                                    <div class="card-body @theme.ThemeStyle">
+                                                        <p>Export all configuration data as JSON format for portability and version control.</p>
+                                                        <button type="button" class="btn btn-primary" @onclick="ExportConfigurationAsJson" title="Export JSON">
+                                                            <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export JSON
+                                                        </button>
+                                                        @if (currentuser == "GlobalAdmin")
+                                                        {
+                                                            <div class="mt-2">
+                                                                <input title="Include Security/Identity Provider Settings" class="form-check-input" type="checkbox" @bind="@includeAdmin">
+                                                                Include Security/Identity Provider Settings?
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="card card-body @theme.ThemeStyle">
-                                    <p>
-                                        Click <span class="fw-bold">Export</span> to export the current Global Configuration. This includes all components, options, and tool settings.
-                                    </p>
-                                    <p>
-                                        <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("Global",0,"download")) title="Export">
-                                            <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                        </button>
-                                        @if (currentuser == "GlobalAdmin")
-                                        {
-                                            <span>
-                                                <input title="Include Security/Identity Provider Settings" class="form-check-input" type="checkbox" @bind="@includeAdmin" style="margin-top: 9px; margin-left:10px;">
-                                                Include Security/Identity Provider Settings?
-                                            </span>
-                                        }
-                                    </p>
+                            }
+                            else
+                            {
+                                <div class="card w-auto mb-3">
+                                    <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                        Export the current Global Configuration
+                                    </div>
+                                    <div class="card card-body @theme.ThemeStyle">
+                                        <p>
+                                            Click <span class="fw-bold">Export</span> to export the current Global Configuration. This includes all components, options, and tool settings.
+                                        </p>
+                                        <p>
+                                            <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("Global",0,"download")) title="Export">
+                                                <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
+                                            </button>
+                                            @if (currentuser == "GlobalAdmin")
+                                            {
+                                                <span>
+                                                    <input title="Include Security/Identity Provider Settings" class="form-check-input" type="checkbox" @bind="@includeAdmin" style="margin-top: 9px; margin-left:10px;">
+                                                    Include Security/Identity Provider Settings?
+                                                </span>
+                                            }
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
+                            }
                             <div class="card  w-auto mb-3">
                                 <div class="card card-header bg-default text-dark" style="font-weight:bold;">
                                     Reset the Global Configuration
@@ -2139,20 +2190,67 @@
                                     Import Global Configuration
                                 </div>
                                 <div class="card card-body @theme.ThemeStyle">
-                                    <p>
-                                        Enter the new Global Configuration JSON below and click <span class="fw-bold">Import</span> to import the Global Configuration.
-                                    </p>
-                                    <p>
-                                        <span class="fw-bold">NOTE:</span> This will update all existing configurations and cannot be undone!
-                                    </p>
-                                    <p>
-                                        <textarea title="Configuration" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newGlobalConfig",(string)ui.Value!);})" />
-                                    </p>
-                                    <p>
-                                        <button type="button" class="btn btn-success" @onclick="@(e => FormAction("Global",0,"update"))" title="Import">
-                                            <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
-                                        </button>
-                                    </p>
+                                    @if (isUsingSQLite)
+                                    {
+                                        <p>
+                                            Import Global Configuration using one of the options below.
+                                        </p>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card mb-3">
+                                                    <div class="card-header bg-light text-dark">
+                                                        <span class="oi oi-hard-drive" aria-hidden="true"></span> Restore from Database File
+                                                    </div>
+                                                    <div class="card-body @theme.ThemeStyle">
+                                                        <p>Upload a SQLite database file (.db) to restore your complete configuration.</p>
+                                                        <p><strong class="text-danger">WARNING:</strong> This will replace your current database and cannot be undone!</p>
+                                                        <InputFile OnChange="HandleSQLiteDatabaseUpload" class="form-control @theme.ThemeStyle mb-2" accept=".db" />
+                                                        @if (sqliteBackupFile != null)
+                                                        {
+                                                            <div class="alert alert-info mt-2">
+                                                                <small>Selected: @sqliteBackupFile.Name (@FormatFileSize(sqliteBackupFile.Size))</small>
+                                                            </div>
+                                                        }
+                                                        <button type="button" class="btn btn-warning" @onclick="RestoreFromSQLiteBackup" disabled="@(sqliteBackupFile == null)" title="Restore Database">
+                                                            <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Restore Database
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card mb-3">
+                                                    <div class="card-header bg-light text-dark">
+                                                        <span class="oi oi-document" aria-hidden="true"></span> Import from JSON
+                                                    </div>
+                                                    <div class="card-body @theme.ThemeStyle">
+                                                        <p>Enter JSON configuration below or upload a JSON file to import Global Configuration.</p>
+                                                        <p><strong class="text-danger">NOTE:</strong> This will update all existing configurations and cannot be undone!</p>
+                                                        <textarea title="Configuration" class="form-control @theme.ThemeStyle mb-2" rows="6" type="text" @onchange="@((ui) => { SetFormValue("newGlobalConfig",(string)ui.Value!);})" />
+                                                        <button type="button" class="btn btn-success" @onclick="@(e => FormAction("Global",0,"update"))" title="Import">
+                                                            <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import JSON
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <p>
+                                            Enter the new Global Configuration JSON below and click <span class="fw-bold">Import</span> to import the Global Configuration.
+                                        </p>
+                                        <p>
+                                            <span class="fw-bold">NOTE:</span> This will update all existing configurations and cannot be undone!
+                                        </p>
+                                        <p>
+                                            <textarea title="Configuration" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newGlobalConfig",(string)ui.Value!);})" />
+                                        </p>
+                                        <p>
+                                            <button type="button" class="btn btn-success" @onclick="@(e => FormAction("Global",0,"update"))" title="Import">
+                                                <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
+                                            </button>
+                                        </p>
+                                    }
                                 </div>
                             </div>
 
