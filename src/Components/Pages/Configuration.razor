@@ -1967,6 +1967,125 @@
             @if (admin)
             {
                 <div>
+                    @if (admin && isUsingSQLite)
+                    {
+                        <h4>Database Backup & Restore</h4>
+                        <div class="alert alert-info">
+                            <strong>SQLite Storage:</strong> You are currently using SQLite for data storage. Use the options below to backup and restore your configuration database.
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <h5 class="card-header text-white bg-primary">
+                                        <a class="link-light text-decoration-none" data-bs-toggle="collapse" style="display:block;" href="#sqliteBackup" role="button" aria-expanded="false" aria-controls="sqliteBackup">
+                                            <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Backup Options
+                                        </a>
+                                    </h5>
+                                    <div class="collapse card card-body @theme.ThemeStyle" id="sqliteBackup">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card mb-3">
+                                                    <div class="card-header bg-default text-dark" style="font-weight:bold;">
+                                                        <span class="oi oi-hard-drive" aria-hidden="true"></span> Download Database File
+                                                    </div>
+                                                    <div class="card-body @theme.ThemeStyle">
+                                                        <p>Download the complete SQLite database file (azurenamingtool.db) for backup purposes.</p>
+                                                        <p><strong>When to use:</strong> For routine backups and quick disaster recovery.</p>
+                                                        <button type="button" class="btn btn-primary" @onclick="DownloadDatabaseFile" title="Download Database">
+                                                            <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Download Database
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card mb-3">
+                                                    <div class="card-header bg-default text-dark" style="font-weight:bold;">
+                                                        <span class="oi oi-document" aria-hidden="true"></span> Export as JSON
+                                                    </div>
+                                                    <div class="card-body @theme.ThemeStyle">
+                                                        <p>Export all configuration data as JSON format for portability and version control.</p>
+                                                        <p><strong>When to use:</strong> For sharing configurations or migrating between instances.</p>
+                                                        <button type="button" class="btn btn-primary" @onclick="ExportConfigurationAsJson" title="Export JSON">
+                                                            <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export JSON
+                                                        </button>
+                                                        @if (currentuser == "GlobalAdmin")
+                                                        {
+                                                            <div class="mt-2">
+                                                                <input title="Include Security/Identity Provider Settings" class="form-check-input" type="checkbox" @bind="@includeAdmin">
+                                                                Include Security/Identity Provider Settings?
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <h5 class="card-header text-white bg-warning">
+                                        <a class="link-light text-decoration-none" data-bs-toggle="collapse" style="display:block;" href="#sqliteRestore" role="button" aria-expanded="false" aria-controls="sqliteRestore">
+                                            <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Restore Options
+                                        </a>
+                                    </h5>
+                                    <div class="collapse card card-body @theme.ThemeStyle" id="sqliteRestore">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="card mb-3">
+                                                    <div class="card-header bg-default text-dark" style="font-weight:bold;">
+                                                        <span class="oi oi-hard-drive" aria-hidden="true"></span> Restore from Database File (Scenario 1)
+                                                    </div>
+                                                    <div class="card-body @theme.ThemeStyle">
+                                                        <p>Upload and replace the current database with a previously downloaded SQLite database file.</p>
+                                                        <p><strong>Use case:</strong> Disaster recovery or reverting to a previous backup.</p>
+                                                        <div class="alert alert-warning">
+                                                            <strong>WARNING:</strong> This will completely replace your current database. All current data will be lost!
+                                                        </div>
+                                                        <InputFile OnChange="HandleSQLiteDatabaseUpload" accept=".db" class="form-control mb-2" />
+                                                        @if (sqliteBackupFile != null)
+                                                        {
+                                                            <p class="text-info">Selected: @sqliteBackupFile.Name (@FormatFileSize(sqliteBackupFile.Size))</p>
+                                                            <button type="button" class="btn btn-warning" @onclick="RestoreFromSQLiteBackup" title="Restore Database">
+                                                                <span class="oi oi-loop-circular" aria-hidden="true"></span> Restore Database
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card mb-3">
+                                                    <div class="card-header bg-default text-dark" style="font-weight:bold;">
+                                                        <span class="oi oi-document" aria-hidden="true"></span> Restore from JSON File (Scenario 2)
+                                                    </div>
+                                                    <div class="card-body @theme.ThemeStyle">
+                                                        <p>Import configuration data from a JSON backup file. Works with both pre-migration and post-migration JSON exports.</p>
+                                                        <p><strong>Use case:</strong> Importing configurations from another instance or pre-migration backups.</p>
+                                                        <div class="alert alert-warning">
+                                                            <strong>WARNING:</strong> This will overwrite your current configuration data!
+                                                        </div>
+                                                        <InputFile OnChange="HandleJsonConfigUpload" accept=".json" class="form-control mb-2" />
+                                                        @if (jsonBackupFile != null)
+                                                        {
+                                                            <p class="text-info">Selected: @jsonBackupFile.Name (@FormatFileSize(jsonBackupFile.Size))</p>
+                                                            <button type="button" class="btn btn-warning" @onclick="RestoreFromJsonBackup" title="Restore from JSON">
+                                                                <span class="oi oi-loop-circular" aria-hidden="true"></span> Restore from JSON
+                                                            </button>
+                                                        }
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+
                     <h4>General Configuration</h4>
                     <div class="card">
                         <h5 class="card-header text-white bg-secondary text-white">
@@ -2147,6 +2266,15 @@
     private bool refreshlocationshortnames = false;
     private bool includeAdmin = false;
     private string currentuser = String.Empty;
+    
+    // Storage provider detection for UI adaptation
+    private string currentStorageProvider = "FileSystem";
+    private bool isUsingSQLite => currentStorageProvider == "SQLite";
+    private bool isUsingFileSystem => currentStorageProvider == "FileSystem";
+    
+    // File upload handlers for restore functionality
+    private IBrowserFile? sqliteBackupFile;
+    private IBrowserFile? jsonBackupFile;
 
     private ResponseMessage message = new();
 
@@ -2160,6 +2288,9 @@
             var result = await session.GetAsync<bool>("admin");
             admin = (bool)result.Value;
             servicesData = await ServicesHelper.LoadServicesData(servicesData, admin);
+            
+            // Detect current storage provider for UI adaptation
+            currentStorageProvider = ConfigurationHelper.GetAppSetting("StorageProvider") ?? "FileSystem";
 
             // Get the list of categories
             categories = ResourceTypeService!.GetTypeCategories(servicesData.ResourceTypes!);
@@ -4829,6 +4960,367 @@
                 ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ATTENTION", "<div class=\"my-4\">This will reset the Types short names and details to match the latest Azure Naming Tool values and cannot be undone!</div>", "", admin);
             }
         }
+    }
+
+    // ========== SQLite Backup/Restore Methods ==========
+
+    private async Task DownloadDatabaseFile()
+    {
+        try
+        {
+            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "azurenamingtool.db");
+            
+            if (!File.Exists(dbPath))
+            {
+                await InvokeAsync(() =>
+                {
+                    ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                        "Database file not found. Ensure you are using SQLite storage.", "", admin);
+                    StateHasChanged();
+                });
+                return;
+            }
+
+            byte[] fileBytes = await File.ReadAllBytesAsync(dbPath);
+            string fileName = $"azurenamingtool-backup-{DateTime.Now:yyyyMMdd-HHmmss}.db";
+            
+            await BlazorDownloadFileService!.DownloadFile(fileName, fileBytes, "application/x-sqlite3");
+            
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-success", "SUCCESS", 
+                    $"Database file downloaded successfully: {fileName}", "", admin);
+                StateHasChanged();
+            });
+
+            // Log the backup
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "INFORMATION",
+                Message = $"Database backup downloaded: {fileName} (Size: {FormatFileSize(fileBytes.Length)})"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+        catch (Exception ex)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    $"Failed to download database file: {ex.Message}", "", admin);
+                StateHasChanged();
+            });
+
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "ERROR",
+                Message = $"Database backup download failed: {ex.Message}"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+    }
+
+    private async Task ExportConfigurationAsJson()
+    {
+        try
+        {
+            var response = await ImportExportService!.ExportConfigAsync(includeAdmin);
+            if (!response.Success || response.ResponseObject == null)
+            {
+                throw new Exception("Failed to export configuration data");
+            }
+
+            string jsonData = System.Text.Json.JsonSerializer.Serialize(response.ResponseObject);
+            string fileName = $"azurenamingtool-config-{DateTime.Now:yyyyMMdd-HHmmss}.json";
+            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            
+            await BlazorDownloadFileService!.DownloadFile(fileName, fileBytes, "application/json");
+            
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-success", "SUCCESS", 
+                    $"Configuration exported successfully: {fileName}", "", admin);
+                StateHasChanged();
+            });
+
+            // Log the export
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "INFORMATION",
+                Message = $"Configuration JSON export: {fileName} (Size: {FormatFileSize(fileBytes.Length)}, Include Admin: {includeAdmin})"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+        catch (Exception ex)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    $"Failed to export configuration: {ex.Message}", "", admin);
+                StateHasChanged();
+            });
+
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "ERROR",
+                Message = $"Configuration JSON export failed: {ex.Message}"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+    }
+
+    private void HandleSQLiteDatabaseUpload(InputFileChangeEventArgs e)
+    {
+        sqliteBackupFile = e.File;
+        StateHasChanged();
+    }
+
+    private void HandleJsonConfigUpload(InputFileChangeEventArgs e)
+    {
+        jsonBackupFile = e.File;
+        StateHasChanged();
+    }
+
+    private async Task RestoreFromSQLiteBackup()
+    {
+        if (sqliteBackupFile == null)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-warning", "WARNING", 
+                    "Please select a database file to restore.", "", admin);
+                StateHasChanged();
+            });
+            return;
+        }
+
+        // Validate file extension
+        if (!sqliteBackupFile.Name.EndsWith(".db", StringComparison.OrdinalIgnoreCase))
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    "Invalid file type. Please select a .db file.", "", admin);
+                StateHasChanged();
+            });
+            return;
+        }
+
+        // Show confirmation modal
+        string confirmMessage = $"<div class=\"my-4\"><p>You are about to restore the database from:</p>" +
+            $"<p><strong>{sqliteBackupFile.Name}</strong> ({FormatFileSize(sqliteBackupFile.Size)})</p>" +
+            $"<p class=\"text-danger\"><strong>WARNING:</strong> This will completely replace your current database. All current data will be lost!</p>" +
+            $"<p>The application will restart automatically after the restore completes.</p>" +
+            $"<p>Do you want to proceed?</p></div>";
+
+        bool confirmed = await ModalHelper.ShowConfirmationModal(Modal!, "Confirm Database Restore", confirmMessage, "bg-warning", theme);
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        try
+        {
+            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "azurenamingtool.db");
+            string backupPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, $"azurenamingtool-prerestore-{DateTime.Now:yyyyMMdd-HHmmss}.db");
+
+            // Create a backup of the current database before restoring
+            if (File.Exists(dbPath))
+            {
+                File.Copy(dbPath, backupPath, true);
+            }
+
+            // Read the uploaded file
+            using (var stream = sqliteBackupFile.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024)) // 50MB max
+            {
+                using (var fileStream = new FileStream(dbPath, FileMode.Create))
+                {
+                    await stream.CopyToAsync(fileStream);
+                }
+            }
+
+            // Log the restore
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "INFORMATION",
+                Message = $"Database restored from: {sqliteBackupFile.Name} (Size: {FormatFileSize(sqliteBackupFile.Size)}). Pre-restore backup saved to: {Path.GetFileName(backupPath)}"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-success", "SUCCESS", 
+                    $"<div class=\"my-4\"><p>Database restored successfully!</p>" +
+                    $"<p>A pre-restore backup was saved to: {Path.GetFileName(backupPath)}</p>" +
+                    $"<p>The application will restart in 3 seconds...</p></div>", "", admin);
+                StateHasChanged();
+            });
+
+            // Restart the application
+            await Task.Delay(3000);
+            NavigationManager!.NavigateTo("/", true);
+        }
+        catch (Exception ex)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    $"Failed to restore database: {ex.Message}", "", admin);
+                StateHasChanged();
+            });
+
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "ERROR",
+                Message = $"Database restore failed: {ex.Message}"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+    }
+
+    private async Task RestoreFromJsonBackup()
+    {
+        if (jsonBackupFile == null)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-warning", "WARNING", 
+                    "Please select a JSON file to restore.", "", admin);
+                StateHasChanged();
+            });
+            return;
+        }
+
+        // Validate file extension
+        if (!jsonBackupFile.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    "Invalid file type. Please select a .json file.", "", admin);
+                StateHasChanged();
+            });
+            return;
+        }
+
+        // Show confirmation modal
+        string confirmMessage = $"<div class=\"my-4\"><p>You are about to restore configuration from:</p>" +
+            $"<p><strong>{jsonBackupFile.Name}</strong> ({FormatFileSize(jsonBackupFile.Size)})</p>" +
+            $"<p class=\"text-warning\"><strong>NOTE:</strong> This will overwrite your current configuration data!</p>" +
+            $"<p>This works with both pre-migration and post-migration JSON exports.</p>" +
+            $"<p>Do you want to proceed?</p></div>";
+
+        bool confirmed = await ModalHelper.ShowConfirmationModal(Modal!, "Confirm JSON Restore", confirmMessage, "bg-warning", theme);
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        try
+        {
+            // Read the uploaded JSON file
+            string jsonContent;
+            using (var stream = jsonBackupFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)) // 10MB max
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    jsonContent = await reader.ReadToEndAsync();
+                }
+            }
+
+            // Validate JSON format
+            ConfigurationData? configData;
+            try
+            {
+                configData = System.Text.Json.JsonSerializer.Deserialize<ConfigurationData>(jsonContent);
+                if (configData == null)
+                {
+                    throw new Exception("Deserialized configuration data is null.");
+                }
+            }
+            catch (Exception ex)
+            {
+                await InvokeAsync(() =>
+                {
+                    ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                        $"Invalid JSON format: {ex.Message}", "", admin);
+                    StateHasChanged();
+                });
+                return;
+            }
+
+            // Import the configuration using the existing ImportExportService
+            var result = await ImportExportService!.PostConfigAsync(configData);
+
+            if (result.Success)
+            {
+                await InvokeAsync(() =>
+                {
+                    ModalHelper.ShowInformationModal(Modal!, theme, "bg-success", "SUCCESS", 
+                        $"<div class=\"my-4\"><p>Configuration restored successfully from JSON!</p>" +
+                        $"<p>The page will refresh in 2 seconds...</p></div>", "", admin);
+                    StateHasChanged();
+                });
+
+                // Log the restore
+                AdminLogMessage adminLogMessage = new()
+                {
+                    Title = "INFORMATION",
+                    Message = $"Configuration restored from JSON: {jsonBackupFile.Name} (Size: {FormatFileSize(jsonBackupFile.Size)})"
+                };
+                await AdminLogService!.PostItemAsync(adminLogMessage);
+
+                // Refresh the page
+                await Task.Delay(2000);
+                NavigationManager!.NavigateTo("/configuration", true);
+            }
+            else
+            {
+                await InvokeAsync(() =>
+                {
+                    ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                        "Failed to restore configuration from JSON. Check the log for details.", "", admin);
+                    StateHasChanged();
+                });
+
+                AdminLogMessage adminLogMessage = new()
+                {
+                    Title = "ERROR",
+                    Message = $"Configuration restore from JSON failed: {jsonBackupFile.Name}"
+                };
+                await AdminLogService!.PostItemAsync(adminLogMessage);
+            }
+        }
+        catch (Exception ex)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    $"Failed to restore configuration: {ex.Message}", "", admin);
+                StateHasChanged();
+            });
+
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "ERROR",
+                Message = $"Configuration restore from JSON failed: {ex.Message}"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+    }
+
+    private string FormatFileSize(long bytes)
+    {
+        string[] sizes = { "B", "KB", "MB", "GB" };
+        double len = bytes;
+        int order = 0;
+        while (len >= 1024 && order < sizes.Length - 1)
+        {
+            order++;
+            len = len / 1024;
+        }
+        return $"{len:0.##} {sizes[order]}";
     }
 }
 
