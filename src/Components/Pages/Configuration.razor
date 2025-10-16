@@ -2689,7 +2689,8 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Components Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        if (FileSystemHelper.ResetConfiguration("resourcecomponents.json"))
+                                        var resetResult = await ResetConfigurationData<ResourceComponent>("resourcecomponents.json", ResourceComponentService!.PostConfigAsync);
+                                        if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
                                             message.Message = "Components configuration reset!";
@@ -2697,7 +2698,8 @@
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Components configuration reset failed! Please check the Admin Log for details.";
+                                            message.Message = resetResult.Message;
+                                            message.MessageDetails = resetResult.Details;
                                         }
                                     }
                                     break;
@@ -2821,7 +2823,8 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will update the reset Delimiters Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        if (FileSystemHelper.ResetConfiguration("resourcedelimiters.json"))
+                                        var resetResult = await ResetConfigurationData<ResourceDelimiter>("resourcedelimiters.json", ResourceDelimiterService!.PostConfigAsync);
+                                        if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
                                             message.Message = "Delimiters configuration reset!";
@@ -2829,7 +2832,8 @@
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Delimiters configuration reset failed! Please check the Admin Log for details.";
+                                            message.Message = resetResult.Message;
+                                            message.MessageDetails = resetResult.Details;
                                         }
                                     }
                                     break;
@@ -3026,7 +3030,8 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Environments Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        if (FileSystemHelper.ResetConfiguration("resourceenvironments.json"))
+                                        var resetResult = await ResetConfigurationData<ResourceEnvironment>("resourceenvironments.json", ResourceEnvironmentService!.PostConfigAsync);
+                                        if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
                                             message.Message = "Environments configuration reset!";
@@ -3034,7 +3039,8 @@
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Environments configuration reset failed! Please check the Admin Log for details.";
+                                            message.Message = resetResult.Message;
+                                            message.MessageDetails = resetResult.Details;
                                         }
                                     }
                                     break;
@@ -3254,7 +3260,8 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Functions Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        if (FileSystemHelper.ResetConfiguration("resourcefunctions.json"))
+                                        var resetResult = await ResetConfigurationData<ResourceFunction>("resourcefunctions.json", ResourceFunctionService!.PostConfigAsync);
+                                        if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
                                             message.Message = "Functions configuration reset!";
@@ -3262,7 +3269,8 @@
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Functions configuration reset failed! Please check the Admin Log for details.";
+                                            message.Message = resetResult.Message;
+                                            message.MessageDetails = resetResult.Details;
                                         }
                                     }
                                     break;
@@ -3487,7 +3495,8 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Locations Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        if (FileSystemHelper.ResetConfiguration("resourcelocations.json"))
+                                        var resetResult = await ResetConfigurationData<AzureNamingTool.Models.ResourceLocation>("resourcelocations.json", ResourceLocationService!.PostConfigAsync);
+                                        if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
                                             message.Message = "Locations configuration reset!";
@@ -3495,7 +3504,8 @@
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Locations configuration reset failed! Please check the Admin Log for details.";
+                                            message.Message = resetResult.Message;
+                                            message.MessageDetails = resetResult.Details;
                                         }
                                     }
                                     break;
@@ -3715,7 +3725,8 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Orgs Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        if (FileSystemHelper.ResetConfiguration("resourceorgs.json"))
+                                        var resetResult = await ResetConfigurationData<ResourceOrg>("resourceorgs.json", ResourceOrgService!.PostConfigAsync);
+                                        if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
                                             message.Message = "Orgs configuration reset!";
@@ -3723,7 +3734,8 @@
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Orgs configuration reset failed! Please check the Admin Log for details.";
+                                            message.Message = resetResult.Message;
+                                            message.MessageDetails = resetResult.Details;
                                         }
                                     }
                                     break;
@@ -3943,7 +3955,8 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Projects/Apps/Services Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        if (FileSystemHelper.ResetConfiguration("resourceprojappsvcs.json"))
+                                        var resetResult = await ResetConfigurationData<ResourceProjAppSvc>("resourceprojappsvcs.json", ResourceProjAppSvcService!.PostConfigAsync);
+                                        if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
                                             message.Message = "Projects/Apps/Services configuration reset!";
@@ -3951,7 +3964,8 @@
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Projects/Apps/Services configuration reset failed! Please check the Admin Log for details.";
+                                            message.Message = resetResult.Message;
+                                            message.MessageDetails = resetResult.Details;
                                         }
                                     }
                                     break;
@@ -4183,7 +4197,8 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Types Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        if (FileSystemHelper.ResetConfiguration("resourcetypes.json"))
+                                        var resetResult = await ResetConfigurationData<ResourceType>("resourcetypes.json", ResourceTypeService!.PostConfigAsync);
+                                        if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
                                             message.Message = "Types configuration reset!";
@@ -4191,7 +4206,8 @@
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Types configuration reset failed! Please check the Admin Log for details.";
+                                            message.Message = resetResult.Message;
+                                            message.MessageDetails = resetResult.Details;
                                         }
                                     }
                                     break;
@@ -4412,7 +4428,8 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Units/Depts Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        if (FileSystemHelper.ResetConfiguration("resourceunitdepts.json"))
+                                        var resetResult = await ResetConfigurationData<ResourceUnitDept>("resourceunitdepts.json", ResourceUnitDeptService!.PostConfigAsync);
+                                        if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
                                             message.Message = "Units/Depts configuration reset!";
@@ -4420,7 +4437,8 @@
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Units/Depts configuration reset failed! Please check the Admin Log for details.";
+                                            message.Message = resetResult.Message;
+                                            message.MessageDetails = resetResult.Details;
                                         }
                                     }
                                     break;
@@ -4671,15 +4689,17 @@
                                     confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Custom Components Configuration and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
                                     if (confirm)
                                     {
-                                        if (FileSystemHelper.ResetConfiguration("customcomponents.json"))
+                                        var resetResult = await ResetConfigurationData<CustomComponent>("customcomponents.json", CustomComponentService!.PostConfigAsync);
+                                        if (resetResult.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = "Custom Components configuration reset! Please check the Admin Log for details.";
+                                            message.Message = "Custom Components configuration reset!";
                                         }
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Custom Components configuration reset failed!";
+                                            message.Message = resetResult.Message;
+                                            message.MessageDetails = resetResult.Details;
                                         }
                                     }
                                     break;
@@ -5554,6 +5574,63 @@
             len = len / 1024;
         }
         return $"{len:0.##} {sizes[order]}";
+    }
+
+    private async Task<(bool Success, string Message, string? Details)> ResetConfigurationData<T>(string repositoryFileName, Func<List<T>, Task<ServiceResponse>> postConfigAsync)
+    {
+        try
+        {
+            if (isUsingSQLite)
+            {
+                // For SQLite: Load from repository JSON and save to database
+                var repositoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "repository", repositoryFileName);
+                if (File.Exists(repositoryPath))
+                {
+                    var jsonContent = await File.ReadAllTextAsync(repositoryPath);
+                    JsonSerializerOptions options = new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    };
+                    var resetItems = JsonSerializer.Deserialize<List<T>>(jsonContent, options);
+                    if (resetItems != null)
+                    {
+                        var serviceResponse = await postConfigAsync(resetItems);
+                        if (serviceResponse.Success)
+                        {
+                            return (true, "Configuration reset successfully!", null);
+                        }
+                        else
+                        {
+                            return (false, "Configuration reset failed! Please check the Admin Log for details.", serviceResponse.ResponseMessage);
+                        }
+                    }
+                    else
+                    {
+                        return (false, "Configuration reset failed! Could not deserialize repository data.", null);
+                    }
+                }
+                else
+                {
+                    return (false, "Configuration reset failed! Repository file not found.", null);
+                }
+            }
+            else
+            {
+                // For FileSystem: Use existing file copy method
+                if (FileSystemHelper.ResetConfiguration(repositoryFileName))
+                {
+                    return (true, "Configuration reset successfully!", null);
+                }
+                else
+                {
+                    return (false, "Configuration reset failed! Please check the Admin Log for details.", null);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            return (false, $"Configuration reset failed: {ex.Message}", ex.StackTrace);
+        }
     }
 }
 
