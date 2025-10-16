@@ -606,9 +606,11 @@ namespace AzureNamingTool.Services
                                                                             if (!String.IsNullOrEmpty(componentvalue))
                                                                             {
                                                                                 // Check to make sure it is a valid custom component
-                                                                                var customComponents = await ConfigurationHelper.GetList<CustomComponent>();
-                                                                                if (GeneralHelper.IsNotNull(customComponents))
+                                                                                // Use service layer instead of ConfigurationHelper to support both SQLite and FileSystem
+                                                                                var customComponentsResponse = await _customComponentService.GetItemsAsync();
+                                                                                if (customComponentsResponse.Success && GeneralHelper.IsNotNull(customComponentsResponse.ResponseObject))
                                                                                 {
+                                                                                    var customComponents = (List<CustomComponent>)customComponentsResponse.ResponseObject!;
                                                                                     var validcustomComponent = customComponents.Find(x => x.ParentComponent == normalizedcomponentname && x.ShortName == componentvalue);
                                                                                     if (!GeneralHelper.IsNotNull(validcustomComponent))
                                                                                     {

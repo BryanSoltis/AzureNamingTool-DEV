@@ -316,10 +316,19 @@
         confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will purge the Generated Names Log and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
         if (confirm)
         {
-            await LogHelper.PurgeGeneratedNames();
-            toastService.ShowSuccess("Generated Names Log purged!");
-            await AdminLogService.PostItemAsync(new AdminLogMessage() { Source = currentuser, Title = "INFORMATION", Message = "Generated Names log purged." });
-            await LoadData();
+            // Use GeneratedNamesService.DeleteAllItemsAsync() which works with both SQLite and FileSystem
+            serviceResponse = await GeneratedNamesService!.DeleteAllItemsAsync();
+            
+            if (serviceResponse.Success)
+            {
+                toastService.ShowSuccess("Generated Names Log purged!");
+                await LoadData();
+            }
+            else
+            {
+                toastService.ShowError("Failed to purge Generated Names Log. Please check the Admin Log.");
+            }
+            
             StateHasChanged();
         }
     }

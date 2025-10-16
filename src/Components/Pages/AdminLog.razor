@@ -203,18 +203,29 @@
         confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will purge the Admin Log and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme!);
         if (confirm)
         {
-            await LogHelper.PurgeAdminLog();
-            toastService.ShowSuccess("Admin Log purged!");
-            await AdminLogService.PostItemAsync(new AdminLogMessage() { Source = currentuser, Title = "INFORMATION", Message = "Admin Log purged." });
-            CacheHelper.InvalidateCacheObject("AdminLogMessage");
-            serviceResponse = await AdminLogService.GetItemsAsync();
+            // Use AdminLogService.DeleteAllItemsAsync() which works with both SQLite and FileSystem
+            serviceResponse = await AdminLogService!.DeleteAllItemsAsync();
+            
             if (serviceResponse.Success)
             {
-                if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                toastService.ShowSuccess("Admin Log purged!");
+                
+                // Clear cache and reload (should now be empty)
+                CacheHelper.InvalidateCacheObject("AdminLogMessage");
+                serviceResponse = await AdminLogService.GetItemsAsync();
+                if (serviceResponse.Success)
                 {
-                    lstAdminLogMessages = (List<AdminLogMessage>)serviceResponse.ResponseObject!;
+                    if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                    {
+                        lstAdminLogMessages = (List<AdminLogMessage>)serviceResponse.ResponseObject!;
+                    }
                 }
             }
+            else
+            {
+                toastService.ShowError("Failed to purge Admin Log. Please check the application logs.");
+            }
+            
             dataLoaded = true;
             StateHasChanged();
         }
