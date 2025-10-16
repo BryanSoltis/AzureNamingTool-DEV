@@ -1122,15 +1122,17 @@
             return;
         }
 
-        // Second confirmation (text input required - simulated for now, will use TextConfirmationModal later)
-        var confirm2 = await ModalHelper.ShowConfirmationModal(
+        // Second confirmation with text input required
+        var confirm2 = await ModalHelper.ShowTextConfirmationModal(
             Modal!, 
-            "FINAL CONFIRMATION - Type MIGRATE to proceed (Step 2 of 2)", 
+            "FINAL CONFIRMATION (Step 2 of 2)", 
             "<div class=\"my-4\"><p class=\"text-danger\"><strong>FINAL WARNING: This action cannot be undone!</strong></p>" +
-            "<p>Please confirm you want to migrate to SQLite.</p>" +
-            "<p><strong>Note:</strong> In the next update, you will need to type 'MIGRATE' to confirm. For now, click Yes to proceed.</p></div>", 
+            "<p>The migration to SQLite is irreversible. Your JSON files will be preserved but no longer actively used.</p>" +
+            "<p>You will need to use the Configuration page to restore from backups if needed.</p></div>",
+            "MIGRATE",
             "bg-danger", 
-            theme
+            theme,
+            true  // case-sensitive
         );
 
         if (!confirm2)

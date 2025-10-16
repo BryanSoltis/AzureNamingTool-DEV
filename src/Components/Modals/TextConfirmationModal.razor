@@ -1,0 +1,134 @@
+@using AzureNamingTool.Helpers
+@using AzureNamingTool.Models
+@using AzureNamingTool.Components
+@inject StateContainer state
+@inject ProtectedSessionStorage session
+@inject IToastService toastService
+@inject ILogger<TextConfirmationModal> Logger
+
+<div class="modal fade show d-block" tabindex="-1" role="dialog">
+    <div class="modal-backdrop fade show" @onclick="Cancel"></div>
+    <div class="modal-dialog" style="z-index: 1050">
+        <!-- Pop it above the backdrop -->
+        <div class="modal-content @theme.ThemeStyle">
+            <div class="modal-header @headerstyle text-white">
+                <h3 class="modal-title">@title</h3>
+            </div>
+            <div class="modal-body">
+                @if (GeneralHelper.IsNotNull(message))
+                {
+                    <div class="mb-3">
+                        @((MarkupString)message)
+                    </div>
+                }
+                
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    <strong>Type the following text to confirm:</strong>
+                    <div class="mt-2">
+                        <code class="fs-5 bg-dark text-white px-2 py-1">@requiredText</code>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmationText" class="fw-bold">Confirmation Text</label>
+                    <input 
+                        id="confirmationText" 
+                        type="text" 
+                        class="form-control @(showError ? "is-invalid" : "")" 
+                        @bind="userInput" 
+                        @bind:event="oninput"
+                        @onkeyup="HandleKeyPress"
+                        placeholder="Type the text above"
+                        autofocus />
+                    @if (showError)
+                    {
+                        <div class="invalid-feedback">
+                            The text you entered does not match. Please type exactly: <strong>@requiredText</strong>
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button 
+                    type="button" 
+                    class="btn btn-success" 
+                    @onclick="Confirm"
+                    disabled="@(!IsTextMatching)">
+                    OK
+                </button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public EventCallback<bool> OnClose { get; set; }
+    
+    [CascadingParameter] 
+    BlazoredModalInstance ModalInstance { get; set; } = new();
+    
+    [Parameter] 
+    public ThemeInfo theme { get; set; } = new();
+
+    [Parameter] 
+    public string title { get; set; } = String.Empty;
+    
+    [Parameter] 
+    public string message { get; set; } = String.Empty;
+    
+    [Parameter] 
+    public string headerstyle { get; set; } = String.Empty;
+    
+    [Parameter]
+    public string requiredText { get; set; } = "CONFIRM";
+    
+    [Parameter]
+    public bool caseSensitive { get; set; } = true;
+
+    private string userInput = String.Empty;
+    private bool showError = false;
+
+    private bool IsTextMatching
+    {
+        get
+        {
+            if (string.IsNullOrEmpty(userInput))
+                return false;
+                
+            if (caseSensitive)
+                return userInput == requiredText;
+            else
+                return userInput.Equals(requiredText, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    private void HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter" && IsTextMatching)
+        {
+            _ = Confirm();
+        }
+    }
+
+    async Task Confirm()
+    {
+        if (IsTextMatching)
+        {
+            showError = false;
+            await ModalInstance.CloseAsync();
+        }
+        else
+        {
+            showError = true;
+            StateHasChanged();
+        }
+    }
+
+    async Task Cancel()
+    {
+        await ModalInstance.CancelAsync();
+    }
+}
