@@ -74,14 +74,14 @@
                         <div class="modern-card-body">
                             <div class="modern-radio-group">
                                 <div class="modern-radio-item">
-                                    <input class="modern-radio-input" type="radio" name="generateselect" id="singleselect" value="single" checked="@(generateMode == "single")" @onchange="@(() => OnGenerateModeChangeHandler("single"))">
+                                    <input class="modern-radio-input" type="radio" name="generateselect" id="singleselect" value="single" checked @onclick="@(e => OnGenerateModeChange("single"))">
                                     <label class="modern-radio-label" for="singleselect">
                                         <div class="modern-radio-title">Generate Single Resource Type Name</div>
                                         <div class="modern-radio-description">This option will allow the generation of a single resource type name using the selected components.</div>
                                     </label>
                                 </div>
                                 <div class="modern-radio-item">
-                                    <input class="modern-radio-input" type="radio" name="generateselect" id="multiselect" value="multi" checked="@(generateMode == "multi")" @onchange="@(() => OnGenerateModeChangeHandler("multi"))">
+                                    <input class="modern-radio-input" type="radio" name="generateselect" id="multiselect" value="multi" @onclick="@(e => OnGenerateModeChange("multi"))">
                                     <label class="modern-radio-label" for="multiselect">
                                         <div class="modern-radio-title">Generate Multiple Resource Type Names</div>
                                         <div class="modern-radio-description">This option will allow the generation of names for multiple resource types using the selected components. <span class="modern-text-warning">All components will be required (Optional and Excluded Components).</span></div>
@@ -593,7 +593,6 @@
     private string componentsVisible = "collapse in";
     private string resourcetypeVisible = "";
     private string resourcetypesVisible = "collapse";
-    private string generateMode = "single";
     private string optional = " <span class=\"fst-italic\">** OPTIONAL **</span>";
     private string[] filteredscopes = new string[] { "resource group", "resource group & region", "region", "global", "subscription", "tenant" };
     private ResourceNameRequest resourceNameRequest = new();
@@ -841,13 +840,6 @@
                 workingmodal.Close();
             }
         }
-    }
-
-    private void OnGenerateModeChangeHandler(string mode)
-    {
-        generateMode = mode;
-        // Use InvokeAsync to properly handle the async call
-        InvokeAsync(async () => await OnGenerateModeChange(mode));
     }
 
     private async Task OnGenerateModeChange(string mode)
