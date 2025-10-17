@@ -13,90 +13,90 @@
         <div class="modern-modal-content">
             <div class="modern-modal-body">
                 <div class="modern-card">
-                    <div class="modern-card-header bg-navcolor text-white">
-                        <h3 class="modern-modal-title">Select Resource Types</h3>
+                    <div class="modern-card-header">
+                        <h3 class="modern-card-title mb-0">Select Resource Types</h3>
                     </div>
                     <div class="modern-card-body">
-                        <p>
+                        <p class="mb-3">
                             Select the resource types.
                         </p>
 
-                <div class="form-group row mt-3">
-                <div class="input-group flex-nowrap">
-                    <div class="input-group flex-nowrap mb-3">
-                        <span class="input-group-text" id="addon-wrapping">
-                            <span class="oi oi-magnifying-glass" id="addon-wrapping"></span>
-                        </span>
-                        <input class="modern-form-input" type="search" placeholder="Filter by Name, Short Name"
-                               @bind="filterData"
-                               @bind:event="oninput">
-                    </div>
-                </div>
-            </div>
+                        <div class="modern-input-group mb-3">
+                            <span class="modern-input-group-icon">
+                                <span class="oi oi-magnifying-glass"></span>
+                            </span>
+                            <input class="modern-form-input" type="search" placeholder="Filter by Name, Short Name"
+                                   @bind="filterData"
+                                   @bind:event="oninput">
+                        </div>
 
-            <div class="modern-card mb-3">
-                <h5 class="modern-card-header text-white bg-secondary">
-                    <a id="ResourceDelimiter" class="link-light text-decoration-none" data-bs-toggle="collapse" style="display:block;" href="#resourcetypes" role="button" aria-expanded="false" aria-controls="resourcetypes">
-                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Resource Types
-                    </a>
-                </h5>
-                <div class="collapse show modern-card-body" id="resourcetypes">
-                    @foreach (var category in categories)
-                    {
-                        if (!IsCategoryVisible(category))
-                            continue;
-                        <div id="@("multitypecontainer_"+@category)" class="modern-card mb-3">
-                            <div class="modern-card-header">
-                                <a id="NamingGuidlines" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="@("#multitypesection_"+@category)" role="button" aria-expanded="false" aria-controls="@("multitypesection_"+@category)">
-                                    <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @category
-                                </a>
-                            </div>
-                            <div class="collapse show modern-card-body" id="@("multitypesection_"+@category)">
-                                <ul style="list-style-type: none;word-break: break-word;">
-                                    @foreach (var resourceType in ResourceTypeService.GetFilteredResourceTypes(servicesData.ResourceTypes!, category))
+                        <div class="modern-card mb-3">
+                            <details class="modern-collapsible" open>
+                                <summary class="modern-collapsible-header">
+                                    <span class="modern-collapsible-icon">
+                                        <span class="oi oi-chevron-bottom"></span>
+                                    </span>
+                                    <span class="modern-collapsible-title">Resource Types</span>
+                                </summary>
+                                <div class="modern-collapsible-content">
+                                    @foreach (var category in categories)
                                     {
-                                        if (!IsTypeVisible(resourceType))
+                                        if (!IsCategoryVisible(category))
                                             continue;
-                                        <li>
-                                            <div class="form-check">
-                                                @if (multiselectedResourceTypes.Contains(resourceType.Id.ToString()))
-                                                {
-                                                    <input class="form-check-input" type="checkbox" checked value="@resourceType.Id" id="@("multitype_"+@resourceType.Id)" @onchange="eventArgs => { OnMultiTypesChange(resourceType.Id.ToString(), eventArgs.Value!); }">
-                                                }
-                                                else
-                                                {
-                                                    <input class="form-check-input" type="checkbox" value="@resourceType.Id" id="@("multitype_"+@resourceType.Id)" @onchange="eventArgs => { OnMultiTypesChange(resourceType.Id.ToString(), eventArgs.Value!); }">
-                                                }
-                                                @if (!String.IsNullOrEmpty(resourceType.Property))
-                                                {
-                                                    <label class="form-check-label" for="flexCheckDefault">
-                                                        @resourceType.Resource - @resourceType.Property (@resourceType.ShortName)
-                                                    </label>
-                                                }
-                                                else
-                                                {
-                                                    <label class="form-check-label" for="flexCheckDefault">
-                                                        @resourceType.Resource (@resourceType.ShortName)
-                                                    </label>
-                                                    }
+                                        <div id="@("multitypecontainer_"+@category)" class="modern-card mb-3">
+                                            <details class="modern-collapsible" open>
+                                                <summary class="modern-collapsible-header">
+                                                    <span class="modern-collapsible-icon">
+                                                        <span class="oi oi-chevron-bottom"></span>
+                                                    </span>
+                                                    <span class="modern-collapsible-title">@category</span>
+                                                </summary>
+                                                <div class="modern-collapsible-content">
+                                                    <ul style="list-style-type: none; padding-left: 0;">
+                                                        @foreach (var resourceType in ResourceTypeService.GetFilteredResourceTypes(servicesData.ResourceTypes!, category))
+                                                        {
+                                                            if (!IsTypeVisible(resourceType))
+                                                                continue;
+                                                            <li class="mb-2">
+                                                                <label class="modern-checkbox-label">
+                                                                    @if (multiselectedResourceTypes.Contains(resourceType.Id.ToString()))
+                                                                    {
+                                                                        <input class="modern-checkbox" type="checkbox" checked value="@resourceType.Id" id="@("multitype_"+@resourceType.Id)" @onchange="eventArgs => { OnMultiTypesChange(resourceType.Id.ToString(), eventArgs.Value!); }">
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <input class="modern-checkbox" type="checkbox" value="@resourceType.Id" id="@("multitype_"+@resourceType.Id)" @onchange="eventArgs => { OnMultiTypesChange(resourceType.Id.ToString(), eventArgs.Value!); }">
+                                                                    }
+                                                                    <span class="modern-checkbox-text">
+                                                                        @if (!String.IsNullOrEmpty(resourceType.Property))
+                                                                        {
+                                                                            <span>@resourceType.Resource - @resourceType.Property (@resourceType.ShortName)</span>
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            <span>@resourceType.Resource (@resourceType.ShortName)</span>
+                                                                        }
+                                                                    </span>
+                                                                </label>
+                                                            </li>
+                                                        }
+                                                    </ul>
                                                 </div>
-                                            </li>
-                                        }
-                                    </ul>
+                                            </details>
+                                        </div>
+                                    }
                                 </div>
-                            </div>
-                        }
+                            </details>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>
 
-<div class="modern-modal-footer">
-    <button title="Close" @onclick="Save" class="modern-btn-success">Close</button>
-</div>
-</div>
+        <div class="modern-modal-footer">
+            <button title="Close" @onclick="Save" class="modern-btn-success">Close</button>
+        </div>
+    </div>
 </div>
 
 @code {
