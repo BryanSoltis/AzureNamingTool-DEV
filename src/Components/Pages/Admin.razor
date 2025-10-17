@@ -902,38 +902,23 @@
                         @if (!String.IsNullOrEmpty(selectedComponentType))
                         {
                             <div class="row g-3">
-                                <!-- Export Component - Only for FileSystem/JSON storage -->
-                                @if (!isUsingSQLite)
-                                {
-                                    <div class="col-md-6">
-                                        <div class="modern-action-card">
-                                            <div class="action-card-icon">
-                                                <i class="bi bi-file-earmark-arrow-down"></i>
-                                            </div>
-                                            <div class="action-card-content">
-                                                <h6 class="action-card-title">Export @GetComponentDisplayName(selectedComponentType)</h6>
-                                                <p class="action-card-description">
-                                                    Download the current @GetComponentDisplayName(selectedComponentType) configuration as JSON.
-                                                </p>
-                                                <button type="button" class="modern-btn-primary" @onclick="ExportComponentData" title="Export Component">
-                                                    <i class="bi bi-download"></i> Export @GetComponentDisplayName(selectedComponentType)
-                                                </button>
-                                            </div>
+                                <!-- Export Component - Available for all storage types -->
+                                <div class="col-md-6">
+                                    <div class="modern-action-card">
+                                        <div class="action-card-icon">
+                                            <i class="bi bi-file-earmark-arrow-down"></i>
+                                        </div>
+                                        <div class="action-card-content">
+                                            <h6 class="action-card-title">Export @GetComponentDisplayName(selectedComponentType)</h6>
+                                            <p class="action-card-description">
+                                                Download the current @GetComponentDisplayName(selectedComponentType) configuration as JSON for sharing or backup purposes.
+                                            </p>
+                                            <button type="button" class="modern-btn-primary" @onclick="ExportComponentData" title="Export Component">
+                                                <i class="bi bi-download"></i> Export @GetComponentDisplayName(selectedComponentType)
+                                            </button>
                                         </div>
                                     </div>
-                                }
-                                else
-                                {
-                                    <div class="col-md-6">
-                                        <div class="modern-action-card">
-                                            <div class="modern-notification-warning">
-                                                <i class="bi bi-info-circle"></i>
-                                                <strong>SQLite Storage Active</strong><br />
-                                                Component export is only available when using FileSystem (JSON) storage. Use the full configuration export above for SQLite backups.
-                                            </div>
-                                        </div>
-                                    </div>
-                                }
+                                </div>
 
                                 <!-- Import Component - Available for all storage types -->
                                 <div class="col-md-6">
@@ -944,7 +929,7 @@
                                         <div class="action-card-content">
                                             <h6 class="action-card-title">Import @GetComponentDisplayName(selectedComponentType)</h6>
                                             <p class="action-card-description">
-                                                Upload and import @GetComponentDisplayName(selectedComponentType) configuration from JSON.
+                                                Upload and import @GetComponentDisplayName(selectedComponentType) configuration from JSON. This will update your current storage provider.
                                             </p>
                                             <div class="modern-notification-danger mb-3">
                                                 <i class="bi bi-exclamation-triangle-fill"></i>
