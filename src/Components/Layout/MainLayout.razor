@@ -42,17 +42,7 @@
             </div>
             
             <div class="header-right">
-                @if (!String.IsNullOrEmpty(currentuser))
-                {
-                    if (currentuser != "System")
-                    {
-                        <div class="user-info">
-                            <span class="oi oi-person"></span>
-                            <span class="user-name">@currentuser</span>
-                        </div>
-                    }
-                }
-                
+                <!-- Feedback Button -->
                 @if (admin)
                 {
                     @if (!String.IsNullOrEmpty(feedbackurl))
@@ -67,14 +57,35 @@
                     }
                 }
                 
-                <!-- Theme Toggle (Old Style - Will be replaced with ThemeToggle component in Phase 5.5) -->
-                <div class="theme-toggle-wrapper">
-                    <label class="switch" title="App Theme">
-                        <input type="checkbox" checked="@isdarktheme" @oninput="ThemeChanged">
-                        <span class="slider round"></span>
-                    </label>
+                <!-- Theme Toggle -->
+                <div class="modern-theme-toggle">
+                    <button type="button" class="theme-toggle-btn" @onclick="ToggleTheme" title="Toggle Light/Dark Theme">
+                        @if (isdarktheme)
+                        {
+                            <i class="bi bi-moon-stars-fill theme-icon"></i>
+                            <span class="theme-label">Dark</span>
+                        }
+                        else
+                        {
+                            <i class="bi bi-sun-fill theme-icon"></i>
+                            <span class="theme-label">Light</span>
+                        }
+                    </button>
                 </div>
                 
+                <!-- User Info -->
+                @if (!String.IsNullOrEmpty(currentuser))
+                {
+                    if (currentuser != "System")
+                    {
+                        <div class="user-info">
+                            <span class="oi oi-person"></span>
+                            <span class="user-name">@currentuser</span>
+                        </div>
+                    }
+                }
+                
+                <!-- Logout Button -->
                 @if (!String.IsNullOrEmpty(currentuser))
                 {
                     if (currentuser != "System")
@@ -222,16 +233,24 @@
             {
                 theme.ThemeStyle = "bg-default text-dark";
             }
+            
+            string jsTheme;
             if (theme.ThemeStyle == "bg-default text-dark")
             {
                 theme.ThemeName = "Light";
                 isdarktheme = false;
+                jsTheme = "light";
             }
             else
             {
                 theme.ThemeName = "Dark";
                 isdarktheme = true;
+                jsTheme = "dark";
             }
+            
+            // Initialize theme using JavaScript
+            await JsRuntime.InvokeVoidAsync("setTheme", jsTheme);
+            
             state.AppTheme = theme.ThemeStyle!;
 
             // Check if Feedback is enabled
@@ -377,21 +396,33 @@
         }
     }
 
-    private async void ThemeChanged(ChangeEventArgs e)
+    private async void ToggleTheme()
     {
-        isdarktheme = (bool)e.Value!;
+        // Toggle the theme state
+        isdarktheme = !isdarktheme;
+        
+        string newTheme;
         if (!isdarktheme)
         {
-            theme.ThemeName = "Dark";
+            theme.ThemeName = "Light";
             theme.ThemeStyle = "bg-default text-dark";
+            newTheme = "light";
         }
         else
         {
-            theme.ThemeName = "Light";
+            theme.ThemeName = "Dark";
             theme.ThemeStyle = "bg-dark text-white";
+            newTheme = "dark";
         }
+        
+        // Apply theme using JavaScript
+        await JsRuntime.InvokeVoidAsync("setTheme", newTheme);
+        
+        // Save to storage
         await storage.SetAsync("apptheme", theme.ThemeStyle);
         state.AppTheme = theme.ThemeStyle;
+        
+        StateHasChanged();
     }
 
     private async void Logout()

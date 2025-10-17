@@ -177,10 +177,59 @@
     color: var(--color-text-primary);
 }
 
-/* Theme Toggle Wrapper (temporary until ThemeToggle component) */
-.theme-toggle-wrapper {
+/* Theme Toggle Wrapper (modern button style) */
+.modern-theme-toggle {
     display: flex;
     align-items: center;
+}
+
+.theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-md);
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.theme-toggle-btn:hover {
+    background: var(--color-hover-bg);
+    border-color: var(--color-border-hover);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.theme-toggle-btn:active {
+    transform: translateY(0);
+}
+
+.theme-toggle-btn .theme-icon {
+    font-size: 16px;
+    transition: transform var(--transition-fast);
+}
+
+.theme-toggle-btn:hover .theme-icon {
+    transform: rotate(20deg);
+}
+
+.theme-toggle-btn .theme-label {
+    font-size: var(--font-size-sm);
+    white-space: nowrap;
+}
+
+/* Dark mode specific icon colors */
+[data-theme="dark"] .theme-toggle-btn .bi-moon-stars-fill {
+    color: #fbbf24;
+}
+
+[data-theme="light"] .theme-toggle-btn .bi-sun-fill {
+    color: #f59e0b;
 }
 
 /* ===================================================================

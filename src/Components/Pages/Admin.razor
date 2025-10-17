@@ -11,6 +11,7 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using Microsoft.Extensions.Logging
 @using System.Reflection;
+@using System.Text.Json;
 @using Markdig;
 @inject IJSRuntime JsRuntime
 @inject StateContainer state
@@ -89,6 +90,10 @@
                 <button class="modern-tab" data-tab="tab-settings">
                     <span class="oi oi-cog tab-icon" aria-hidden="true"></span>
                     Site Settings
+                </button>
+                <button class="modern-tab" data-tab="tab-configuration">
+                    <span class="oi oi-database tab-icon" aria-hidden="true"></span>
+                    Configuration
                 </button>
                 <button class="modern-tab" data-tab="tab-security">
                     <span class="oi oi-lock-locked tab-icon" aria-hidden="true"></span>
@@ -649,6 +654,259 @@
                 }
             </div>
 
+            <!-- Configuration Tab Content -->
+            <div id="tab-configuration" class="modern-tab-content">
+                <h3 class="mb-3">Configuration Management</h3>
+                <p class="text-secondary mb-4">
+                    Backup, restore, and manage your Azure Naming Tool configuration data. Available options depend on your storage provider.
+                </p>
+
+                @if (isUsingSQLite)
+                {
+                    <!-- SQLite Backup Options -->
+                    <div class="modern-setting-row">
+                        <div class="setting-label">
+                            <i class="bi bi-download"></i> Backup Options
+                        </div>
+                        <div class="setting-description">
+                            Create backups of your configuration data for disaster recovery or migration purposes.
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="modern-notification-info mb-3">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>SQLite Storage Active</strong><br />
+                                You can backup your data as a database file or export as JSON for portability.
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="modern-action-card">
+                                        <div class="action-card-icon">
+                                            <i class="bi bi-database"></i>
+                                        </div>
+                                        <div class="action-card-content">
+                                            <h6 class="action-card-title">Download Database File</h6>
+                                            <p class="action-card-description">
+                                                Download the complete SQLite database file (azurenamingtool.db) for backup purposes.
+                                            </p>
+                                            <p class="action-card-use-case">
+                                                <strong>When to use:</strong> For routine backups and quick disaster recovery.
+                                            </p>
+                                            <button type="button" class="modern-btn-primary" @onclick="DownloadDatabaseFile" title="Download Database">
+                                                <i class="bi bi-download"></i> Download Database
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="modern-action-card">
+                                        <div class="action-card-icon">
+                                            <i class="bi bi-file-earmark-code"></i>
+                                        </div>
+                                        <div class="action-card-content">
+                                            <h6 class="action-card-title">Export as JSON</h6>
+                                            <p class="action-card-description">
+                                                Export all configuration data as JSON format for portability and version control.
+                                            </p>
+                                            <p class="action-card-use-case">
+                                                <strong>When to use:</strong> For sharing configurations or migrating between instances.
+                                            </p>
+                                            <button type="button" class="modern-btn-primary" @onclick="ExportConfigurationAsJson" title="Export JSON">
+                                                <i class="bi bi-file-earmark-arrow-down"></i> Export JSON
+                                            </button>
+                                            @if (currentuser == "GlobalAdmin")
+                                            {
+                                                <div class="modern-checkbox-wrapper mt-2">
+                                                    <input id="includeAdminExport" title="Include Security/Identity Provider Settings" class="modern-checkbox" type="checkbox" @bind="@includeAdmin">
+                                                    <label for="includeAdminExport" class="modern-checkbox-label">
+                                                        Include Security/Identity Provider Settings
+                                                    </label>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SQLite Restore Options -->
+                    <div class="modern-setting-row">
+                        <div class="setting-label">
+                            <i class="bi bi-arrow-counterclockwise"></i> Restore Options
+                        </div>
+                        <div class="setting-description">
+                            Restore your configuration from a previous backup. This will replace your current data.
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="modern-notification-danger mb-3">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <strong>WARNING:</strong> Restore operations will replace your current configuration data. This action cannot be undone. Always create a backup before restoring.
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <div class="modern-action-card">
+                                        <div class="action-card-icon">
+                                            <i class="bi bi-database-fill-up"></i>
+                                        </div>
+                                        <div class="action-card-content">
+                                            <h6 class="action-card-title">Restore from Database File</h6>
+                                            <p class="action-card-description">
+                                                Upload and replace the current database with a previously downloaded SQLite database file.
+                                            </p>
+                                            <p class="action-card-use-case">
+                                                <strong>Use case:</strong> Disaster recovery or reverting to a previous backup.
+                                            </p>
+                                            <div class="mt-2">
+                                                <label class="modern-form-label">Select Database File (.db)</label>
+                                                <InputFile OnChange="HandleSQLiteDatabaseUpload" accept=".db" class="modern-form-input" />
+                                            </div>
+                                            @if (sqliteBackupFile != null)
+                                            {
+                                                <div class="modern-notification-success mt-2">
+                                                    <strong>Selected:</strong> @sqliteBackupFile.Name (@FormatFileSize(sqliteBackupFile.Size))
+                                                </div>
+                                                <button type="button" class="modern-btn-warning mt-2" @onclick="RestoreFromSQLiteBackup" title="Restore Database">
+                                                    <i class="bi bi-arrow-counterclockwise"></i> Restore Database
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="modern-action-card">
+                                        <div class="action-card-icon">
+                                            <i class="bi bi-file-earmark-arrow-up"></i>
+                                        </div>
+                                        <div class="action-card-content">
+                                            <h6 class="action-card-title">Restore from JSON File</h6>
+                                            <p class="action-card-description">
+                                                Import configuration data from a JSON backup file. Works with both pre-migration and post-migration JSON exports.
+                                            </p>
+                                            <p class="action-card-use-case">
+                                                <strong>Use case:</strong> Importing configurations from another instance or pre-migration backups.
+                                            </p>
+                                            <div class="mt-2">
+                                                <label class="modern-form-label">Select JSON File (.json)</label>
+                                                <InputFile OnChange="HandleJsonConfigUpload" accept=".json" class="modern-form-input" />
+                                            </div>
+                                            @if (jsonBackupFile != null)
+                                            {
+                                                <div class="modern-notification-success mt-2">
+                                                    <strong>Selected:</strong> @jsonBackupFile.Name (@FormatFileSize(jsonBackupFile.Size))
+                                                </div>
+                                                <button type="button" class="modern-btn-warning mt-2" @onclick="RestoreFromJsonBackup" title="Restore from JSON">
+                                                    <i class="bi bi-arrow-counterclockwise"></i> Restore from JSON
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Reset Configuration -->
+                    <div class="modern-setting-row">
+                        <div class="setting-label">
+                            <i class="bi bi-arrow-clockwise"></i> Reset Configuration
+                        </div>
+                        <div class="setting-description">
+                            Reset the Global Configuration back to the default values at the time of installation. This will apply to all component configurations.
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="modern-notification-danger">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <strong>WARNING:</strong> This will reset your current Global Configuration to factory defaults. This action cannot be undone. Create a backup before proceeding.
+                            </div>
+                            <button type="button" class="modern-btn-danger mt-3" @onclick="@(e => FormAction("Global",0,"reset"))" title="Reset">
+                                <i class="bi bi-arrow-clockwise"></i> Reset Global Configuration
+                            </button>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <!-- FileSystem Export -->
+                    <div class="modern-setting-row">
+                        <div class="setting-label">
+                            <i class="bi bi-download"></i> Export Configuration
+                        </div>
+                        <div class="setting-description">
+                            Export your current Global Configuration as JSON. This includes all components, options, and tool settings.
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="modern-notification-info mb-3">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>FileSystem Storage Active</strong><br />
+                                Your configuration is stored in JSON files. Use this option to create a backup or share your configuration.
+                            </div>
+
+                            <button type="button" class="modern-btn-primary" @onclick="@(e => FormAction("Global",0,"download"))" title="Export">
+                                <i class="bi bi-file-earmark-arrow-down"></i> Export Configuration
+                            </button>
+                            @if (currentuser == "GlobalAdmin")
+                            {
+                                <div class="modern-checkbox-wrapper mt-2">
+                                    <input id="includeAdminExportFS" title="Include Security/Identity Provider Settings" class="modern-checkbox" type="checkbox" @bind="@includeAdmin">
+                                    <label for="includeAdminExportFS" class="modern-checkbox-label">
+                                        Include Security/Identity Provider Settings
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- FileSystem Reset -->
+                    <div class="modern-setting-row">
+                        <div class="setting-label">
+                            <i class="bi bi-arrow-clockwise"></i> Reset Configuration
+                        </div>
+                        <div class="setting-description">
+                            Reset the Global Configuration back to the default values at the time of installation.
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="modern-notification-danger">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <strong>WARNING:</strong> This will reset your current Global Configuration to factory defaults. This action cannot be undone. Create a backup before proceeding.
+                            </div>
+                            <button type="button" class="modern-btn-danger mt-3" @onclick="@(e => FormAction("Global",0,"reset"))" title="Reset">
+                                <i class="bi bi-arrow-clockwise"></i> Reset Global Configuration
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- FileSystem Import -->
+                    <div class="modern-setting-row">
+                        <div class="setting-label">
+                            <i class="bi bi-upload"></i> Import Configuration
+                        </div>
+                        <div class="setting-description">
+                            Import a Global Configuration from JSON. This will update all existing configurations.
+                        </div>
+                        
+                        <div class="mt-3">
+                            <div class="modern-notification-danger mb-3">
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <strong>WARNING:</strong> This will overwrite your current configuration data and cannot be undone. Create a backup before proceeding.
+                            </div>
+                            
+                            <label class="modern-form-label">Configuration JSON</label>
+                            <textarea title="Configuration" class="modern-form-textarea" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newGlobalConfig",(string)ui.Value!);})" />
+                            <button type="button" class="modern-btn-success mt-2" @onclick="@(e => FormAction("Global",0,"update"))" title="Import">
+                                <i class="bi bi-file-earmark-arrow-up"></i> Import Configuration
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+
             <!-- Identity Provider Tab Content -->
             <div id="tab-identity" class="modern-tab-content">
                 <h3 class="mb-3">Identity Provider Settings</h3>
@@ -814,6 +1072,9 @@
     [Inject]
     public IBlazorDownloadFileService? BlazorDownloadFileService { get; set; }
     
+    [Inject]
+    public IConfiguration? Configuration { get; set; }
+    
     private ServicesData servicesData = new();
     private string currentpassword = String.Empty;
     private string newpassword = String.Empty;
@@ -857,6 +1118,13 @@
     private string migrationErrorMessage = String.Empty;
     private bool preMigrationBackupCompleted = false;
     private string preMigrationBackupFileName = String.Empty;
+
+    // Backup/Restore related variables
+    private IBrowserFile? sqliteBackupFile;
+    private IBrowserFile? jsonBackupFile;
+    private bool includeAdmin = false;
+    private bool isUsingSQLite => currentStorageProvider == "SQLite";
+    private string newGlobalConfig = String.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -1642,6 +1910,9 @@
             case "customtoolname":
                 customtoolname = value;
                 break;
+            case "newGlobalConfig":
+                newGlobalConfig = value;
+                break;
         }
     }
 
@@ -1883,6 +2154,736 @@
         }
         StateHasChanged();
     }
+    
+    // Configuration Backup/Restore Methods
+    
+    private async Task FormAction(string type, long id, string action, string parentcomponent = "")
+    {
+        if (type == "Global")
+        {
+            message = new ResponseMessage();
+            bool confirm = false;
+            ServiceResponse serviceResponse = new();
+            JsonSerializerOptions options = new JsonSerializerOptions
+            {
+                PropertyNameCaseInsensitive = true
+            };
+            
+            var workingmodaloptions = new ModalOptions()
+            {
+                HideCloseButton = true,
+                UseCustomLayout = true
+            };
+            
+            if (GeneralHelper.IsNotNull(Modal))
+            {
+                var workingmodal = Modal.Show<WorkingModal>("Working", workingmodaloptions);
+                try
+                {
+                    switch (action)
+                    {
+                        case "download":
+                            serviceResponse = await ImportExportService!.ExportConfigAsync(includeAdmin);
+                            if (serviceResponse.Success)
+                            {
+                                if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
+                                {
+                                    var globaljson = serviceResponse.ResponseObject;
+                                    if (GeneralHelper.IsNotNull(BlazorDownloadFileService))
+                                    {
+                                        await BlazorDownloadFileService.DownloadFileFromText("globalconfig.json", JsonSerializer.Serialize(globaljson).ToString(), System.Text.Encoding.UTF8, "application/octet-stream");
+                                    }
+                                }
+                            }
+                            break;
+                        case "reset":
+                            confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will reset the current Global Configuration for all settings and cannot be undone!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                            if (confirm)
+                            {
+                                bool confirmglobalreset = await ModalHelper.ShowTextConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\"><span class=\"fw-bold\">Every setting of the site will be reset if you continue!</span></div><div class=\"my-4\">It is recommended you take a backup of the configuration before proceeding!</div><div class=\"my-4\"><strong>Type CONFIRM to proceed:</strong></div>", "CONFIRM", "bg-danger", theme);
+                                if (confirmglobalreset)
+                                {
+                                    try
+                                    {
+                                        // Log the global reset attempt
+                                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                        { 
+                                            Title = "INFORMATION", 
+                                            Message = $"Global configuration reset started. Storage mode: {currentStorageProvider}" 
+                                        });
+
+                                        if (isUsingSQLite)
+                                        {
+                                            // For SQLite: Load all configuration from repository JSON files and save to database
+                                            var repositoryPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "repository");
+                                            
+                                            // Reset all components using ImportExportService
+                                            // This loads from repository files and saves to database
+                                            var configData = new ConfigurationData();
+                                            
+                                            // Load each configuration type from repository
+                                            JsonSerializerOptions jsonOptions = new JsonSerializerOptions
+                                            {
+                                                PropertyNameCaseInsensitive = true
+                                            };
+                                            
+                                            // Load resource components
+                                            var componentsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourcecomponents.json"));
+                                            configData.ResourceComponents = JsonSerializer.Deserialize<List<ResourceComponent>>(componentsJson, jsonOptions)!;
+                                            
+                                            // Load resource delimiters
+                                            var delimitersJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourcedelimiters.json"));
+                                            configData.ResourceDelimiters = JsonSerializer.Deserialize<List<ResourceDelimiter>>(delimitersJson, jsonOptions)!;
+                                            
+                                            // Load resource environments
+                                            var environmentsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourceenvironments.json"));
+                                            configData.ResourceEnvironments = JsonSerializer.Deserialize<List<ResourceEnvironment>>(environmentsJson, jsonOptions)!;
+                                            
+                                            // Load resource functions
+                                            var functionsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourcefunctions.json"));
+                                            configData.ResourceFunctions = JsonSerializer.Deserialize<List<ResourceFunction>>(functionsJson, jsonOptions)!;
+                                            
+                                            // Load resource locations
+                                            var locationsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourcelocations.json"));
+                                            configData.ResourceLocations = JsonSerializer.Deserialize<List<AzureNamingTool.Models.ResourceLocation>>(locationsJson, jsonOptions)!;
+                                            
+                                            // Load resource orgs
+                                            var orgsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourceorgs.json"));
+                                            configData.ResourceOrgs = JsonSerializer.Deserialize<List<ResourceOrg>>(orgsJson, jsonOptions)!;
+                                            
+                                            // Load resource project/app/services
+                                            var projappsvcJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourceprojappsvcs.json"));
+                                            configData.ResourceProjAppSvcs = JsonSerializer.Deserialize<List<ResourceProjAppSvc>>(projappsvcJson, jsonOptions)!;
+                                            
+                                            // Load resource types
+                                            var typesJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourcetypes.json"));
+                                            configData.ResourceTypes = JsonSerializer.Deserialize<List<ResourceType>>(typesJson, jsonOptions)!;
+                                            
+                                            // Load resource unit/depts
+                                            var unitdeptsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "resourceunitdepts.json"));
+                                            configData.ResourceUnitDepts = JsonSerializer.Deserialize<List<ResourceUnitDept>>(unitdeptsJson, jsonOptions)!;
+                                            
+                                            // Load custom components
+                                            var customcomponentsJson = await File.ReadAllTextAsync(Path.Combine(repositoryPath, "customcomponents.json"));
+                                            configData.CustomComponents = JsonSerializer.Deserialize<List<CustomComponent>>(customcomponentsJson, jsonOptions)!;
+                                            
+                                            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                            { 
+                                                Title = "INFORMATION", 
+                                                Message = $"Global reset: Loaded all configuration from repository. Calling PostConfigAsync to save to database..." 
+                                            });
+                                            
+                                            // Save all configuration to database
+                                            var postResponse = await ImportExportService!.PostConfigAsync(configData);
+                                            
+                                            if (postResponse.Success)
+                                            {
+                                                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                                { 
+                                                    Title = "SUCCESS", 
+                                                    Message = "Global reset: All configuration saved to database successfully" 
+                                                });
+                                                
+                                                message.Type = MessageTypesEnum.SUCCESS;
+                                                message.Message = "Global configuration reset! Page will refresh in 2 seconds...";
+                                                
+                                                // Force page refresh to show updated data
+                                                await Task.Delay(2000);
+                                                NavigationManager!.NavigateTo("/admin", true);
+                                            }
+                                            else
+                                            {
+                                                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                                { 
+                                                    Title = "ERROR", 
+                                                    Message = $"Global reset failed: {postResponse.ResponseMessage}" 
+                                                });
+                                                
+                                                message.Type = MessageTypesEnum.ERROR;
+                                                message.Message = "Global configuration reset failed! Please check the Admin Log for details.";
+                                                message.MessageDetails = postResponse.ResponseMessage;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            // For FileSystem: Use existing method which copies files and clears cache
+                                            if (ConfigurationHelper.ResetSiteConfiguration())
+                                            {
+                                                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                                { 
+                                                    Title = "SUCCESS", 
+                                                    Message = "Global reset (FileSystem): Files copied and cache cleared" 
+                                                });
+                                                
+                                                message.Type = MessageTypesEnum.SUCCESS;
+                                                message.Message = "Global configuration reset! Page will refresh in 2 seconds...";
+                                                
+                                                // Force page refresh to show updated data
+                                                await Task.Delay(2000);
+                                                NavigationManager!.NavigateTo("/admin", true);
+                                            }
+                                            else
+                                            {
+                                                message.Type = MessageTypesEnum.ERROR;
+                                                message.Message = "Global configuration reset failed! Please check the Admin Log for details.";
+                                            }
+                                        }
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                                        { 
+                                            Title = "ERROR", 
+                                            Message = $"Global reset exception: {ex.Message}\nStackTrace: {ex.StackTrace}" 
+                                        });
+                                        
+                                        message.Type = MessageTypesEnum.ERROR;
+                                        message.Message = $"Global configuration reset failed: {ex.Message}";
+                                    }
+                                }
+                            }
+                            break;
+                        case "update":
+                            if (GeneralHelper.IsNotNull(newGlobalConfig))
+                            {
+                                confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will update the current Global Configuration and cannot be undone!!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                                if (confirm)
+                                {
+                                    bool confirmglobalupdate = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\"><span class=\"fw-bold\">Every setting of the site will be updated if you continue!</span></div><div class=\"my-4\">It is recommended you take a backup of the configuration before proceeding!</div><div class=\"my-4\">Continue?</div>", "bg-danger", theme);
+                                    if (confirmglobalupdate)
+                                    {
+                                        serviceResponse = await ImportExportService!.PostConfigAsync(JsonSerializer.Deserialize<ConfigurationData>(newGlobalConfig, options)!);
+                                        if (serviceResponse.Success)
+                                        {
+                                            message.Type = MessageTypesEnum.SUCCESS;
+                                            message.Message = "Global config update succeeded!";
+                                            newGlobalConfig = String.Empty;
+                                        }
+                                        else
+                                        {
+                                            message.Type = MessageTypesEnum.ERROR;
+                                            message.Message = "Global config update failed! Please check the Admin Log for details.";
+                                            message.MessageDetails = serviceResponse.ResponseMessage;
+                                        }
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    message.Type = MessageTypesEnum.ERROR;
+                    message.Message = $"Operation failed: {ex.Message}";
+                }
+                finally
+                {
+                    workingmodal.Close();
+                }
+            }
+            
+            // Show message if there is one
+            if (!String.IsNullOrEmpty(message.Message))
+            {
+                await InvokeAsync(() =>
+                {
+                    string bgcolor = message.Type == MessageTypesEnum.SUCCESS ? "bg-success" : 
+                                   message.Type == MessageTypesEnum.WARNING ? "bg-warning" : "bg-danger";
+                    ModalHelper.ShowInformationModal(Modal!, theme, bgcolor, message.Type.ToString(), message.Message, message.MessageDetails, admin);
+                    StateHasChanged();
+                });
+                
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() { Title = message.Type.ToString(), Message = message.Message, Source = currentuser });
+            }
+            
+            StateHasChanged();
+        }
+    }
+    
+    private async Task DownloadDatabaseFile()
+    {
+        string? tempBackupPath = null;
+        try
+        {
+            // Get the database path from configuration (e.g., "settings/azurenamingtool.db")
+            string dbRelativePath = Configuration?.GetValue<string>("StorageOptions:DatabasePath") ?? "settings/azurenamingtool.db";
+            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dbRelativePath);
+            
+            if (!File.Exists(dbPath))
+            {
+                await InvokeAsync(() =>
+                {
+                    ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                        $"Database file not found at: {dbPath}. Ensure you are using SQLite storage.", "", admin);
+                    StateHasChanged();
+                });
+                return;
+            }
+
+            // Create a temporary copy to avoid file lock issues
+            // Use SQLite's VACUUM INTO command which creates a clean backup
+            string dbDirectory = Path.GetDirectoryName(dbPath)!;
+            tempBackupPath = Path.Combine(dbDirectory, $"temp_backup_{Guid.NewGuid()}.db");
+            
+            // Use VACUUM INTO to create a backup copy
+            // This command creates a clean, defragmented copy of the database
+            using (var connection = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={dbPath}"))
+            {
+                await connection.OpenAsync();
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = $"VACUUM INTO '{tempBackupPath.Replace("\\", "\\\\")}'";
+                    await command.ExecuteNonQueryAsync();
+                }
+                await connection.CloseAsync();
+            }
+            
+            // Wait for file system to release handles
+            await Task.Delay(500);
+            
+            // Read the backup file with retry logic
+            byte[] fileBytes;
+            int retryCount = 0;
+            while (true)
+            {
+                try
+                {
+                    fileBytes = await File.ReadAllBytesAsync(tempBackupPath);
+                    break;
+                }
+                catch (IOException) when (retryCount < 5)
+                {
+                    retryCount++;
+                    await Task.Delay(200);
+                }
+            }
+            string fileName = $"azurenamingtool-backup-{DateTime.Now:yyyyMMdd-HHmmss}.db";
+            
+            await BlazorDownloadFileService!.DownloadFile(fileName, fileBytes, "application/x-sqlite3");
+            
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-success", "SUCCESS", 
+                    $"Database file downloaded successfully: {fileName}", "", admin);
+                StateHasChanged();
+            });
+
+            // Log the backup
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "INFORMATION",
+                Message = $"Database backup downloaded: {fileName} (Size: {FormatFileSize(fileBytes.Length)})"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+        catch (Exception ex)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    $"Failed to download database file: {ex.Message}", "", admin);
+                StateHasChanged();
+            });
+
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "ERROR",
+                Message = $"Database backup download failed: {ex.Message}"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+        finally
+        {
+            // Clean up temporary backup file with retry logic
+            if (!string.IsNullOrEmpty(tempBackupPath) && File.Exists(tempBackupPath))
+            {
+                // Try to delete with retries (file handles may still be releasing)
+                for (int i = 0; i < 5; i++)
+                {
+                    try
+                    {
+                        // Force garbage collection to release any lingering handles
+                        GC.Collect();
+                        GC.WaitForPendingFinalizers();
+                        
+                        await Task.Delay(200);
+                        File.Delete(tempBackupPath);
+                        break; // Success
+                    }
+                    catch (IOException) when (i < 4)
+                    {
+                        // File still locked, wait and retry
+                        await Task.Delay(500);
+                    }
+                    catch (Exception) when (i == 4)
+                    {
+                        // Final attempt failed, but don't throw to avoid breaking the backup process
+                    }
+                }
+            }
+        }
+    }
+
+    private async Task ExportConfigurationAsJson()
+    {
+        try
+        {
+            var response = await ImportExportService!.ExportConfigAsync(includeAdmin);
+            if (!response.Success || response.ResponseObject == null)
+            {
+                throw new Exception("Failed to export configuration data");
+            }
+
+            string jsonData = System.Text.Json.JsonSerializer.Serialize(response.ResponseObject);
+            string fileName = $"azurenamingtool-config-{DateTime.Now:yyyyMMdd-HHmmss}.json";
+            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            
+            await BlazorDownloadFileService!.DownloadFile(fileName, fileBytes, "application/json");
+            
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-success", "SUCCESS", 
+                    $"Configuration exported successfully: {fileName}", "", admin);
+                StateHasChanged();
+            });
+
+            // Log the export
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "INFORMATION",
+                Message = $"Configuration JSON export: {fileName} (Size: {FormatFileSize(fileBytes.Length)}, Include Admin: {includeAdmin})"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+        catch (Exception ex)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    $"Failed to export configuration: {ex.Message}", "", admin);
+                StateHasChanged();
+            });
+
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "ERROR",
+                Message = $"Configuration JSON export failed: {ex.Message}"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+    }
+
+    private void HandleSQLiteDatabaseUpload(InputFileChangeEventArgs e)
+    {
+        sqliteBackupFile = e.File;
+        StateHasChanged();
+    }
+
+    private void HandleJsonConfigUpload(InputFileChangeEventArgs e)
+    {
+        jsonBackupFile = e.File;
+        StateHasChanged();
+    }
+
+    private async Task RestoreFromSQLiteBackup()
+    {
+        if (sqliteBackupFile == null)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-warning", "WARNING", 
+                    "Please select a database file to restore.", "", admin);
+                StateHasChanged();
+            });
+            return;
+        }
+
+        // Validate file extension
+        if (!sqliteBackupFile.Name.EndsWith(".db", StringComparison.OrdinalIgnoreCase))
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    "Invalid file type. Please select a .db file.", "", admin);
+                StateHasChanged();
+            });
+            return;
+        }
+
+        // Show text confirmation modal (user must type CONFIRM to confirm)
+        string confirmMessage = $"<div class=\"my-4\">" +
+            $"<p>You are about to restore the database from:</p>" +
+            $"<p><strong>{sqliteBackupFile.Name}</strong> ({FormatFileSize(sqliteBackupFile.Size)})</p>" +
+            $"<p class=\"text-danger mt-3\"><strong>⚠️ WARNING:</strong> This will completely replace your current database!</p>" +
+            $"<ul class=\"text-danger text-start\">" +
+            $"<li>All current data will be lost</li>" +
+            $"<li>A pre-restore backup will be created automatically</li>" +
+            $"<li>The application will restart immediately</li>" +
+            $"<li><strong>All active users will be disconnected</strong></li>" +
+            $"</ul>" +
+            $"<p class=\"text-info mt-3\"><i class=\"bi bi-info-circle\"></i> The restore process will:</p>" +
+            $"<ol class=\"text-start\">" +
+            $"<li>Create a backup of your current database</li>" +
+            $"<li>Prepare the uploaded database for restore</li>" +
+            $"<li>Automatically restart the application</li>" +
+            $"<li>Complete the restore on startup</li>" +
+            $"</ol>" +
+            $"<p class=\"mt-3\">This is a critical administrative operation.</p></div>";
+
+        bool confirmed = await ModalHelper.ShowTextConfirmationModal(
+            Modal!, 
+            "Confirm Database Restore", 
+            confirmMessage, 
+            "CONFIRM", 
+            "bg-warning", 
+            theme
+        );
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        try
+        {
+            // Get the database path from configuration (e.g., "settings/azurenamingtool.db")
+            string dbRelativePath = Configuration?.GetValue<string>("StorageOptions:DatabasePath") ?? "settings/azurenamingtool.db";
+            string dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, dbRelativePath);
+            
+            // Ensure the settings directory exists
+            string dbDirectory = Path.GetDirectoryName(dbPath)!;
+            if (!Directory.Exists(dbDirectory))
+            {
+                Directory.CreateDirectory(dbDirectory);
+            }
+            
+            // Save uploaded file as pending restore
+            string pendingRestorePath = Path.Combine(dbDirectory, "azurenamingtool-pending-restore.db");
+            string backupPath = Path.Combine(dbDirectory, $"azurenamingtool-prerestore-{DateTime.Now:yyyyMMdd-HHmmss}.db");
+
+            // Create a backup of the current database before restoring
+            if (File.Exists(dbPath))
+            {
+                File.Copy(dbPath, backupPath, true);
+            }
+
+            // Save the uploaded file as pending restore
+            using (var stream = sqliteBackupFile.OpenReadStream(maxAllowedSize: 50 * 1024 * 1024)) // 50MB max
+            {
+                using (var fileStream = new FileStream(pendingRestorePath, FileMode.Create))
+                {
+                    await stream.CopyToAsync(fileStream);
+                }
+            }
+            
+            // Create a flag file to indicate pending restore
+            string flagPath = Path.Combine(dbDirectory, "restore-pending.flag");
+            await File.WriteAllTextAsync(flagPath, $"Restore from: {sqliteBackupFile.Name}\nTimestamp: {DateTime.Now:yyyy-MM-dd HH:mm:ss}\nBackup: {Path.GetFileName(backupPath)}");
+
+            // Log the restore preparation
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "INFORMATION",
+                Message = $"Database restore prepared from: {sqliteBackupFile.Name} (Size: {FormatFileSize(sqliteBackupFile.Size)}). Pre-restore backup saved. Restart required."
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-success", "RESTORE PREPARED", 
+                    $"<div class=\"my-4\">" +
+                    $"<p><i class=\"bi bi-check-circle\"></i> Database restore has been prepared successfully!</p>" +
+                    $"<p class=\"text-info\"><strong>Pre-restore backup:</strong> {Path.GetFileName(backupPath)}</p>" +
+                    $"<hr class=\"my-3\"/>" +
+                    $"<p><i class=\"bi bi-arrow-repeat\"></i> <strong>The application will restart in 3 seconds...</strong></p>" +
+                    $"<p class=\"text-warning\"><i class=\"bi bi-exclamation-triangle\"></i> <strong>Development Mode:</strong></p>" +
+                    $"<ul class=\"text-start text-warning\">" +
+                    $"<li>The application will stop</li>" +
+                    $"<li>Restart it manually with: <code>dotnet run</code></li>" +
+                    $"<li>Then refresh this page</li>" +
+                    $"</ul>" +
+                    $"<p class=\"text-muted small\"><strong>Production Mode:</strong> The application will restart automatically and this page will reload.</p></div>", 
+                    "", admin);
+                StateHasChanged();
+            });
+
+            // Add JavaScript to attempt auto-reload when server comes back
+            await JsRuntime.InvokeVoidAsync("eval", @"
+                setTimeout(function() {
+                    var checkInterval = setInterval(function() {
+                        fetch('/')
+                            .then(function(response) {
+                                if (response.ok) {
+                                    clearInterval(checkInterval);
+                                    window.location.href = '/';
+                                }
+                            })
+                            .catch(function() {
+                                // Server still down, keep checking
+                            });
+                    }, 2000);
+                }, 3000);
+            ");
+
+            // Trigger application restart - the restore will complete on startup
+            await Task.Delay(3000);
+            AppLifetime.StopApplication();
+        }
+        catch (Exception ex)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    $"Failed to restore database: {ex.Message}", "", admin);
+                StateHasChanged();
+            });
+
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "ERROR",
+                Message = $"Database restore failed: {ex.Message}"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+    }
+
+    private async Task RestoreFromJsonBackup()
+    {
+        if (jsonBackupFile == null)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-warning", "WARNING", 
+                    "Please select a JSON file to restore.", "", admin);
+                StateHasChanged();
+            });
+            return;
+        }
+
+        // Validate file extension
+        if (!jsonBackupFile.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    "Invalid file type. Please select a .json file.", "", admin);
+                StateHasChanged();
+            });
+            return;
+        }
+
+        // Show confirmation modal
+        string confirmMessage = $"<div class=\"my-4\"><p>You are about to restore configuration from:</p>" +
+            $"<p><strong>{jsonBackupFile.Name}</strong> ({FormatFileSize(jsonBackupFile.Size)})</p>" +
+            $"<p class=\"text-warning\"><strong>NOTE:</strong> This will overwrite your current configuration data!</p>" +
+            $"<p>This works with both pre-migration and post-migration JSON exports.</p>" +
+            $"<p>Do you want to proceed?</p></div>";
+
+        bool confirmed = await ModalHelper.ShowConfirmationModal(Modal!, "Confirm JSON Restore", confirmMessage, "bg-warning", theme);
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        try
+        {
+            // Read the uploaded JSON file
+            string jsonContent;
+            using (var stream = jsonBackupFile.OpenReadStream(maxAllowedSize: 10 * 1024 * 1024)) // 10MB max
+            {
+                using (var reader = new StreamReader(stream))
+                {
+                    jsonContent = await reader.ReadToEndAsync();
+                }
+            }
+
+            // Validate JSON format
+            ConfigurationData? configData;
+            try
+            {
+                configData = System.Text.Json.JsonSerializer.Deserialize<ConfigurationData>(jsonContent);
+                if (configData == null)
+                {
+                    throw new Exception("Deserialized configuration data is null.");
+                }
+            }
+            catch (Exception ex)
+            {
+                await InvokeAsync(() =>
+                {
+                    ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                        $"Invalid JSON format: {ex.Message}", "", admin);
+                    StateHasChanged();
+                });
+                return;
+            }
+
+            // Import the configuration using the existing ImportExportService
+            var result = await ImportExportService!.PostConfigAsync(configData);
+
+            if (result.Success)
+            {
+                await InvokeAsync(() =>
+                {
+                    ModalHelper.ShowInformationModal(Modal!, theme, "bg-success", "SUCCESS", 
+                        $"<div class=\"my-4\"><p>Configuration restored successfully from JSON!</p>" +
+                        $"<p>The page will refresh in 2 seconds...</p></div>", "", admin);
+                    StateHasChanged();
+                });
+
+                // Log the restore
+                AdminLogMessage adminLogMessage = new()
+                {
+                    Title = "INFORMATION",
+                    Message = $"Configuration restored from JSON: {jsonBackupFile.Name} (Size: {FormatFileSize(jsonBackupFile.Size)})"
+                };
+                await AdminLogService!.PostItemAsync(adminLogMessage);
+
+                // Refresh the page
+                await Task.Delay(2000);
+                NavigationManager!.NavigateTo("/admin", true);
+            }
+            else
+            {
+                await InvokeAsync(() =>
+                {
+                    ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                        "Failed to restore configuration from JSON. Check the log for details.", "", admin);
+                    StateHasChanged();
+                });
+
+                AdminLogMessage adminLogMessage = new()
+                {
+                    Title = "ERROR",
+                    Message = $"Configuration restore from JSON failed: {jsonBackupFile.Name}"
+                };
+                await AdminLogService!.PostItemAsync(adminLogMessage);
+            }
+        }
+        catch (Exception ex)
+        {
+            await InvokeAsync(() =>
+            {
+                ModalHelper.ShowInformationModal(Modal!, theme, "bg-danger", "ERROR", 
+                    $"Failed to restore configuration: {ex.Message}", "", admin);
+                StateHasChanged();
+            });
+
+            AdminLogMessage adminLogMessage = new()
+            {
+                Title = "ERROR",
+                Message = $"Configuration restore from JSON failed: {ex.Message}"
+            };
+            await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+    }
 }
+
+
+
+
+
+
 
 
