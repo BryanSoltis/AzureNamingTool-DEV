@@ -69,54 +69,72 @@
             </p>
         </div>
 
-        <!-- Version Details Section -->
-        <div class="modern-collapsible-section">
-            <div class="modern-collapsible-header success" data-bs-toggle="collapse" href="#versiondetails" role="button" aria-expanded="false">
-                <div class="header-title">
-                    <span class="oi oi-info" aria-hidden="true"></span>
-                    <span>Version Details</span>
-                </div>
-                <span class="oi oi-chevron-bottom header-icon" aria-hidden="true"></span>
+        <!-- Version Details Banner -->
+        <div class="modern-banner modern-banner-info">
+            <div class="modern-banner-icon">
+                <span class="oi oi-info" aria-hidden="true"></span>
             </div>
-            <div class="collapse modern-collapsible-body" id="versiondetails">
-                <div class="modern-setting-row">
-                    <div class="setting-label">Current Version</div>
-                    <div class="setting-description">
-                        @appversion (<a href="@releasenotesurl" target="_blank" class="modern-link">Release Notes</a>)
-                    </div>
+            <div class="modern-banner-content">
+                <div class="modern-banner-title">Azure Naming Tool v@appversion</div>
+                <div class="modern-banner-text">
+                    <a href="@releasenotesurl" target="_blank" class="modern-link">View Release Notes</a>
+                    @if (!String.IsNullOrEmpty(versionalert))
+                    {
+                        <div class="mt-2">
+                            @((MarkupString)versionalert)
+                        </div>
+                    }
                 </div>
-                @if (!String.IsNullOrEmpty(versionalert))
-                {
-                    <div class="modern-warning-box">
-                        @((MarkupString)versionalert)
-                    </div>
-                }
-                <div class="setting-actions">
-                    <button type="button" class="modern-btn-primary" @onclick="@(e => SubmitGHTopic("feature"))" title="Feature request">
+                <div class="modern-banner-actions">
+                    <button type="button" class="modern-btn-primary modern-btn-small" @onclick="@(e => SubmitGHTopic("feature"))" title="Feature request">
                         <span class="oi oi-plus" aria-hidden="true"></span> Feature Request
                     </button>
-                    <button type="button" class="modern-btn-danger" @onclick="@(e => SubmitGHTopic("bug"))" title="Submit a bug">
+                    <button type="button" class="modern-btn-danger modern-btn-small" @onclick="@(e => SubmitGHTopic("bug"))" title="Submit a bug">
                         <span class="oi oi-bug" aria-hidden="true"></span> Submit Bug
                     </button>
-                    <button type="button" class="modern-btn-secondary" @onclick="@(e => SubmitGHTopic("discussion"))" title="Start a discussion">
-                        <span class="oi oi-comment-square" aria-hidden="true"></span> Start Discussion
+                    <button type="button" class="modern-btn-secondary modern-btn-small" @onclick="@(e => SubmitGHTopic("discussion"))" title="Start a discussion">
+                        <span class="oi oi-comment-square" aria-hidden="true"></span> Discussion
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- System Details Section (for GlobalAdmin or if showadmindetailstoallusers is enabled) -->
-        @if (((currentuser == "GlobalAdmin") || (showadmindetailstoallusers)) && (GeneralHelper.IsNotNull(environmentvariables)))
-        {
-            <div class="modern-collapsible-section">
-                <div class="modern-collapsible-header" data-bs-toggle="collapse" href="#admindetails" role="button" aria-expanded="false">
-                    <div class="header-title">
-                        <span class="oi oi-wrench" aria-hidden="true"></span>
-                        <span>System Details</span>
-                    </div>
-                    <span class="oi oi-chevron-bottom header-icon" aria-hidden="true"></span>
-                </div>
-                <div class="collapse modern-collapsible-body" id="admindetails">
+        <!-- Modern Tab Navigation -->
+        <div class="modern-tabs-container">
+            <div class="modern-tabs">
+                @if (((currentuser == "GlobalAdmin") || (showadmindetailstoallusers)) && (GeneralHelper.IsNotNull(environmentvariables)))
+                {
+                    <button class="modern-tab active" data-tab="tab-system">
+                        <span class="oi oi-wrench tab-icon" aria-hidden="true"></span>
+                        System
+                    </button>
+                }
+                <button class="modern-tab @(((currentuser != "GlobalAdmin") && (!showadmindetailstoallusers)) ? "active" : "")" data-tab="tab-customization">
+                    <span class="oi oi-brush tab-icon" aria-hidden="true"></span>
+                    Customization
+                </button>
+                <button class="modern-tab" data-tab="tab-settings">
+                    <span class="oi oi-cog tab-icon" aria-hidden="true"></span>
+                    Site Settings
+                </button>
+                <button class="modern-tab" data-tab="tab-security">
+                    <span class="oi oi-lock-locked tab-icon" aria-hidden="true"></span>
+                    Security
+                </button>
+                <button class="modern-tab" data-tab="tab-identity">
+                    <span class="oi oi-people tab-icon" aria-hidden="true"></span>
+                    Identity Provider
+                </button>
+            </div>
+
+            <!-- System Details Tab Content -->
+            @if (((currentuser == "GlobalAdmin") || (showadmindetailstoallusers)) && (GeneralHelper.IsNotNull(environmentvariables)))
+            {
+                <div id="tab-system" class="modern-tab-content active">
+                    <h3 class="mb-3">System Details</h3>
+                    <p class="text-secondary mb-4">
+                        View system information, manage cache, and inspect environment variables for the Azure Naming Tool.
+                    </p>
                     <!-- View Cache -->
                     <div class="modern-setting-row">
                         <div class="setting-label">View Cache Data</div>
@@ -162,20 +180,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
-        }
+            }
 
-        <!-- Customization Section -->
-        <div class="modern-collapsible-section">
-            <div class="modern-collapsible-header secondary" data-bs-toggle="collapse" href="#customization" role="button" aria-expanded="false">
-                <div class="header-title">
-                    <span class="oi oi-brush" aria-hidden="true"></span>
-                    <span>Customization</span>
-                </div>
-                <span class="oi oi-chevron-bottom header-icon" aria-hidden="true"></span>
-            </div>
-            <div class="collapse modern-collapsible-body" id="customization">
-                <p class="text-secondary mb-3">
+            <!-- Customization Tab Content -->
+            <div id="tab-customization" class="modern-tab-content @(((currentuser != "GlobalAdmin") && (!showadmindetailstoallusers)) ? "active" : "")">
+                <h3 class="mb-3">Customization</h3>
+                <p class="text-secondary mb-4">
                     Customize the Azure Naming Tool site including home content, logo, and navigation links displayed for non-admin users.
                 </p>
 
@@ -306,23 +316,15 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Site Settings Section -->
-        <div class="modern-collapsible-section">
-            <div class="modern-collapsible-header secondary" data-bs-toggle="collapse" href="#sitesettings" role="button" aria-expanded="false">
-                <div class="header-title">
-                    <span class="oi oi-cog" aria-hidden="true"></span>
-                    <span>Site Settings</span>
-                </div>
-                <span class="oi oi-chevron-bottom header-icon" aria-hidden="true"></span>
-            </div>
-            <div class="collapse modern-collapsible-body" id="sitesettings">
-                <p class="text-secondary mb-3">
-                    Configure site settings for the Azure Naming Tool including storage provider, duplicate names, resource type editing, and webhooks.
-                </p>
+        <!-- Site Settings Tab Content -->
+        <div id="tab-settings" class="modern-tab-content">
+            <h3 class="mb-3">Site Settings</h3>
+            <p class="text-secondary mb-4">
+                Configure general site settings including storage provider, duplicate name handling, resource type editing, and webhooks for the Azure Naming Tool.
+            </p>
 
-                <!-- Storage Provider -->
+            <!-- Storage Provider -->
                 <div class="modern-setting-row">
                     <div class="setting-label">Storage Provider</div>
                     <div class="setting-description">
@@ -544,19 +546,11 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Security Section -->
-        <div class="modern-collapsible-section">
-            <div class="modern-collapsible-header secondary" data-bs-toggle="collapse" href="#security" role="button" aria-expanded="false">
-                <div class="header-title">
-                    <span class="oi oi-lock-locked" aria-hidden="true"></span>
-                    <span>Security</span>
-                </div>
-                <span class="oi oi-chevron-bottom header-icon" aria-hidden="true"></span>
-            </div>
-            <div class="collapse modern-collapsible-body" id="security">
-                <p class="text-secondary mb-3">
+            <!-- Security Tab Content -->
+            <div id="tab-security" class="modern-tab-content">
+                <h3 class="mb-3">Security</h3>
+                <p class="text-secondary mb-4">
                     Manage security settings including the Global Admin password, API keys, identity headers, and admin users for the Azure Naming Tool.
                 </p>
                 
@@ -662,23 +656,15 @@
                     </div>
                 }
             </div>
-        </div>
 
-        <!-- Identity Provider Settings Section -->
-        <div class="modern-collapsible-section">
-            <div class="modern-collapsible-header secondary" data-bs-toggle="collapse" href="#identityprovidersettings" role="button" aria-expanded="false">
-                <div class="header-title">
-                    <span class="oi oi-person" aria-hidden="true"></span>
-                    <span>Identity Provider Settings</span>
-                </div>
-                <span class="oi oi-chevron-bottom header-icon" aria-hidden="true"></span>
-            </div>
-            <div class="collapse modern-collapsible-body" id="identityprovidersettings">
-                <p class="text-secondary mb-3">
-                    Configure the <strong>Identity Provider</strong> settings for the site if authentication is implemented. The Azure Naming Tool is designed to work with <strong><a href="https://learn.microsoft.com/en-us/azure/app-service/overview-authentication-authorization" target="_blank">Azure App Service Authentication</a></strong>, by default. If the Azure Naming Tool is configured to identify users, the site will track user activity. Users can also be designated as Admins using the <strong>Admin Users</strong> configuration.
+            <!-- Identity Provider Tab Content -->
+            <div id="tab-identity" class="modern-tab-content">
+                <h3 class="mb-3">Identity Provider Settings</h3>
+                <p class="text-secondary mb-4">
+                    Configure the <strong>Identity Provider</strong> settings for the site if authentication is implemented. The Azure Naming Tool is designed to work with <strong><a href="https://learn.microsoft.com/en-us/azure/app-service/overview-authentication-authorization" target="_blank">Azure App Service Authentication</a></strong>, by default.
                 </p>
                 <p class="text-secondary mb-3">
-                    You can learn more about the new Identity Provider Integration <a href="https://soltisweb.com/blog/detail/2023-06-azurenamingtool-identityproviderintegrationdeepdive" target="_blank"><strong>HERE</strong></a>.
+                    If the Azure Naming Tool is configured to identify users, the site will track user activity. Users can also be designated as Admins using the <strong>Admin Users</strong> configuration. Learn more about Identity Provider Integration <a href="https://soltisweb.com/blog/detail/2023-06-azurenamingtool-identityproviderintegrationdeepdive" target="_blank"><strong>here</strong></a>.
                 </p>
                 @if (currentuser == "GlobalAdmin")
                 {
@@ -802,10 +788,13 @@
                     </div>
                 }
             </div>
+            <!-- End of tab-identity -->
         </div>
+        <!-- End of modern-tabs-container -->
     }
-}
+    <!-- End of else (admin) block -->
 </div>
+<!-- End of modern-admin-container -->
 
 @code {
     [CascadingParameter]

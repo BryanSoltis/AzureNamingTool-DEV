@@ -12,7 +12,57 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeModals();
     initializeDropdowns();
     initializeDismissibles();
+    initializeTabs();
 });
+
+/* ===================================================================
+   TAB COMPONENTS
+   Modern tabbed navigation system
+   =================================================================== */
+
+function initializeTabs() {
+    // Handle all tab navigation
+    document.querySelectorAll('.modern-tab').forEach(function(tab) {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            const targetId = tab.getAttribute('data-tab');
+            if (!targetId) return;
+            
+            // Get the tab container
+            const tabContainer = tab.closest('.modern-tabs').parentElement;
+            
+            // Deactivate all tabs in this container
+            tabContainer.querySelectorAll('.modern-tab').forEach(function(t) {
+                t.classList.remove('active');
+            });
+            
+            // Activate clicked tab
+            tab.classList.add('active');
+            
+            // Hide all tab contents in this container
+            tabContainer.querySelectorAll('.modern-tab-content').forEach(function(content) {
+                content.classList.remove('active');
+            });
+            
+            // Show target content
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+                targetContent.classList.add('active');
+            }
+        });
+    });
+    
+    // Activate first tab by default if none are active
+    document.querySelectorAll('.modern-tabs').forEach(function(tabsContainer) {
+        const activeTabs = tabsContainer.querySelectorAll('.modern-tab.active');
+        if (activeTabs.length === 0) {
+            const firstTab = tabsContainer.querySelector('.modern-tab');
+            if (firstTab) {
+                firstTab.click();
+            }
+        }
+    });
+}
 
 /* ===================================================================
    COLLAPSIBLE/ACCORDION COMPONENTS
