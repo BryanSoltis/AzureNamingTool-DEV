@@ -265,21 +265,6 @@
                                     <div class="collapse card card-body @theme.ThemeStyle" id="componentsconfig">
                                         <div class="card  w-auto mb-3">
                                             <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                Export the current Components Configuration
-                                            </div>
-                                            <div class="card card-body @theme.ThemeStyle">
-                                                <p>
-                                                    Click <span class="fw-bold">Export</span> to export the current Components Configuration.
-                                                </p>
-                                                <p>
-                                                    <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("ResourceComponent",0,"download")) title="Export">
-                                                        <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                                    </button>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="card  w-auto mb-3">
-                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
                                                 Reset the Components Configuration
                                             </div>
                                             <div class="card card-body @theme.ThemeStyle">
@@ -296,25 +281,6 @@
                                                 </p>
                                             </div>
                                         </div>
-                                        <!--<div class="card">
-                                            <div class="card card-header bg-default" style="font-weight:bold;">
-                                                Import Components Configuration
-                                            </div>
-                                            <div class="card card-body">
-                                                <p>
-                                                    Enter the new Components Configuration JSON below and click <span class="fw-bold">Import</span> to import the Components Configuration.</p><p><span class="fw-bold">NOTE:</span> This will update the existing Components Configuration and cannot be undone!
-                                                </p>
-                                                <p>
-                                                    <textarea title="Configuration" class="form-control" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newComponentConfig",(string)ui.Value);})">@newComponentConfig</textarea>
-                                                </p>
-                                                <p>
-                                                    <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceComponent",0,"update"))" title="Import">
-                                                        <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
-                                                    </button>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        -->
                                     </div>
                                 </div>
                             }
@@ -391,21 +357,6 @@
                                     <div class="collapse card card-body @theme.ThemeStyle" id="delimitersconfig">
                                         <div class="card w-auto mb-3">
                                             <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                Export the current Delimiters Configuration
-                                            </div>
-                                            <div class="card card-body @theme.ThemeStyle">
-                                                <p>
-                                                    Click <span class="fw-bold">Export</span> to export the current Delimiters Configuration.
-                                                </p>
-                                                <p>
-                                                    <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("ResourceDelimiter",0,"download")) title="Export">
-                                                        <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                                    </button>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="card w-auto mb-3">
-                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
                                                 Reset the Delimiters Configuration
                                             </div>
                                             <div class="card card-body @theme.ThemeStyle">
@@ -418,26 +369,6 @@
                                                 <p>
                                                     <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceDelimiter",0,"reset")) title="Reset">
                                                         <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
-                                                    </button>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="card mb-3">
-                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                Import Delimiters Configuration
-                                            </div>
-                                            <div class="card card-body @theme.ThemeStyle">
-                                                <p>
-                                                    Enter the new Delimiters Configuration JSON below and click <span class="fw-bold">Import</span> to import the Delimiters Configuration.
-                                                </p><p>
-                                                    <span class="fw-bold">NOTE:</span> This will update the existing Delimiters Configuration and cannot be undone!
-                                                </p>
-                                                <p>
-                                                    <textarea title="Configuration" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newDelimiterConfig",(string)ui.Value!);})">@newDelimiterConfig</textarea>
-                                                </p>
-                                                <p>
-                                                    <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceDelimiter",0,"update"))" title="Import">
-                                                        <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
                                                     </button>
                                                 </p>
                                             </div>
@@ -582,45 +513,6 @@
                                         </a>
                                     </div>
                                     <div class="collapse card card-body @theme.ThemeStyle" id=@("customcomponentconfig")>
-                                        <div class="card w-auto mb-3">
-                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                Export the current Custom Components Configuration
-                                            </div>
-                                            <div class="card card-body @theme.ThemeStyle">
-                                                <p>
-                                                    Click <span class="fw-bold">Export</span> to export the current Custom Components Configuration.
-                                                </p>
-                                                <p>
-                                                    <span class="fw-bold">NOTE:</span> All custom component types and values will be exported to a single file.
-                                                </p>
-                                                <p>
-                                                    <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("CustomComponent",0,"download")) title="Export">
-                                                        <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                                    </button>
-                                                </p>
-                                            </div>
-                                        </div>
-                                        <div class="card mb-3">
-                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                Import Custom Components Configuration
-                                            </div>
-                                            <div class="card card-body @theme.ThemeStyle">
-                                                <p>
-                                                    Enter the new Custom Components Configuration JSON below and click <span class="fw-bold">Import</span> to import the Custom Components Configuration.
-                                                </p>
-                                                <p>
-                                                    <span class="fw-bold">NOTE:</span> This will update the existing Custom Components Configuration and cannot be undone!
-                                                </p>
-                                                <p>
-                                                    <textarea title="Configuration" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newCustomComponentConfig",(string)ui.Value!);})">@newCustomComponentConfig</textarea>
-                                                </p>
-                                                <p>
-                                                    <button type="button" class="btn btn-success" @onclick="@(e => FormAction("CustomComponent",0,"update"))" title="Import">
-                                                        <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
-                                                    </button>
-                                                </p>
-                                            </div>
-                                        </div>
                                     </div>
                                 </div>
                             }
@@ -736,21 +628,6 @@
                                                     </div>
                                                     <div class="card w-auto mb-3">
                                                         <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Export the current Environments Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Click <span class="fw-bold">Export</span> to export the current Environments Configuration.
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("ResourceEnvironment",0,"download")) title="Export">
-                                                                    <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
                                                             Reset the Environments Configuration
                                                         </div>
                                                         <div class="card card-body @theme.ThemeStyle">
@@ -763,26 +640,6 @@
                                                             <p>
                                                                 <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceEnvironment",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Import Environments Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Enter the new Environments Configuration JSON below and click <span class="fw-bold">Import</span> to import the Environments Configuration.
-                                                            </p><p>
-                                                                <span class="fw-bold">NOTE:</span> This will update the existing Environments Configuration and cannot be undone!
-                                                            </p>
-                                                            <p>
-                                                                <textarea title="Configuration" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newEnvironmentConfig",(string)ui.Value!);})">@newEnvironmentConfig</textarea>
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceEnvironment",0,"update"))" title="Import">
-                                                                    <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
                                                                 </button>
                                                             </p>
                                                         </div>
