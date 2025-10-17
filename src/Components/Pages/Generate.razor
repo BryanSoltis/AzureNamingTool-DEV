@@ -846,6 +846,8 @@
     {
         try
         {
+            Logger.LogInformation($"OnGenerateModeChange called with mode: {mode}");
+            
             if (mode == "multi")
             {
                 resourcetypeVisible = "collapse";
@@ -933,9 +935,6 @@
                 Logger.LogWarning("Modal service is null!");
                 toastService.ShowError("Modal service is not available");
             }
-
-            resourcetypeVisible = "collapse";
-            resourcetypesVisible = "";
         }
         catch (Exception ex)
         {
