@@ -32,7 +32,7 @@
     [Parameter] public string headerstyle { get; set; } = String.Empty;
 
 
-    async Task Confirm() => await ModalInstance.CloseAsync();
+    async Task Confirm() => await ModalInstance.CloseAsync(ModalResult.Ok(true));
 
     async Task Cancel() => await ModalInstance.CancelAsync();
 

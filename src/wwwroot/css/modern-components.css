@@ -1407,6 +1407,41 @@ pre code {
     box-shadow: 0 0 0 3px rgba(var(--color-azure-blue-rgb), 0.1);
 }
 
+.modern-form-input:disabled,
+.modern-form-select:disabled,
+.modern-form-textarea:disabled {
+    background-color: var(--color-bg-tertiary);
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.modern-input-error {
+    border-color: #ef4444 !important;
+}
+
+.modern-input-error:focus {
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+}
+
+.modern-error-message {
+    margin-top: 8px;
+    font-size: var(--font-size-sm);
+    color: #ef4444;
+    display: block;
+}
+
+.modern-code-block {
+    display: inline-block;
+    padding: 8px 12px;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 1.1rem;
+    background-color: #1f2937;
+    color: #ffffff;
+    border-radius: var(--radius-sm);
+    font-weight: var(--font-weight-semibold);
+}
+
 .modern-form-textarea {
     min-height: 120px;
     resize: vertical;
@@ -1993,6 +2028,16 @@ pre code {
 /* Modal Content Helpers */
 .modern-modal-content {
     color: var(--color-text-primary);
+    display: flex;
+    flex-direction: column;
+    max-height: 85vh;
+}
+
+.modern-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1.5rem;
+    max-height: calc(85vh - 120px); /* Account for header and footer */
 }
 
 .modern-modal-content h4,
@@ -2188,6 +2233,28 @@ pre code {
     background: linear-gradient(90deg, #dc2626 0%, #b91c1c 100%);
 }
 
+.modern-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-azure-blue) 0%, #00b7c3 100%);
+    transition: width 0.3s ease;
+    width: 100%;
+}
+
+.modern-progress-fill.animated {
+    background: linear-gradient(90deg, var(--color-azure-blue) 0%, #00b7c3 100%, var(--color-azure-blue) 200%);
+    background-size: 200% 100%;
+    animation: progressSlide 1.5s linear infinite;
+}
+
+@keyframes progressSlide {
+    0% {
+        background-position: 200% 0;
+    }
+    100% {
+        background-position: -200% 0;
+    }
+}
+
 /* Modern Breadcrumb (replaces Bootstrap breadcrumb) */
 .modern-breadcrumb {
     display: flex;
@@ -2295,6 +2362,25 @@ pre code {
 
 .modern-bg-primary { background-color: var(--color-bg-primary) !important; }
 .modern-bg-secondary { background-color: var(--color-bg-secondary) !important; }
+
+.modern-border { border: 1px solid var(--color-border) !important; }
+.modern-border-top { border-top: 1px solid var(--color-border) !important; }
+.modern-border-bottom { border-bottom: 1px solid var(--color-border) !important; }
+.modern-border-left { border-left: 1px solid var(--color-border) !important; }
+.modern-border-right { border-right: 1px solid var(--color-border) !important; }
+
+.modern-rounded { border-radius: var(--radius-md) !important; }
+.modern-rounded-sm { border-radius: var(--radius-sm) !important; }
+.modern-rounded-lg { border-radius: var(--radius-lg) !important; }
+
+.modern-font-semibold { font-weight: var(--font-weight-semibold) !important; }
+.modern-font-bold { font-weight: var(--font-weight-bold) !important; }
+.modern-font-medium { font-weight: var(--font-weight-medium) !important; }
+
+.modern-text-sm { font-size: var(--font-size-sm) !important; }
+.modern-text-base { font-size: var(--font-size-base) !important; }
+.modern-text-lg { font-size: var(--font-size-lg) !important; }
+.modern-text-xl { font-size: var(--font-size-xl) !important; }
 
 /* Modern Tab System */
 .modern-tabs {

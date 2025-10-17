@@ -6,61 +6,51 @@
 @inject IToastService toastService
 @inject ILogger<TextConfirmationModal> Logger
 
-<div class="modal fade show d-block" tabindex="-1" role="dialog">
-    <div class="modal-backdrop fade show" @onclick="Cancel"></div>
-    <div class="modal-dialog" style="z-index: 1050">
-        <!-- Pop it above the backdrop -->
-        <div class="modal-content @theme.ThemeStyle">
-            <div class="modal-header @headerstyle text-white">
-                <h3 class="modal-title">@title</h3>
-            </div>
-            <div class="modal-body">
-                @if (GeneralHelper.IsNotNull(message))
-                {
-                    <div class="mb-3">
-                        @((MarkupString)message)
-                    </div>
-                }
-                
-                <div class="alert alert-warning">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    <strong>Type the following text to confirm:</strong>
-                    <div class="mt-2">
-                        <code class="fs-5 bg-dark text-white px-2 py-1">@requiredText</code>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirmationText" class="fw-bold">Confirmation Text</label>
-                    <input 
-                        id="confirmationText" 
-                        type="text" 
-                        class="form-control @(showError ? "is-invalid" : "")" 
-                        @bind="userInput" 
-                        @bind:event="oninput"
-                        @onkeyup="HandleKeyPress"
-                        placeholder="Type the text above"
-                        autofocus />
-                    @if (showError)
-                    {
-                        <div class="invalid-feedback">
-                            The text you entered does not match. Please type exactly: <strong>@requiredText</strong>
-                        </div>
-                    }
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button 
-                    type="button" 
-                    class="btn btn-success" 
-                    @onclick="Confirm"
-                    disabled="@(!IsTextMatching)">
-                    OK
-                </button>
-                <button type="button" class="btn btn-secondary" @onclick="Cancel">Cancel</button>
-            </div>
+<div class="modern-modal-content">
+    @if (GeneralHelper.IsNotNull(message))
+    {
+        <div class="mb-3">
+            @((MarkupString)message)
+        </div>
+    }
+    
+    <div class="modern-warning-box">
+        <i class="bi bi-exclamation-triangle"></i>
+        <strong>Type the following text to confirm:</strong>
+        <div class="mt-2">
+            <code class="modern-code-block">@requiredText</code>
         </div>
     </div>
+    
+    <div class="mt-3">
+        <label for="confirmationText" class="modern-form-label">Confirmation Text</label>
+        <input 
+            id="confirmationText" 
+            type="text" 
+            class="modern-form-input @(showError ? "modern-input-error" : "")" 
+            @bind="userInput" 
+            @bind:event="oninput"
+            @onkeyup="HandleKeyPress"
+            placeholder="Type the text above"
+            autofocus />
+        @if (showError)
+        {
+            <div class="modern-error-message">
+                The text you entered does not match. Please type exactly: <strong>@requiredText</strong>
+            </div>
+        }
+    </div>
+</div>
+
+<div class="modern-modal-footer">
+    <button 
+        type="button" 
+        class="modern-btn-success" 
+        @onclick="Confirm"
+        disabled="@(!IsTextMatching)">
+        OK
+    </button>
+    <button type="button" class="modern-btn-secondary" @onclick="Cancel">Cancel</button>
 </div>
 
 @code {
@@ -118,7 +108,7 @@
         if (IsTextMatching)
         {
             showError = false;
-            await ModalInstance.CloseAsync();
+            await ModalInstance.CloseAsync(ModalResult.Ok(true));
         }
         else
         {

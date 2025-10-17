@@ -145,8 +145,8 @@
                                 @foreach (var variable in environmentvariables)
                                 {
                                     <li class="mb-2">
-                                        <span class="fw-bold">@variable.Key:</span>
-                                        <span class="text-secondary">@variable.Value</span>
+                                        <span class="modern-font-semibold">@variable.Key:</span>
+                                        <span class="modern-text-secondary">@variable.Value</span>
                                     </li>
                                 }
                             </ul>
@@ -190,7 +190,7 @@
                     @if (!String.IsNullOrEmpty(customlogopath))
                     {
                         <div class="my-3">
-                            <img src="@customlogopath" height="100" alt="Custom Logo" class="border rounded p-2" />
+                            <img src="@customlogopath" height="100" alt="Custom Logo" class="modern-border modern-rounded p-2" />
                         </div>
                         <div class="setting-actions">
                             <button type="button" class="modern-btn-danger" @onclick="@(e => AdminFormAction("customlogopathclear"))" title="Delete Custom Logo">
@@ -201,7 +201,7 @@
                     else
                     {
                         <div class="my-3">
-                            <span class="text-secondary fst-italic">No custom logo uploaded.</span>
+                            <span class="modern-text-secondary fst-italic">No custom logo uploaded.</span>
                         </div>
                     }
                     <div class="mt-3">
@@ -225,65 +225,75 @@
                     </div>
                     
                     <div class="mt-3">
-                        <div class="d-flex flex-column gap-3">
+                        <div class="modern-flex modern-flex-column modern-gap-3">
                             <!-- Instructions Toggle -->
-                            <div class="d-flex justify-content-between align-items-center p-3 border rounded">
-                                <div>
-                                    <div class="fw-semibold">Instructions Page</div>
-                                    <div class="text-secondary small">Enable/Disable the Instructions page for non-admin users</div>
+                            <div class="modern-toggle-row">
+                                <div class="toggle-content">
+                                    <div class="toggle-label">Instructions Page</div>
+                                    <div class="toggle-description">Enable/Disable the Instructions page for non-admin users</div>
                                 </div>
-                                <label class="switch" title="Instructions Enabled">
-                                    <input type="checkbox" checked="@instructionsenabled" @oninput='args => SettingChanged(args, "instructionsenabled")'>
-                                    <span class="slider round"></span>
-                                </label>
+                                <div class="toggle-switch-wrapper">
+                                    <label class="modern-toggle-switch" title="Instructions Enabled">
+                                        <input type="checkbox" checked="@instructionsenabled" @oninput='args => SettingChanged(args, "instructionsenabled")'>
+                                        <span class="modern-toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
 
                             <!-- Configuration Toggle -->
-                            <div class="d-flex justify-content-between align-items-center p-3 border rounded">
-                                <div>
-                                    <div class="fw-semibold">Configuration Page</div>
-                                    <div class="text-secondary small">Enable/Disable the Configuration page for non-admin users</div>
+                            <div class="modern-toggle-row">
+                                <div class="toggle-content">
+                                    <div class="toggle-label">Configuration Page</div>
+                                    <div class="toggle-description">Enable/Disable the Configuration page for non-admin users</div>
                                 </div>
-                                <label class="switch" title="Configuration Enabled">
-                                    <input type="checkbox" checked="@configurationenabled" @oninput='args => SettingChanged(args, "configurationenabled")'>
-                                    <span class="slider round"></span>
-                                </label>
+                                <div class="toggle-switch-wrapper">
+                                    <label class="modern-toggle-switch" title="Configuration Enabled">
+                                        <input type="checkbox" checked="@configurationenabled" @oninput='args => SettingChanged(args, "configurationenabled")'>
+                                        <span class="modern-toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
 
                             <!-- Reference Toggle -->
-                            <div class="d-flex justify-content-between align-items-center p-3 border rounded">
-                                <div>
-                                    <div class="fw-semibold">Reference Page</div>
-                                    <div class="text-secondary small">Enable/Disable the Reference page for non-admin users</div>
+                            <div class="modern-toggle-row">
+                                <div class="toggle-content">
+                                    <div class="toggle-label">Reference Page</div>
+                                    <div class="toggle-description">Enable/Disable the Reference page for non-admin users</div>
                                 </div>
-                                <label class="switch" title="Reference Enabled">
-                                    <input type="checkbox" checked="@referenceenabled" @oninput='args => SettingChanged(args, "referenceenabled")'>
-                                    <span class="slider round"></span>
-                                </label>
+                                <div class="toggle-switch-wrapper">
+                                    <label class="modern-toggle-switch" title="Reference Enabled">
+                                        <input type="checkbox" checked="@referenceenabled" @oninput='args => SettingChanged(args, "referenceenabled")'>
+                                        <span class="modern-toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
 
                             <!-- Generated Names Log Toggle -->
-                            <div class="d-flex justify-content-between align-items-center p-3 border rounded">
-                                <div>
-                                    <div class="fw-semibold">Generated Names Log</div>
-                                    <div class="text-secondary small">Enable/Disable the Generated Names Log page for non-admin users</div>
+                            <div class="modern-toggle-row">
+                                <div class="toggle-content">
+                                    <div class="toggle-label">Generated Names Log</div>
+                                    <div class="toggle-description">Enable/Disable the Generated Names Log page for non-admin users</div>
                                 </div>
-                                <label class="switch" title="Generated Names Log Enabled">
-                                    <input type="checkbox" checked="@generatednameslogenabled" @oninput='args => SettingChanged(args, "generatednameslogenabled")'>
-                                    <span class="slider round"></span>
-                                </label>
+                                <div class="toggle-switch-wrapper">
+                                    <label class="modern-toggle-switch" title="Generated Names Log Enabled">
+                                        <input type="checkbox" checked="@generatednameslogenabled" @oninput='args => SettingChanged(args, "generatednameslogenabled")'>
+                                        <span class="modern-toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
 
                             <!-- Latest News Toggle -->
-                            <div class="d-flex justify-content-between align-items-center p-3 border rounded">
-                                <div>
-                                    <div class="fw-semibold">Latest News</div>
-                                    <div class="text-secondary small">Enable/Disable the Latest News for all users</div>
+                            <div class="modern-toggle-row">
+                                <div class="toggle-content">
+                                    <div class="toggle-label">Latest News</div>
+                                    <div class="toggle-description">Enable/Disable the Latest News for all users</div>
                                 </div>
-                                <label class="switch" title="Latest News Enabled">
-                                    <input type="checkbox" checked="@latestnewsenabled" @oninput='args => SettingChanged(args, "latestnewsenabled")'>
-                                    <span class="slider round"></span>
-                                </label>
+                                <div class="toggle-switch-wrapper">
+                                    <label class="modern-toggle-switch" title="Latest News Enabled">
+                                        <input type="checkbox" checked="@latestnewsenabled" @oninput='args => SettingChanged(args, "latestnewsenabled")'>
+                                        <span class="modern-toggle-slider"></span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -398,32 +408,34 @@
                 </div>
 
                 <!-- Allow Duplicate Names -->
-                <div class="modern-setting-row">
-                    <div class="setting-label">Allow Duplicate Names</div>
-                    <div class="setting-description">
-                        By default, the Azure Naming Tool prevents duplicate resource names from being generated. Enable this setting to allow duplicate names.
+                <div class="modern-toggle-row">
+                    <div class="toggle-content">
+                        <div class="toggle-label">Allow Duplicate Names</div>
+                        <div class="toggle-description">
+                            By default, the Azure Naming Tool prevents duplicate resource names from being generated. Enable this setting to allow duplicate names.
+                        </div>
                     </div>
-                    <div class="mt-3">
-                        <label class="switch" title="Duplicate Names Allowed">
+                    <div class="toggle-switch-wrapper">
+                        <label class="modern-toggle-switch" title="Duplicate Names Allowed">
                             <input type="checkbox" checked="@duplicatenamesallowed" @oninput='args => SettingChanged(args, "duplicatenamesallowed")'>
-                            <span class="slider round"></span>
+                            <span class="modern-toggle-slider"></span>
                         </label>
-                        <span class="align-text-top ms-2">Enable Duplicate Names</span>
                     </div>
                 </div>
 
                 <!-- Auto-Increment Resource Instance -->
-                <div class="modern-setting-row">
-                    <div class="setting-label">Auto-Increment Resource Instance</div>
-                    <div class="setting-description">
-                        If enabled, this setting will increment the <strong>Resource Instance</strong> value to the next number for the generated resource type name.
+                <div class="modern-toggle-row">
+                    <div class="toggle-content">
+                        <div class="toggle-label">Auto-Increment Resource Instance</div>
+                        <div class="toggle-description">
+                            If enabled, this setting will increment the <strong>Resource Instance</strong> value to the next number for the generated resource type name.
+                        </div>
                     </div>
-                    <div class="mt-3">
-                        <label class="switch" title="Auto-Increment Resource Instance">
+                    <div class="toggle-switch-wrapper">
+                        <label class="modern-toggle-switch" title="Auto-Increment Resource Instance">
                             <input type="checkbox" checked="@autoincrementresourceinstance" @oninput='args => SettingChanged(args, "autoincrementresourceinstance")'>
-                            <span class="slider round"></span>
+                            <span class="modern-toggle-slider"></span>
                         </label>
-                        <span class="align-text-top ms-2">Enable Auto-Increment</span>
                     </div>
                 </div>
 
@@ -439,45 +451,52 @@
                             Please see the <a href="https://github.com/mspnp/AzureNamingTool/wiki/Resource-Type-Editing" target="_blank" class="alert-link">Resource Type Editing documentation</a> for guidance on metadata editing.
                         </p>
                     </div>
-                    <div class="mt-3">
-                        <label class="switch" title="Resource Type Editing Enabled">
-                            <input type="checkbox" checked="@resourcetypeeditingallowed" @oninput='args => SettingChanged(args, "resourcetypeeditingallowed")'>
-                            <span class="slider round"></span>
-                        </label>
-                        <span class="align-text-top ms-2">Enable Resource Type Editing</span>
+                    <div class="modern-toggle-row mt-3">
+                        <div class="toggle-content">
+                            <div class="toggle-label">Enable Resource Type Editing</div>
+                            <div class="toggle-description">Allow editing of resource type validation rules</div>
+                        </div>
+                        <div class="toggle-switch-wrapper">
+                            <label class="modern-toggle-switch" title="Resource Type Editing Enabled">
+                                <input type="checkbox" checked="@resourcetypeeditingallowed" @oninput='args => SettingChanged(args, "resourcetypeeditingallowed")'>
+                                <span class="modern-toggle-slider"></span>
+                            </label>
+                        </div>
                     </div>
                 </div>
 
                 @if (currentuser == "GlobalAdmin")
                 {
                     <!-- Show Admin Data To All Users (GlobalAdmin only) -->
-                    <div class="modern-setting-row">
-                        <div class="setting-label">Show Admin Data To All Users</div>
-                        <div class="setting-description">
-                            By default, admin details are only displayed for the Global Admin. This setting enables admin details to be shown to all admin users.
+                    <div class="modern-toggle-row">
+                        <div class="toggle-content">
+                            <div class="toggle-label">Show Admin Data To All Users</div>
+                            <div class="toggle-description">
+                                By default, admin details are only displayed for the Global Admin. This setting enables admin details to be shown to all admin users.
+                            </div>
                         </div>
-                        <div class="mt-3">
-                            <label class="switch" title="Show Admin Details To All Users">
+                        <div class="toggle-switch-wrapper">
+                            <label class="modern-toggle-switch" title="Show Admin Details To All Users">
                                 <input type="checkbox" checked="@showadmindetailstoallusers" @oninput='args => SettingChanged(args, "showadmindetailstoallusers")'>
-                                <span class="slider round"></span>
+                                <span class="modern-toggle-slider"></span>
                             </label>
-                            <span class="align-text-top ms-2">Enable for All Users</span>
                         </div>
                     </div>
                 }
 
                 <!-- Connectivity Check -->
-                <div class="modern-setting-row">
-                    <div class="setting-label">Connectivity Check</div>
-                    <div class="setting-description">
-                        The Azure Naming Tool will verify the tool has internet connectivity to enable update features. Use this setting to disable the connectivity check functionality.
+                <div class="modern-toggle-row">
+                    <div class="toggle-content">
+                        <div class="toggle-label">Connectivity Check</div>
+                        <div class="toggle-description">
+                            The Azure Naming Tool will verify the tool has internet connectivity to enable update features. Use this setting to disable the connectivity check functionality.
+                        </div>
                     </div>
-                    <div class="mt-3">
-                        <label class="switch" title="Connectivity Check Enabled">
+                    <div class="toggle-switch-wrapper">
+                        <label class="modern-toggle-switch" title="Connectivity Check Enabled">
                             <input type="checkbox" checked="@connectivitycheckenabled" @oninput='args => SettingChanged(args, "connectivitycheckenabled")'>
-                            <span class="slider round"></span>
+                            <span class="modern-toggle-slider"></span>
                         </label>
-                        <span class="align-text-top ms-2">Enable Connectivity Check</span>
                     </div>
                 </div>
 
@@ -562,16 +581,16 @@
                         </div>
 
                         <!-- Full Access API Key -->
-                        <div class="mt-3 p-3 border rounded">
-                            <h6 class="fw-bold">Full Access API Key</h6>
-                            <p class="text-secondary">
+                        <div class="mt-3 p-3 modern-border modern-rounded">
+                            <h6 class="modern-font-semibold">Full Access API Key</h6>
+                            <p class="modern-text-secondary">
                                 This key provides <strong>full access</strong> to the API. Click <strong>Generate</strong> to create a new random key, or update the text to the desired value.
                             </p>
                             <div class="mb-3">
                                 <label class="modern-form-label">API Key</label>
                                 <input title="Full Access API Key" id="currentapikey" class="modern-form-input mb-3" type="text" @onchange="@((ui) => { SetFormValue("apikey",(string)ui.Value!);})" value="@currentapikey" />
                             </div>
-                            <div class="d-flex gap-2">
+                            <div class="modern-flex modern-gap-2">
                                 <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("apikeysave"))" title="Save Full Access API Key">
                                     <span class="oi oi-check" aria-hidden="true"></span> Save
                                 </button>
@@ -582,16 +601,16 @@
                         </div>
 
                         <!-- Name Generation API Key -->
-                        <div class="mt-3 p-3 border rounded">
-                            <h6 class="fw-bold">Name Generation API Key</h6>
-                            <p class="text-secondary">
+                        <div class="mt-3 p-3 modern-border modern-rounded">
+                            <h6 class="modern-font-semibold">Name Generation API Key</h6>
+                            <p class="modern-text-secondary">
                                 This key provides <strong>Name Generation</strong> access to the API (only for name generation). Click <strong>Generate</strong> to create a new random key, or update the text to the desired value.
                             </p>
                             <div class="mb-3">
                                 <label class="modern-form-label">API Key</label>
                                 <input title="Name Generation API Key" id="currentnamegenerationapikey" class="modern-form-input mb-3" type="text" @onchange="@((ui) => { SetFormValue("namegenerationapikey",(string)ui.Value!);})" value="@currentnamegenerationapikey" />
                             </div>
-                            <div class="d-flex gap-2">
+                            <div class="modern-flex modern-gap-2">
                                 <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("namegenerationapikeysave"))" title="Save Name Generation API Key">
                                     <span class="oi oi-check" aria-hidden="true"></span> Save
                                 </button>
@@ -602,16 +621,16 @@
                         </div>
 
                         <!-- Read-Only API Key -->
-                        <div class="mt-3 p-3 border rounded">
-                            <h6 class="fw-bold">Read-Only API Key</h6>
-                            <p class="text-secondary">
+                        <div class="mt-3 p-3 modern-border modern-rounded">
+                            <h6 class="modern-font-semibold">Read-Only API Key</h6>
+                            <p class="modern-text-secondary">
                                 This key provides <strong>read-only</strong> access to the API (GET operations only). Click <strong>Generate</strong> to create a new random key, or update the text to the desired value.
                             </p>
                             <div class="mb-3">
                                 <label class="modern-form-label">API Key</label>
                                 <input title="Read-Only API Key" id="currentreadonlyapikey" class="modern-form-input mb-3" type="text" @onchange="@((ui) => { SetFormValue("readonlyapikey",(string)ui.Value!);})" value="@currentreadonlyapikey" />
                             </div>
-                            <div class="d-flex gap-2">
+                            <div class="modern-flex modern-gap-2">
                                 <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("readonlyapikeysave"))" title="Save Read-Only API Key">
                                     <span class="oi oi-check" aria-hidden="true"></span> Save
                                 </button>
@@ -1089,12 +1108,6 @@
 
     private async void AdminFormAction(string action, int id = 0)
     {
-        var workingmodaloptions = new ModalOptions()
-            {
-                HideCloseButton = true,
-                UseCustomLayout = true
-            };
-        var workingmodal = Modal!.Show<WorkingModal>("Working", workingmodaloptions);
         message = new ResponseMessage();
         message.Header = "INFORMATION";
         message.Type = MessageTypesEnum.INFORMATION;
@@ -1578,7 +1591,6 @@
         state.SetNavReload(true);
         StateHasChanged();
 
-        workingmodal.Close();
         if (redirect)
         {
             if (admin)

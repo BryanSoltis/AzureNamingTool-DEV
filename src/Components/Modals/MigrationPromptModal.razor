@@ -6,86 +6,77 @@
 @inject ILogger<MigrationPromptModal> Logger
 @inject IStorageMigrationService MigrationService
 
-<div class="modal fade show" id="migrationModal" style="display:block; background-color: rgba(10,10,10,.8);"
-     aria-modal="true" role="dialog">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content @state.AppTheme">
-            <div class="modal-header bg-primary text-white">
-                <h3><i class="bi bi-database-gear"></i> Upgrade to SQLite Storage</h3>
-            </div>
-            <div class="modal-body">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">New Storage Option Available!</h5>
-                        <p class="mb-3">
-                            A new SQLite storage provider is now available, offering improved performance and reliability.
-                        </p>
+<div class="modern-modal-content">
+    <h5 class="mb-3"><i class="bi bi-database-gear"></i> Upgrade to SQLite Storage</h5>
+    
+    <p class="mb-3">
+        A new SQLite storage provider is now available, offering improved performance and reliability.
+    </p>
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <h6><i class="bi bi-file-earmark-text"></i> Current: JSON Files</h6>
-                                <ul class="small">
-                                    <li>Simple file-based storage</li>
-                                    <li>Works well for single-user scenarios</li>
-                                    <li>May have concurrency limitations</li>
-                                </ul>
-                            </div>
-                            <div class="col-md-6">
-                                <h6><i class="bi bi-database"></i> New: SQLite Database</h6>
-                                <ul class="small text-success">
-                                    <li>✓ Better performance for large datasets</li>
-                                    <li>✓ Improved multi-user concurrency</li>
-                                    <li>✓ ACID transactions (data integrity)</li>
-                                    <li>✓ Still embedded (no external server)</li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle"></i>
-                            <strong>Safe Migration:</strong> Your JSON files will be backed up before migration.
-                            You can rollback if needed from the Admin page.
-                        </div>
-
-                        @if (showMigrationStatus)
-                        {
-                            <div class="alert alert-warning">
-                                <i class="bi bi-hourglass-split"></i>
-                                <strong>Migration in progress...</strong>
-                                <div class="progress mt-2">
-                                    <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div>
-                                </div>
-                            </div>
-                        }
-
-                        @if (!String.IsNullOrEmpty(errorMessage))
-                        {
-                            <div class="alert alert-danger">
-                                <i class="bi bi-exclamation-triangle"></i>
-                                <strong>Error:</strong> @errorMessage
-                            </div>
-                        }
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary" @onclick="MigrateNow" disabled="@isProcessing">
-                    <i class="bi bi-arrow-right-circle"></i> Migrate Now
-                </button>
-                <button type="button" class="btn btn-secondary" @onclick="KeepJSON" disabled="@isProcessing">
-                    <i class="bi bi-file-earmark-text"></i> Keep Using JSON
-                </button>
-                <button type="button" class="btn btn-outline-secondary" @onclick="RemindLater" disabled="@isProcessing">
-                    <i class="bi bi-clock"></i> Remind Me Later
-                </button>
-            </div>
+    <div class="modern-flex modern-gap-3 mb-3">
+        <div class="flex-1">
+            <h6><i class="bi bi-file-earmark-text"></i> Current: JSON Files</h6>
+            <ul class="modern-text-sm">
+                <li>Simple file-based storage</li>
+                <li>Works well for single-user scenarios</li>
+                <li>May have concurrency limitations</li>
+            </ul>
+        </div>
+        <div class="flex-1">
+            <h6><i class="bi bi-database"></i> New: SQLite Database</h6>
+            <ul class="modern-text-sm" style="color: #10b981;">
+                <li>✓ Better performance for large datasets</li>
+                <li>✓ Improved multi-user concurrency</li>
+                <li>✓ ACID transactions (data integrity)</li>
+                <li>✓ Still embedded (no external server)</li>
+            </ul>
         </div>
     </div>
+
+    <div class="modern-info-box mb-3">
+        <i class="bi bi-info-circle"></i>
+        <strong>Safe Migration:</strong> Your JSON files will be backed up before migration.
+        You can rollback if needed from the Admin page.
+    </div>
+
+    @if (showMigrationStatus)
+    {
+        <div class="modern-warning-box">
+            <i class="bi bi-hourglass-split"></i>
+            <strong>Migration in progress...</strong>
+            <div class="modern-progress-bar mt-2">
+                <div class="modern-progress-fill animated"></div>
+            </div>
+        </div>
+    }
+
+    @if (!String.IsNullOrEmpty(errorMessage))
+    {
+        <div class="modern-notification-danger">
+            <i class="bi bi-exclamation-triangle"></i>
+            <strong>Error:</strong> @errorMessage
+        </div>
+    }
+</div>
+
+<div class="modern-modal-footer">
+    <button type="button" class="modern-btn-primary" @onclick="MigrateNow" disabled="@isProcessing">
+        <i class="bi bi-arrow-right-circle"></i> Migrate Now
+    </button>
+    <button type="button" class="modern-btn-secondary" @onclick="KeepJSON" disabled="@isProcessing">
+        <i class="bi bi-file-earmark-text"></i> Keep Using JSON
+    </button>
+    <button type="button" class="modern-btn-outline" @onclick="RemindLater" disabled="@isProcessing">
+        <i class="bi bi-clock"></i> Remind Me Later
+    </button>
 </div>
 
 @code {
     [Parameter]
     public EventCallback<MigrationChoice> OnClose { get; set; }
+
+    [CascadingParameter]
+    BlazoredModalInstance ModalInstance { get; set; } = new();
 
     private bool isProcessing = false;
     private bool showMigrationStatus = false;
@@ -111,6 +102,7 @@
                 await ConfigurationHelper.UpdateSettings(config);
 
                 toastService.ShowSuccess("Migration completed successfully! Please restart the application.");
+                await ModalInstance.CloseAsync(ModalResult.Ok(MigrationChoice.Migrated));
                 await OnClose.InvokeAsync(MigrationChoice.Migrated);
             }
             else
@@ -141,6 +133,7 @@
         await ConfigurationHelper.UpdateSettings(config);
 
         toastService.ShowInfo("Continuing with JSON file storage.");
+        await ModalInstance.CloseAsync(ModalResult.Ok(MigrationChoice.KeepJSON));
         await OnClose.InvokeAsync(MigrationChoice.KeepJSON);
     }
 
@@ -148,6 +141,7 @@
     {
         // Don't update MigrationPromptDismissed - user will see prompt again next time
         toastService.ShowInfo("You can migrate from the Admin page anytime.");
+        await ModalInstance.CloseAsync(ModalResult.Ok(MigrationChoice.RemindLater));
         await OnClose.InvokeAsync(MigrationChoice.RemindLater);
     }
 
