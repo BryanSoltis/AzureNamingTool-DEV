@@ -35,8 +35,8 @@ namespace AzureNamingTool.Helpers
 
                 var options = new ModalOptions()
                 {
-                    HideCloseButton = true,
-                    UseCustomLayout = true
+                    HideCloseButton = false,
+                    UseCustomLayout = false
                 };
 
                 if (GeneralHelper.IsNotNull(modal))
@@ -131,13 +131,14 @@ namespace AzureNamingTool.Helpers
 
                 var options = new ModalOptions()
                 {
-                    HideCloseButton = true,
-                    UseCustomLayout = true
+                    HideCloseButton = false,
+                    UseCustomLayout = false,
+                    Size = ModalSize.Large
                 };
 
                 if (GeneralHelper.IsNotNull(modal))
                 {
-                    var displaymodal = modal.Show<InformationModal>("Instructions", parameters, options);
+                    var displaymodal = modal.Show<InformationModal>(title, parameters, options);
                 }
             }
             catch (Exception) {

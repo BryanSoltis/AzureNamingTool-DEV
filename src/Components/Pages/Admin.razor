@@ -844,12 +844,6 @@
         currentuser = await IdentityHelper.GetCurrentUser(session);
         if (firstRender)
         {
-            // Initialize tab navigation
-            if (JSRuntime != null)
-            {
-                await JSRuntime.InvokeVoidAsync("initializeTabs");
-            }
-            
             appversion = ConfigurationHelper.GetAssemblyVersion();
             releasenotesurl = "https://github.com/mspnp/AzureNamingTool/wiki/v" + appversion;
 
@@ -903,6 +897,13 @@
             state.AppTheme = theme.ThemeStyle;
 
             StateHasChanged();
+            
+            // Initialize tabs after state has changed and DOM is ready
+            if (JSRuntime != null)
+            {
+                await Task.Delay(100); // Small delay to ensure DOM is rendered
+                await JSRuntime.InvokeVoidAsync("initializeTabs");
+            }
 
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
             if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("reset", out var _reset))

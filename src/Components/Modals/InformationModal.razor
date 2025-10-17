@@ -7,68 +7,51 @@
 @inject IToastService toastService
 @inject ILogger<PasswordModal> Logger
 
-<div class="modern-modal-backdrop show" @onclick="Cancel"></div>
-<div class="modern-modal show" tabindex="-1" role="dialog">
-    <div class="modern-modal-dialog @theme.ThemeStyle">
-        <div class="modern-modal-header @headerstyle">
-            <h3 class="modern-modal-title">@title</h3>
-            <button type="button" class="modern-modal-close" @onclick="Cancel" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
+<div class="modern-modal-content">
+    @if (GeneralHelper.IsNotNull(message))
+    {
+        <div class="mb-3">
+            @((MarkupString)message)
         </div>
-        <div class="modern-modal-body">
-                @if (GeneralHelper.IsNotNull(message))
-                {
-                    <div class="my-3">
-                        @(
-                            (MarkupString)message
-                            )
-                    </div>
-                }
-                @switch (component)
-                {
-                    case "generateinstructions":
-                        <div class="mb-3">
-                            <GenerateInstructions theme="@theme" admin="@admin" />
-                        </div>
-                        break;
-                    case "generatednamesloginstructions":
-                        <div class="mb-3">
-                            <GeneratedNamesLogInstructions theme="@theme" admin="@admin" />
-                        </div>
-                        break;
-                    case "toolconfigurationinstructions":
-                        <div class="mb-3">
-                            <ConfigurationInstructions theme="@theme" admin="@admin" />
-                        </div>
-                        break;
-                    case "referenceinstructions":
-                        <div class="mb-3">
-                            <ReferenceInstructions theme="@theme" admin="@admin" />
-                        </div>
-                        break;
-                    case "adminconfigurationinstructions":
-                        <div class="mb-3">
-                            <AdminConfigurationInstructions theme="@theme" admin="@admin" />
-                        </div>
-                        break;
-                    case "adminloginstructions":
-                        <div class="mb-3">
-                            <AdminLogInstructions theme="@theme" admin="@admin" />
-                        </div>
-                        break;
-                    case "externalcontent":
-                        <div class="mb-3">
-                            <ExternalContent theme="@theme" admin="@admin" externalurl="@externalurl"/>
-                        </div>
-                        break;
-                }
+    }
+    @switch (component)
+    {
+        case "generateinstructions":
+            <div class="mb-3">
+                <GenerateInstructions theme="@theme" admin="@admin" />
             </div>
-            <div class="modern-modal-footer">
-                <button type="button" class="modern-btn-primary" @onclick=@Confirm>OK</button>
+            break;
+        case "generatednamesloginstructions":
+            <div class="mb-3">
+                <GeneratedNamesLogInstructions theme="@theme" admin="@admin" />
             </div>
-        </div>
-    </div>
+            break;
+        case "toolconfigurationinstructions":
+            <div class="mb-3">
+                <ConfigurationInstructions theme="@theme" admin="@admin" />
+            </div>
+            break;
+        case "referenceinstructions":
+            <div class="mb-3">
+                <ReferenceInstructions theme="@theme" admin="@admin" />
+            </div>
+            break;
+        case "adminconfigurationinstructions":
+            <div class="mb-3">
+                <AdminConfigurationInstructions theme="@theme" admin="@admin" />
+            </div>
+            break;
+        case "adminloginstructions":
+            <div class="mb-3">
+                <AdminLogInstructions theme="@theme" admin="@admin" />
+            </div>
+            break;
+        case "externalcontent":
+            <div class="mb-3">
+                <ExternalContent theme="@theme" admin="@admin" externalurl="@externalurl"/>
+            </div>
+            break;
+    }
 </div>
 
 @code {
