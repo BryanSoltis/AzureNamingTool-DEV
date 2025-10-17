@@ -757,21 +757,6 @@
                                                     </div>
                                                     <div class="card  w-auto mb-3">
                                                         <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Export Function Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Click <span class="fw-bold">Export</span> to export the current Function Configuration.
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("ResourceFunction",0,"download")) title="Export">
-                                                                    <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card  w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
                                                             Reset the Functions Configuration
                                                         </div>
                                                         <div class="card card-body @theme.ThemeStyle">
@@ -784,26 +769,6 @@
                                                             <p>
                                                                 <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceFunction",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Import Function Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Enter the new Functions Configuration JSON below and click <span class="fw-bold">Import</span> to import the Functions Configuration.
-                                                            </p><p>
-                                                                <span class="fw-bold">NOTE:</span> This will update the existing Functions Configuration and cannot be undone!
-                                                            </p>
-                                                            <p>
-                                                                <textarea title="New Function Config" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newFunctionConfig",(string)ui.Value!);})">@newFunctionConfig</textarea>
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceFunction",0,"update"))" title="Import">
-                                                                    <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
                                                                 </button>
                                                             </p>
                                                         </div>
@@ -929,21 +894,6 @@
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div class="card  w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Export the current Locations Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Click <span class="fw-bold">Export</span> to export the current Locations Configuration.
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("ResourceLocation",0,"download")) title="Export">
-                                                                    <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
                                                     @if (ConfigurationHelper.VerifyConnectivity().Result)
                                                     {
                                                         <div class="card  w-auto mb-3">
@@ -1001,27 +951,6 @@
                                                             <p>
                                                                 <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceLocation",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Import Locations Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Enter the new Locations Configuration JSON below and click <span class="fw-bold">Import</span> to import the Locations Configuration.
-                                                            </p>
-                                                            <p>
-                                                                <span class="fw-bold">NOTE:</span> This will update the existing Locations Configuration and cannot be undone!
-                                                            </p>
-                                                            <p>
-                                                                <textarea title="Configuration" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newLocationConfig",(string)ui.Value!);})">@newLocationConfig</textarea>
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceLocation",0,"update"))" title="Import">
-                                                                    <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
                                                                 </button>
                                                             </p>
                                                         </div>
@@ -1138,21 +1067,6 @@
                                                     </div>
                                                     <div class="card  w-auto mb-3">
                                                         <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Export the current Orgs Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Click <span class="fw-bold">Export</span> to export the current Orgs Configuration.
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("ResourceOrg",0,"download")) title="Export">
-                                                                    <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card  w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
                                                             Reset the Orgs Configuration
                                                         </div>
                                                         <div class="card card-body @theme.ThemeStyle">
@@ -1165,27 +1079,6 @@
                                                             <p>
                                                                 <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceOrg",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Import Orgs Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Enter the new Orgs Configuration JSON below and click <span class="fw-bold">Import</span> to import the Orgs Configuration.
-                                                            </p>
-                                                            <p>
-                                                                <span class="fw-bold">NOTE:</span> This will update the existing Orgs Configuration and cannot be undone!
-                                                            </p>
-                                                            <p>
-                                                                <textarea title="Configuration" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newOrgConfig",(string)ui.Value!);})">@newOrgConfig</textarea>
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceOrg",0,"update"))" title="Import">
-                                                                    <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
                                                                 </button>
                                                             </p>
                                                         </div>
@@ -1302,21 +1195,6 @@
                                                     </div>
                                                     <div class="card  w-auto mb-3">
                                                         <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Export the current Projects/Apps/Services Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Click <span class="fw-bold">Export</span> to export the current Projects/Apps/Services Configuration.
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("ResourceProjAppSvc",0,"download")) title="Export">
-                                                                    <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card  w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
                                                             Reset the Projects/Apps/Services Configuration
                                                         </div>
                                                         <div class="card card-body @theme.ThemeStyle">
@@ -1329,26 +1207,6 @@
                                                             <p>
                                                                 <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceProjAppSvc",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Import Projects/Apps/Services Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Enter the new Projects/Apps/Services Configuration JSON below and click <span class="fw-bold">Import</span> to import the Projects/Apps/Services Configuration.
-                                                            </p><p>
-                                                                <span class="fw-bold">NOTE:</span> This will update the existing Projects/Apps/Services Configuration and cannot be undone!
-                                                            </p>
-                                                            <p>
-                                                                <textarea title="Configuration" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newProjAppSvcConfig",(string)ui.Value!);})">@newProjAppSvcConfig</textarea>
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceProjAppSvc",0,"update"))" title="Import">
-                                                                    <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
                                                                 </button>
                                                             </p>
                                                         </div>
@@ -1554,21 +1412,6 @@
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div class="card  w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Export the current Resource Types Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Click <span class="fw-bold">Export</span> to export the current Resource Types Configuration.
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("ResourceType",0,"download")) title="Export">
-                                                                    <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
                                                     @if (ConfigurationHelper.VerifyConnectivity().Result)
                                                     {
                                                         <div class="card  w-auto mb-3">
@@ -1624,26 +1467,6 @@
                                                             <p>
                                                                 <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceType",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Import Resource Types Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Enter the new Resource Types Configuration JSON below and click <span class="fw-bold">Import</span> to import the Resource Types Configuration.
-                                                            </p><p>
-                                                                <span class="fw-bold">NOTE:</span> This will update the existing Resource Types Configuration and cannot be undone!
-                                                            </p>
-                                                            <p>
-                                                                <textarea title="Configuration" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newTypeConfig",(string)ui.Value!);})">@newTypeConfig</textarea>
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceType",0,"update"))" title="Import">
-                                                                    <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
                                                                 </button>
                                                             </p>
                                                         </div>
@@ -1761,21 +1584,6 @@
                                                     </div>
                                                     <div class="card  w-auto mb-3">
                                                         <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Export Units/Depts Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Click <span class="fw-bold">Export</span> to export the current Units/Depts Configuration.
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-primary" @onclick=@(e => FormAction("ResourceUnitDept",0,"download")) title="Export">
-                                                                    <span class="oi oi-data-transfer-download" aria-hidden="true"></span> Export
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card  w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
                                                             Reset the Units/Depts Configuration
                                                         </div>
                                                         <div class="card card-body @theme.ThemeStyle">
@@ -1788,26 +1596,6 @@
                                                             <p>
                                                                 <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceUnitDept",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
-                                                                </button>
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div class="card mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Import Units/Depts Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Enter the new Units/Depts Configuration JSON below and click <span class="fw-bold">Import</span> to import the Units/Depts Configuration.
-                                                            </p><p>
-                                                                <span class="fw-bold">NOTE:</span> This will update the existing Units/Depts Configuration and cannot be undone!
-                                                            </p>
-                                                            <p>
-                                                                <textarea title="Configuration" class="form-control @theme.ThemeStyle" rows="8" type="text" @onchange="@((ui) => { SetFormValue("newUnitDeptConfig",(string)ui.Value!);})">@newUnitDeptConfig</textarea>
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceUnitDept",0,"update"))" title="Import">
-                                                                    <span class="oi oi-data-transfer-upload" aria-hidden="true"></span> Import
                                                                 </button>
                                                             </p>
                                                         </div>
