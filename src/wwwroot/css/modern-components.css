@@ -1548,6 +1548,73 @@ pre code {
     gap: var(--spacing-md);
 }
 
+/* Modern Checkboxes */
+.modern-checkbox-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.modern-checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    padding: var(--spacing-sm);
+    border-radius: var(--radius-md);
+    transition: background-color var(--transition-fast);
+}
+
+.modern-checkbox-label:hover {
+    background-color: var(--color-bg-tertiary);
+}
+
+.modern-checkbox {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border: 2px solid var(--color-border);
+    border-radius: 4px;
+    background-color: var(--color-bg-secondary);
+    cursor: pointer;
+    position: relative;
+    transition: all var(--transition-fast);
+    margin-top: 2px;
+}
+
+.modern-checkbox:hover {
+    border-color: var(--color-azure-blue);
+}
+
+.modern-checkbox:checked {
+    background-color: var(--color-azure-blue);
+    border-color: var(--color-azure-blue);
+}
+
+.modern-checkbox:checked::after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 2px;
+    width: 5px;
+    height: 10px;
+    border: solid white;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.modern-checkbox:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(var(--color-azure-blue-rgb), 0.2);
+}
+
+.modern-checkbox-text {
+    flex: 1;
+    color: var(--color-text-primary);
+    line-height: 1.5;
+}
+
 .modern-radio-item {
     display: flex;
     align-items: flex-start;

@@ -30,64 +30,45 @@
                                    @bind:event="oninput">
                         </div>
 
-                        <div class="modern-card mb-3">
-                            <details class="modern-collapsible" open>
-                                <summary class="modern-collapsible-header">
-                                    <span class="modern-collapsible-icon">
-                                        <span class="oi oi-chevron-bottom"></span>
-                                    </span>
-                                    <span class="modern-collapsible-title">Resource Types</span>
-                                </summary>
-                                <div class="modern-collapsible-content">
-                                    @foreach (var category in categories)
-                                    {
-                                        if (!IsCategoryVisible(category))
-                                            continue;
-                                        <div id="@("multitypecontainer_"+@category)" class="modern-card mb-3">
-                                            <details class="modern-collapsible" open>
-                                                <summary class="modern-collapsible-header">
-                                                    <span class="modern-collapsible-icon">
-                                                        <span class="oi oi-chevron-bottom"></span>
-                                                    </span>
-                                                    <span class="modern-collapsible-title">@category</span>
-                                                </summary>
-                                                <div class="modern-collapsible-content">
-                                                    <ul style="list-style-type: none; padding-left: 0;">
-                                                        @foreach (var resourceType in ResourceTypeService.GetFilteredResourceTypes(servicesData.ResourceTypes!, category))
-                                                        {
-                                                            if (!IsTypeVisible(resourceType))
-                                                                continue;
-                                                            <li class="mb-2">
-                                                                <label class="modern-checkbox-label">
-                                                                    @if (multiselectedResourceTypes.Contains(resourceType.Id.ToString()))
-                                                                    {
-                                                                        <input class="modern-checkbox" type="checkbox" checked value="@resourceType.Id" id="@("multitype_"+@resourceType.Id)" @onchange="eventArgs => { OnMultiTypesChange(resourceType.Id.ToString(), eventArgs.Value!); }">
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        <input class="modern-checkbox" type="checkbox" value="@resourceType.Id" id="@("multitype_"+@resourceType.Id)" @onchange="eventArgs => { OnMultiTypesChange(resourceType.Id.ToString(), eventArgs.Value!); }">
-                                                                    }
-                                                                    <span class="modern-checkbox-text">
-                                                                        @if (!String.IsNullOrEmpty(resourceType.Property))
-                                                                        {
-                                                                            <span>@resourceType.Resource - @resourceType.Property (@resourceType.ShortName)</span>
-                                                                        }
-                                                                        else
-                                                                        {
-                                                                            <span>@resourceType.Resource (@resourceType.ShortName)</span>
-                                                                        }
-                                                                    </span>
-                                                                </label>
-                                                            </li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                            </details>
-                                        </div>
-                                    }
+                        @foreach (var category in categories)
+                        {
+                            if (!IsCategoryVisible(category))
+                                continue;
+                            <div class="modern-card mb-3">
+                                <div class="modern-card-header">
+                                    <h5 class="modern-card-title mb-0">@category</h5>
                                 </div>
-                            </details>
-                        </div>
+                                <div class="modern-card-body">
+                                    <div class="modern-checkbox-group">
+                                        @foreach (var resourceType in ResourceTypeService.GetFilteredResourceTypes(servicesData.ResourceTypes!, category))
+                                        {
+                                            if (!IsTypeVisible(resourceType))
+                                                continue;
+                                            <label class="modern-checkbox-label">
+                                                @if (multiselectedResourceTypes.Contains(resourceType.Id.ToString()))
+                                                {
+                                                    <input class="modern-checkbox" type="checkbox" checked value="@resourceType.Id" id="@("multitype_"+@resourceType.Id)" @onchange="eventArgs => { OnMultiTypesChange(resourceType.Id.ToString(), eventArgs.Value!); }">
+                                                }
+                                                else
+                                                {
+                                                    <input class="modern-checkbox" type="checkbox" value="@resourceType.Id" id="@("multitype_"+@resourceType.Id)" @onchange="eventArgs => { OnMultiTypesChange(resourceType.Id.ToString(), eventArgs.Value!); }">
+                                                }
+                                                <span class="modern-checkbox-text">
+                                                    @if (!String.IsNullOrEmpty(resourceType.Property))
+                                                    {
+                                                        <span>@resourceType.Resource - @resourceType.Property (@resourceType.ShortName)</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>@resourceType.Resource (@resourceType.ShortName)</span>
+                                                    }
+                                                </span>
+                                            </label>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
