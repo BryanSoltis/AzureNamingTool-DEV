@@ -174,7 +174,7 @@
         StateHasChanged();
     }
 
-    async void Save()
+    async Task Save()
     {
         await ModalInstance.CloseAsync(ModalResult.Ok(multiselectedResourceTypes));
     }
