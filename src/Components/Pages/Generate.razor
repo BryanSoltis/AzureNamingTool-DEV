@@ -74,14 +74,14 @@
                         <div class="modern-card-body">
                             <div class="modern-radio-group">
                                 <div class="modern-radio-item">
-                                    <input class="modern-radio-input" type="radio" name="generateselect" id="singleselect" value="single" checked @onclick="@(e => OnGenerateModeChange("single"))">
+                                    <input class="modern-radio-input" type="radio" name="generateselect" id="singleselect" value="single" checked @onclick="@(async () => await OnGenerateModeChange("single"))">
                                     <label class="modern-radio-label" for="singleselect">
                                         <div class="modern-radio-title">Generate Single Resource Type Name</div>
                                         <div class="modern-radio-description">This option will allow the generation of a single resource type name using the selected components.</div>
                                     </label>
                                 </div>
                                 <div class="modern-radio-item">
-                                    <input class="modern-radio-input" type="radio" name="generateselect" id="multiselect" value="multi" @onclick="@(e => OnGenerateModeChange("multi"))">
+                                    <input class="modern-radio-input" type="radio" name="generateselect" id="multiselect" value="multi" @onclick="@(async () => await OnGenerateModeChange("multi"))">
                                     <label class="modern-radio-label" for="multiselect">
                                         <div class="modern-radio-title">Generate Multiple Resource Type Names</div>
                                         <div class="modern-radio-description">This option will allow the generation of names for multiple resource types using the selected components. <span class="modern-text-warning">All components will be required (Optional and Excluded Components).</span></div>
@@ -842,27 +842,37 @@
         }
     }
 
-    private async void OnGenerateModeChange(string mode)
+    private async Task OnGenerateModeChange(string mode)
     {
-        ResetForm(true);
-
-        if (mode == "multi")
+        try
         {
-            resourcetypeVisible = "collapse";
-            resourcetypesVisible = "";
-            toastService.ShowInfo("This option will require all current components to be selected.");
-            // Show the multi select modal
-            await OpenMultiSelectModal(true);
-        }
-        else
-        {
-            // Show the single type selection
-            resourcetypeVisible = "";
-            resourcetypesVisible = "collapse";
-        }
+            ResetForm(true);
 
-        resourceNameRequestResponse = new();
-        StateHasChanged();
+            if (mode == "multi")
+            {
+                resourcetypeVisible = "collapse";
+                resourcetypesVisible = "";
+                toastService.ShowInfo("This option will require all current components to be selected.");
+                // Show the multi select modal
+                StateHasChanged();
+                await Task.Delay(100); // Give UI time to update
+                await OpenMultiSelectModal(true);
+            }
+            else
+            {
+                // Show the single type selection
+                resourcetypeVisible = "";
+                resourcetypesVisible = "collapse";
+                StateHasChanged();
+            }
+
+            resourceNameRequestResponse = new();
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error in OnGenerateModeChange");
+            toastService.ShowError($"Error changing mode: {ex.Message}");
+        }
     }
 
     private async Task OpenMultiSelectModal(bool clearselection)
