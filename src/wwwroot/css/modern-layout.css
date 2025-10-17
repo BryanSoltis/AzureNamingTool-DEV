@@ -1,0 +1,432 @@
+/* ===================================================================
+   Azure Naming Tool - Modern Layout Styles
+   Version: 1.0
+   Date: October 17, 2025
+   Description: Layout structure for DesignLinear design with 
+                collapsible sidebar and modern header
+   =================================================================== */
+
+/* ===================================================================
+   MAIN LAYOUT STRUCTURE
+   =================================================================== */
+
+.modern-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: var(--color-bg-primary);
+}
+
+/* ===================================================================
+   SIDEBAR
+   =================================================================== */
+
+.modern-sidebar {
+    width: 260px;
+    min-width: 260px;
+    background: linear-gradient(180deg, var(--sidebar-bg-start) 0%, var(--sidebar-bg-end) 100%);
+    color: var(--sidebar-text);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overflow-x: hidden;
+    transition: all var(--transition-normal);
+    position: relative;
+    z-index: var(--z-sidebar);
+    box-shadow: 2px 0 8px rgba(0, 0, 0, 0.1);
+}
+
+.modern-sidebar.collapsed {
+    width: 70px;
+    min-width: 70px;
+}
+
+/* Sidebar scrollbar styling */
+.modern-sidebar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modern-sidebar::-webkit-scrollbar-track {
+    background: var(--sidebar-bg-end);
+}
+
+.modern-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-full);
+}
+
+.modern-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===================================================================
+   MAIN CONTENT AREA
+   =================================================================== */
+
+.modern-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0; /* Prevent flex item overflow */
+}
+
+/* ===================================================================
+   HEADER
+   =================================================================== */
+
+.modern-header {
+    height: 64px;
+    background-color: var(--color-bg-secondary);
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--spacing-lg);
+    gap: var(--spacing-md);
+    position: sticky;
+    top: 0;
+    z-index: var(--z-header);
+    box-shadow: var(--shadow-sm);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+    min-width: 0;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
+}
+
+.header-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.sidebar-toggle:hover {
+    background-color: var(--color-bg-hover);
+    border-color: var(--color-border-hover);
+    color: var(--color-text-primary);
+}
+
+.sidebar-toggle:active {
+    transform: scale(0.95);
+}
+
+/* Icon Button (Generic) */
+.btn-icon {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.btn-icon:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-primary);
+}
+
+/* User Info in Header */
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-xs) var(--spacing-md);
+    background-color: var(--color-bg-tertiary);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+}
+
+.user-name {
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-primary);
+}
+
+/* Theme Toggle Wrapper (temporary until ThemeToggle component) */
+.theme-toggle-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+/* ===================================================================
+   CONTENT AREA
+   =================================================================== */
+
+.modern-content {
+    flex: 1;
+    padding: var(--spacing-xl);
+    overflow-y: auto;
+    background-color: var(--color-bg-primary);
+}
+
+/* ===================================================================
+   NAVIGATION MENU STYLES (for NavMenu.razor)
+   =================================================================== */
+
+/* Top row with logo */
+.modern-sidebar .top-row {
+    padding: var(--spacing-lg) var(--spacing-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 64px;
+}
+
+.modern-sidebar .navbar-brand {
+    color: var(--sidebar-text);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    transition: opacity var(--transition-fast);
+}
+
+.modern-sidebar .navbar-brand:hover {
+    opacity: 0.9;
+}
+
+.modern-sidebar.collapsed .navbar-brand span {
+    display: none;
+}
+
+/* Mobile toggle button */
+.modern-sidebar .navbar-toggler {
+    background-color: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--sidebar-text);
+    padding: var(--spacing-xs);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+}
+
+.modern-sidebar .navbar-toggler:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Navigation items */
+.modern-sidebar nav {
+    padding: var(--spacing-sm) 0;
+}
+
+.modern-sidebar .nav-item {
+    margin: 2px var(--spacing-xs);
+}
+
+/* Higher specificity to override Bootstrap */
+.modern-sidebar .nav-item .nav-link,
+.modern-sidebar nav .nav-link {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--sidebar-text) !important;
+    text-decoration: none;
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    background-color: transparent;
+}
+
+.modern-sidebar .nav-item .nav-link:hover,
+.modern-sidebar nav .nav-link:hover {
+    background-color: var(--sidebar-hover) !important;
+    color: #ffffff !important;
+}
+
+.modern-sidebar .nav-item .nav-link.active,
+.modern-sidebar nav .nav-link.active {
+    background-color: var(--sidebar-active) !important;
+    color: #ffffff !important;
+    font-weight: var(--font-weight-semibold);
+}
+
+.modern-sidebar .nav-link .oi {
+    font-size: var(--font-size-base);
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.modern-sidebar.collapsed .nav-link {
+    justify-content: center;
+    padding: var(--spacing-sm);
+}
+
+.modern-sidebar.collapsed .nav-link span:not(.oi) {
+    display: none;
+}
+
+/* Section headers in sidebar */
+.modern-sidebar .nav-section-header {
+    padding: var(--spacing-md) var(--spacing-md) var(--spacing-xs);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--sidebar-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: var(--spacing-md);
+}
+
+.modern-sidebar.collapsed .nav-section-header {
+    display: none;
+}
+
+/* Jump To section in sidebar */
+.modern-sidebar .card {
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: var(--spacing-md) var(--spacing-xs);
+}
+
+.modern-sidebar .card-header {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modern-sidebar.collapsed .card {
+    display: none;
+}
+
+/* ===================================================================
+   SCROLL TO TOP BUTTON
+   =================================================================== */
+
+#btnScrollToTop {
+    position: fixed;
+    bottom: var(--spacing-lg);
+    right: var(--spacing-lg);
+    z-index: var(--z-sticky);
+    display: none;
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-lg);
+}
+
+/* ===================================================================
+   RESPONSIVE LAYOUT
+   =================================================================== */
+
+@media (max-width: 1024px) {
+    .modern-sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        transform: translateX(-100%);
+        z-index: var(--z-modal);
+    }
+    
+    .modern-sidebar.show {
+        transform: translateX(0);
+    }
+    
+    .modern-main {
+        width: 100%;
+    }
+    
+    .header-title {
+        font-size: var(--font-size-base);
+    }
+}
+
+@media (max-width: 768px) {
+    .modern-header {
+        height: 56px;
+        padding: 0 var(--spacing-md);
+    }
+    
+    .header-title {
+        display: none;
+    }
+    
+    .modern-content {
+        padding: var(--spacing-md);
+    }
+    
+    .user-info .user-name {
+        display: none;
+    }
+    
+    .header-right .btn span:not(.oi) {
+        display: none;
+    }
+    
+    .header-right .btn {
+        padding: var(--spacing-xs) var(--spacing-sm);
+    }
+}
+
+@media (max-width: 480px) {
+    .modern-header {
+        gap: var(--spacing-xs);
+    }
+    
+    .header-right {
+        gap: 4px;
+    }
+    
+    .modern-content {
+        padding: var(--spacing-sm);
+    }
+}
+
+/* ===================================================================
+   PRINT STYLES
+   =================================================================== */
+
+@media print {
+    .modern-sidebar,
+    .modern-header {
+        display: none;
+    }
+    
+    .modern-main {
+        width: 100%;
+    }
+    
+    .modern-content {
+        padding: 0;
+    }
+}

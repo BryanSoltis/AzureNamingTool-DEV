@@ -19,60 +19,96 @@
 
 <PageTitle>Azure Naming Tool</PageTitle>
 <BlazoredToasts Position="ToastPosition.BottomRight" ShowProgressBar="true" />
-<div class="page @theme.ThemeStyle">
-    <div class="sidebar" style="overflow-y:auto;">
+
+<div class="modern-layout">
+    <!-- Sidebar -->
+    <aside class="modern-sidebar @(sidebarCollapsed ? "collapsed" : "")">
         <NavMenu PageType="@PageType" />
-    </div>
+    </aside>
 
-    <main>
-        <div class="top-row px-4 auth @theme.ThemeStyle">
-            @if (!String.IsNullOrEmpty(currentuser))
-            {
-                if (currentuser != "System")
-                {
-                    <div class="w-100">
-                        @(
-                                "User: " + currentuser
-                                )
-                    </div>
-                }
-            }
-            @if (admin)
-            {
-                @if (!String.IsNullOrEmpty(feedbackurl))
-                {
-                    <div class="ms-3">
-                        <button type="button" class="btn btn-success" @onclick="@(e => ShowFeedback())" title="Want to give feedback?">Feedback</button>
-                    </div>
-                }
-            }
-            @if (!String.IsNullOrEmpty(currentuser))
-            {
-                if (currentuser != "System")
-                {
-                    <div class="ms-3">
-                        <button type="button" class="btn btn-danger" @onclick="@(e => Logout())" title="Logout" data-bs-toggle="collapse" href="#admin">Logout</button>
-                    </div>
-                }
-            }
-            <div class="px-3">
-                <label class="switch" title="App Theme">
-                    <input type="checkbox" checked="@isdarktheme" @oninput="ThemeChanged">
-                    <span class="slider round"></span>
-                </label>
+    <!-- Main Content Area -->
+    <div class="modern-main">
+        <!-- Header -->
+        <header class="modern-header">
+            <div class="header-left">
+                <button type="button" 
+                        class="btn-icon sidebar-toggle" 
+                        @onclick="ToggleSidebar"
+                        title="@(sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar")"
+                        aria-label="@(sidebarCollapsed ? "Expand sidebar" : "Collapse sidebar")">
+                    <span class="oi oi-menu"></span>
+                </button>
+                <h1 class="header-title">Azure Naming Tool</h1>
             </div>
-        </div>
+            
+            <div class="header-right">
+                @if (!String.IsNullOrEmpty(currentuser))
+                {
+                    if (currentuser != "System")
+                    {
+                        <div class="user-info">
+                            <span class="oi oi-person"></span>
+                            <span class="user-name">@currentuser</span>
+                        </div>
+                    }
+                }
+                
+                @if (admin)
+                {
+                    @if (!String.IsNullOrEmpty(feedbackurl))
+                    {
+                        <button type="button" 
+                                class="btn btn-sm btn-success" 
+                                @onclick="@(e => ShowFeedback())" 
+                                title="Want to give feedback?">
+                            <span class="oi oi-comment-square"></span>
+                            Feedback
+                        </button>
+                    }
+                }
+                
+                <!-- Theme Toggle (Old Style - Will be replaced with ThemeToggle component in Phase 5.5) -->
+                <div class="theme-toggle-wrapper">
+                    <label class="switch" title="App Theme">
+                        <input type="checkbox" checked="@isdarktheme" @oninput="ThemeChanged">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                
+                @if (!String.IsNullOrEmpty(currentuser))
+                {
+                    if (currentuser != "System")
+                    {
+                        <button type="button" 
+                                class="btn btn-sm btn-danger" 
+                                @onclick="@(e => Logout())" 
+                                title="Logout">
+                            <span class="oi oi-account-logout"></span>
+                            Logout
+                        </button>
+                    }
+                }
+            </div>
+        </header>
 
-        <article class="content px-4">
+        <!-- Content Area -->
+        <main class="modern-content">
             @if ((admin) && (bool.Parse(ConfigurationHelper.GetAppSetting("DevMode"))))
             {
-                <div class="warning-message">DEV MODE Enabled! This can cause unexpected behavior! Use at your own risk!</div>
+                <div class="alert alert-warning">
+                    <span class="alert-icon">⚠️</span>
+                    <div class="alert-content">
+                        <div class="alert-title">DEV MODE Enabled!</div>
+                        <div class="alert-message">This can cause unexpected behavior! Use at your own risk!</div>
+                    </div>
+                </div>
             }
+            
             <CascadingValue Value=@theme>
                 @Body
             </CascadingValue>
-        </article>
-    </main>
+        </main>
+    </div>
 </div>
 
 <button onclick="topFunction()" type="button" id="btnScrollToTop" class="btn btn-success btn-sm" title="Go to top"><span class="oi oi-arrow-circle-top" style="vertical-align:text-top;"></span> Top</button>
@@ -100,6 +136,7 @@
     private bool isdarktheme = false;
     private bool admin;
     private string feedbackurl = String.Empty;
+    private bool sidebarCollapsed = false;
 
     private string? currentuser = String.Empty;
 
@@ -376,5 +413,11 @@
     private async void ShowFeedback()
     {
         await JsRuntime.InvokeVoidAsync("open", feedbackurl, "_blank");
+    }
+
+    private void ToggleSidebar()
+    {
+        sidebarCollapsed = !sidebarCollapsed;
+        StateHasChanged();
     }
 }

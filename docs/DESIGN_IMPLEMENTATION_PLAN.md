@@ -995,3 +995,23 @@ function initTheme() {
 **Last Updated**: October 17, 2025
 **Document Version**: 1.1
 **Status**: Planning Phase - Theme System Added
+
+---
+
+## Design Implementation Commit Tracking
+
+To ensure easy rollback and traceability, record the commit hashes for the following milestones:
+
+- **PRE-DESIGN COMMIT**: The last commit before any DesignLinear modernization changes were applied.
+  - Commit hash: `<INSERT_HASH_BEFORE_DESIGN>`
+  - Date: October 17, 2025
+  - Description: Last stable commit before design system implementation began.
+
+- **POST-DESIGN COMMIT**: The first commit after the initial DesignLinear modernization changes were applied (foundation CSS, layout, theme system, sidebar styling).
+  - Commit hash: `<INSERT_HASH_AFTER_DESIGN>`
+  - Date: October 17, 2025
+  - Description: Initial commit for DesignLinear modernization (foundation CSS, theme system, MainLayout, NavMenu sidebar styling).
+
+> Update these hashes after each commit to keep a clear record for rollback and auditing.
+
+---
