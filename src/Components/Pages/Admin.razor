@@ -808,26 +808,6 @@
                             </div>
                         </div>
                     </div>
-
-                    <!-- Reset Configuration -->
-                    <div class="modern-setting-row">
-                        <div class="setting-label">
-                            <i class="bi bi-arrow-clockwise"></i> Reset Configuration
-                        </div>
-                        <div class="setting-description">
-                            Reset the Global Configuration back to the default values at the time of installation. This will apply to all component configurations.
-                        </div>
-                        
-                        <div class="mt-3">
-                            <div class="modern-notification-danger">
-                                <i class="bi bi-exclamation-triangle-fill"></i>
-                                <strong>WARNING:</strong> This will reset your current Global Configuration to factory defaults. This action cannot be undone. Create a backup before proceeding.
-                            </div>
-                            <button type="button" class="modern-btn-danger mt-3" @onclick="@(e => FormAction("Global",0,"reset"))" title="Reset">
-                                <i class="bi bi-arrow-clockwise"></i> Reset Global Configuration
-                            </button>
-                        </div>
-                    </div>
                 }
                 else
                 {
@@ -862,26 +842,6 @@
                         </div>
                     </div>
 
-                    <!-- FileSystem Reset -->
-                    <div class="modern-setting-row">
-                        <div class="setting-label">
-                            <i class="bi bi-arrow-clockwise"></i> Reset Configuration
-                        </div>
-                        <div class="setting-description">
-                            Reset the Global Configuration back to the default values at the time of installation.
-                        </div>
-                        
-                        <div class="mt-3">
-                            <div class="modern-notification-danger">
-                                <i class="bi bi-exclamation-triangle-fill"></i>
-                                <strong>WARNING:</strong> This will reset your current Global Configuration to factory defaults. This action cannot be undone. Create a backup before proceeding.
-                            </div>
-                            <button type="button" class="modern-btn-danger mt-3" @onclick="@(e => FormAction("Global",0,"reset"))" title="Reset">
-                                <i class="bi bi-arrow-clockwise"></i> Reset Global Configuration
-                            </button>
-                        </div>
-                    </div>
-
                     <!-- FileSystem Import -->
                     <div class="modern-setting-row">
                         <div class="setting-label">
@@ -905,6 +865,123 @@
                         </div>
                     </div>
                 }
+
+                <!-- Individual Component Import/Export - Available for all storage types -->
+                <div class="modern-setting-row">
+                    <div class="setting-label">
+                        <i class="bi bi-box-arrow-in-down"></i> Individual Component Import/Export
+                    </div>
+                    <div class="setting-description">
+                        Export or import individual component type configurations. This allows you to share specific component data between instances.
+                    </div>
+                    
+                    <div class="mt-3">
+                        <div class="modern-notification-info mb-3">
+                            <i class="bi bi-info-circle"></i>
+                            <strong>Component-Level Management</strong><br />
+                            Select a component type below to export its current data or import new data. This is useful for sharing configurations between instances or creating backups of specific components.
+                        </div>
+
+                        <!-- Component Type Selection -->
+                        <div class="mb-3">
+                            <label class="modern-form-label">Select Component Type</label>
+                            <select class="modern-form-input" @onchange="@((ChangeEventArgs e) => OnComponentTypeSelected(e.Value?.ToString() ?? ""))">
+                                <option value="">-- Select a component type --</option>
+                                <option value="ResourceType">Resource Types</option>
+                                <option value="ResourceLocation">Locations</option>
+                                <option value="ResourceEnvironment">Environments</option>
+                                <option value="ResourceOrg">Organizations</option>
+                                <option value="ResourceProjAppSvc">Projects/Apps/Services</option>
+                                <option value="ResourceUnitDept">Units/Departments</option>
+                                <option value="ResourceFunction">Functions</option>
+                                <option value="ResourceDelimiter">Delimiters</option>
+                                <option value="CustomComponent">Custom Components</option>
+                            </select>
+                        </div>
+
+                        @if (!String.IsNullOrEmpty(selectedComponentType))
+                        {
+                            <div class="row g-3">
+                                <!-- Export Component - Only for FileSystem/JSON storage -->
+                                @if (!isUsingSQLite)
+                                {
+                                    <div class="col-md-6">
+                                        <div class="modern-action-card">
+                                            <div class="action-card-icon">
+                                                <i class="bi bi-file-earmark-arrow-down"></i>
+                                            </div>
+                                            <div class="action-card-content">
+                                                <h6 class="action-card-title">Export @GetComponentDisplayName(selectedComponentType)</h6>
+                                                <p class="action-card-description">
+                                                    Download the current @GetComponentDisplayName(selectedComponentType) configuration as JSON.
+                                                </p>
+                                                <button type="button" class="modern-btn-primary" @onclick="ExportComponentData" title="Export Component">
+                                                    <i class="bi bi-download"></i> Export @GetComponentDisplayName(selectedComponentType)
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="col-md-6">
+                                        <div class="modern-action-card">
+                                            <div class="modern-notification-warning">
+                                                <i class="bi bi-info-circle"></i>
+                                                <strong>SQLite Storage Active</strong><br />
+                                                Component export is only available when using FileSystem (JSON) storage. Use the full configuration export above for SQLite backups.
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+
+                                <!-- Import Component - Available for all storage types -->
+                                <div class="col-md-6">
+                                    <div class="modern-action-card">
+                                        <div class="action-card-icon">
+                                            <i class="bi bi-file-earmark-arrow-up"></i>
+                                        </div>
+                                        <div class="action-card-content">
+                                            <h6 class="action-card-title">Import @GetComponentDisplayName(selectedComponentType)</h6>
+                                            <p class="action-card-description">
+                                                Upload and import @GetComponentDisplayName(selectedComponentType) configuration from JSON.
+                                            </p>
+                                            <div class="modern-notification-danger mb-3">
+                                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                                <strong>WARNING:</strong> This will overwrite the current @GetComponentDisplayName(selectedComponentType) data.
+                                            </div>
+                                            <label class="modern-form-label">@GetComponentDisplayName(selectedComponentType) JSON</label>
+                                            <textarea title="Component Configuration" class="modern-form-textarea" rows="6" type="text" @bind="componentImportJson" />
+                                            <button type="button" class="modern-btn-success mt-2" @onclick="ImportComponentData" title="Import Component">
+                                                <i class="bi bi-upload"></i> Import @GetComponentDisplayName(selectedComponentType)
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Reset Configuration - Available for all storage types -->
+                <div class="modern-setting-row">
+                    <div class="setting-label">
+                        <i class="bi bi-arrow-clockwise"></i> Reset Configuration
+                    </div>
+                    <div class="setting-description">
+                        Reset the Global Configuration back to the default values at the time of installation. This will apply to all component configurations.
+                    </div>
+                    
+                    <div class="mt-3">
+                        <div class="modern-notification-danger">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <strong>WARNING:</strong> This will reset your current Global Configuration to factory defaults. This action cannot be undone. Create a backup before proceeding.
+                        </div>
+                        <button type="button" class="modern-btn-danger mt-3" @onclick="@(e => FormAction("Global",0,"reset"))" title="Reset">
+                            <i class="bi bi-arrow-clockwise"></i> Reset Global Configuration
+                        </button>
+                    </div>
+                </div>
             </div>
 
             <!-- Identity Provider Tab Content -->
@@ -1075,6 +1152,33 @@
     [Inject]
     public IConfiguration? Configuration { get; set; }
     
+    [Inject]
+    public IResourceTypeService? ResourceTypeService { get; set; }
+    
+    [Inject]
+    public IResourceLocationService? ResourceLocationService { get; set; }
+    
+    [Inject]
+    public IResourceEnvironmentService? ResourceEnvironmentService { get; set; }
+    
+    [Inject]
+    public IResourceOrgService? ResourceOrgService { get; set; }
+    
+    [Inject]
+    public IResourceProjAppSvcService? ResourceProjAppSvcService { get; set; }
+    
+    [Inject]
+    public IResourceUnitDeptService? ResourceUnitDeptService { get; set; }
+    
+    [Inject]
+    public IResourceFunctionService? ResourceFunctionService { get; set; }
+    
+    [Inject]
+    public IResourceDelimiterService? ResourceDelimiterService { get; set; }
+    
+    [Inject]
+    public ICustomComponentService? CustomComponentService { get; set; }
+    
     private ServicesData servicesData = new();
     private string currentpassword = String.Empty;
     private string newpassword = String.Empty;
@@ -1125,6 +1229,10 @@
     private bool includeAdmin = false;
     private bool isUsingSQLite => currentStorageProvider == "SQLite";
     private string newGlobalConfig = String.Empty;
+
+    // Individual component import/export variables
+    private string selectedComponentType = String.Empty;
+    private string componentImportJson = String.Empty;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -2876,6 +2984,254 @@
                 Message = $"Configuration restore from JSON failed: {ex.Message}"
             };
             await AdminLogService!.PostItemAsync(adminLogMessage);
+        }
+    }
+
+    // Individual Component Import/Export Methods
+    private void OnComponentTypeSelected(string componentType)
+    {
+        selectedComponentType = componentType;
+        componentImportJson = String.Empty;
+        StateHasChanged();
+    }
+
+    private string GetComponentDisplayName(string componentType)
+    {
+        return componentType switch
+        {
+            "ResourceType" => "Resource Types",
+            "ResourceLocation" => "Locations",
+            "ResourceEnvironment" => "Environments",
+            "ResourceOrg" => "Organizations",
+            "ResourceProjAppSvc" => "Projects/Apps/Services",
+            "ResourceUnitDept" => "Units/Departments",
+            "ResourceFunction" => "Functions",
+            "ResourceDelimiter" => "Delimiters",
+            "CustomComponent" => "Custom Components",
+            _ => componentType
+        };
+    }
+
+    private async Task ExportComponentData()
+    {
+        if (String.IsNullOrEmpty(selectedComponentType))
+        {
+            toastService.ShowWarning("Please select a component type to export.");
+            return;
+        }
+
+        try
+        {
+            ServiceResponse response;
+            object? data = null;
+
+            switch (selectedComponentType)
+            {
+                case "ResourceType":
+                    response = await ResourceTypeService!.GetItemsAsync(true);
+                    data = response.ResponseObject;
+                    break;
+                case "ResourceLocation":
+                    response = await ResourceLocationService!.GetItemsAsync(true);
+                    data = response.ResponseObject;
+                    break;
+                case "ResourceEnvironment":
+                    response = await ResourceEnvironmentService!.GetItemsAsync(true);
+                    data = response.ResponseObject;
+                    break;
+                case "ResourceOrg":
+                    response = await ResourceOrgService!.GetItemsAsync(true);
+                    data = response.ResponseObject;
+                    break;
+                case "ResourceProjAppSvc":
+                    response = await ResourceProjAppSvcService!.GetItemsAsync(true);
+                    data = response.ResponseObject;
+                    break;
+                case "ResourceUnitDept":
+                    response = await ResourceUnitDeptService!.GetItemsAsync(true);
+                    data = response.ResponseObject;
+                    break;
+                case "ResourceFunction":
+                    response = await ResourceFunctionService!.GetItemsAsync(true);
+                    data = response.ResponseObject;
+                    break;
+                case "ResourceDelimiter":
+                    response = await ResourceDelimiterService!.GetItemsAsync(true);
+                    data = response.ResponseObject;
+                    break;
+                case "CustomComponent":
+                    response = await CustomComponentService!.GetItemsAsync(true);
+                    data = response.ResponseObject;
+                    break;
+                default:
+                    toastService.ShowError("Unknown component type selected.");
+                    return;
+            }
+
+            if (data == null)
+            {
+                toastService.ShowError("Failed to retrieve component data.");
+                return;
+            }
+
+            // Serialize to JSON
+            string jsonData = System.Text.Json.JsonSerializer.Serialize(data, new System.Text.Json.JsonSerializerOptions
+            {
+                WriteIndented = true
+            });
+
+            // Download the file
+            string fileName = $"{selectedComponentType.ToLower()}-{DateTime.Now:yyyyMMdd-HHmmss}.json";
+            byte[] fileBytes = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            
+            await BlazorDownloadFileService!.DownloadFile(fileName, fileBytes, "application/json");
+            
+            toastService.ShowSuccess($"{GetComponentDisplayName(selectedComponentType)} exported successfully!");
+            
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+            { 
+                Title = "INFORMATION", 
+                Message = $"Component exported: {GetComponentDisplayName(selectedComponentType)} to {fileName}"
+            });
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Failed to export component: {ex.Message}");
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+            { 
+                Title = "ERROR", 
+                Message = $"Component export failed: {ex.Message}"
+            });
+        }
+    }
+
+    private async Task ImportComponentData()
+    {
+        if (String.IsNullOrEmpty(selectedComponentType))
+        {
+            toastService.ShowWarning("Please select a component type to import.");
+            return;
+        }
+
+        if (String.IsNullOrEmpty(componentImportJson))
+        {
+            toastService.ShowWarning("Please enter JSON data to import.");
+            return;
+        }
+
+        // Show confirmation modal
+        string confirmMessage = $"<div class=\"my-4\"><p>You are about to import {GetComponentDisplayName(selectedComponentType)} configuration.</p>" +
+            $"<p class=\"text-danger\"><strong>WARNING:</strong> This will overwrite your current {GetComponentDisplayName(selectedComponentType)} data!</p>" +
+            $"<p>Do you want to proceed?</p></div>";
+
+        bool confirmed = await ModalHelper.ShowConfirmationModal(Modal!, $"Confirm {GetComponentDisplayName(selectedComponentType)} Import", confirmMessage, "bg-warning", theme);
+
+        if (!confirmed)
+        {
+            return;
+        }
+
+        try
+        {
+            ServiceResponse response;
+
+            switch (selectedComponentType)
+            {
+                case "ResourceType":
+                    var resourceTypes = System.Text.Json.JsonSerializer.Deserialize<List<ResourceType>>(componentImportJson);
+                    if (resourceTypes == null) throw new Exception("Invalid JSON format for Resource Types.");
+                    response = await ResourceTypeService!.PostConfigAsync(resourceTypes);
+                    break;
+                case "ResourceLocation":
+                    var resourceLocations = System.Text.Json.JsonSerializer.Deserialize<List<Models.ResourceLocation>>(componentImportJson);
+                    if (resourceLocations == null) throw new Exception("Invalid JSON format for Locations.");
+                    response = await ResourceLocationService!.PostConfigAsync(resourceLocations);
+                    break;
+                case "ResourceEnvironment":
+                    var resourceEnvironments = System.Text.Json.JsonSerializer.Deserialize<List<ResourceEnvironment>>(componentImportJson);
+                    if (resourceEnvironments == null) throw new Exception("Invalid JSON format for Environments.");
+                    response = await ResourceEnvironmentService!.PostConfigAsync(resourceEnvironments);
+                    break;
+                case "ResourceOrg":
+                    var resourceOrgs = System.Text.Json.JsonSerializer.Deserialize<List<ResourceOrg>>(componentImportJson);
+                    if (resourceOrgs == null) throw new Exception("Invalid JSON format for Organizations.");
+                    response = await ResourceOrgService!.PostConfigAsync(resourceOrgs);
+                    break;
+                case "ResourceProjAppSvc":
+                    var resourceProjAppSvcs = System.Text.Json.JsonSerializer.Deserialize<List<ResourceProjAppSvc>>(componentImportJson);
+                    if (resourceProjAppSvcs == null) throw new Exception("Invalid JSON format for Projects/Apps/Services.");
+                    response = await ResourceProjAppSvcService!.PostConfigAsync(resourceProjAppSvcs);
+                    break;
+                case "ResourceUnitDept":
+                    var resourceUnitDepts = System.Text.Json.JsonSerializer.Deserialize<List<ResourceUnitDept>>(componentImportJson);
+                    if (resourceUnitDepts == null) throw new Exception("Invalid JSON format for Units/Departments.");
+                    response = await ResourceUnitDeptService!.PostConfigAsync(resourceUnitDepts);
+                    break;
+                case "ResourceFunction":
+                    var resourceFunctions = System.Text.Json.JsonSerializer.Deserialize<List<ResourceFunction>>(componentImportJson);
+                    if (resourceFunctions == null) throw new Exception("Invalid JSON format for Functions.");
+                    response = await ResourceFunctionService!.PostConfigAsync(resourceFunctions);
+                    break;
+                case "ResourceDelimiter":
+                    var resourceDelimiters = System.Text.Json.JsonSerializer.Deserialize<List<ResourceDelimiter>>(componentImportJson);
+                    if (resourceDelimiters == null) throw new Exception("Invalid JSON format for Delimiters.");
+                    response = await ResourceDelimiterService!.PostConfigAsync(resourceDelimiters);
+                    break;
+                case "CustomComponent":
+                    var customComponents = System.Text.Json.JsonSerializer.Deserialize<List<CustomComponent>>(componentImportJson);
+                    if (customComponents == null) throw new Exception("Invalid JSON format for Custom Components.");
+                    response = await CustomComponentService!.PostConfigAsync(customComponents);
+                    break;
+                default:
+                    toastService.ShowError("Unknown component type selected.");
+                    return;
+            }
+
+            if (response.Success)
+            {
+                toastService.ShowSuccess($"{GetComponentDisplayName(selectedComponentType)} imported successfully!");
+                
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                { 
+                    Title = "INFORMATION", 
+                    Message = $"Component imported: {GetComponentDisplayName(selectedComponentType)}"
+                });
+
+                // Clear the import JSON
+                componentImportJson = String.Empty;
+                
+                // Refresh the data
+                await Task.Delay(1000);
+                NavigationManager!.NavigateTo("/admin", true);
+            }
+            else
+            {
+                toastService.ShowError($"Failed to import {GetComponentDisplayName(selectedComponentType)}: {response.ResponseMessage}");
+                
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                { 
+                    Title = "ERROR", 
+                    Message = $"Component import failed: {GetComponentDisplayName(selectedComponentType)} - {response.ResponseMessage}"
+                });
+            }
+        }
+        catch (System.Text.Json.JsonException ex)
+        {
+            toastService.ShowError($"Invalid JSON format: {ex.Message}");
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+            { 
+                Title = "ERROR", 
+                Message = $"Component import failed - Invalid JSON: {ex.Message}"
+            });
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError($"Failed to import component: {ex.Message}");
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+            { 
+                Title = "ERROR", 
+                Message = $"Component import failed: {ex.Message}"
+            });
         }
     }
 }
