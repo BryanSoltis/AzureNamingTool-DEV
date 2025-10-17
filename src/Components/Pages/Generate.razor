@@ -152,27 +152,27 @@
                                     <div class="collapse modern-card-body" id="namingguidelines">
                                         @if (!String.IsNullOrEmpty(currentResourceType.LengthMin))
                                         {
-                                            <div><span class="fw-bold">Minimum Length:</span> @currentResourceType.LengthMin</div>
+                                            <div class="mb-2"><strong>Minimum Length:</strong> @currentResourceType.LengthMin</div>
                                         }
                                         @if (!String.IsNullOrEmpty(currentResourceType.LengthMax))
                                         {
-                                            <div><span class="fw-bold">Maximum Length:</span> @currentResourceType.LengthMax</div>
+                                            <div class="mb-2"><strong>Maximum Length:</strong> @currentResourceType.LengthMax</div>
                                         }
                                         @if (!String.IsNullOrEmpty(currentResourceType.ValidText))
                                         {
-                                            <div><span class="fw-bold">Valid Text:</span> @currentResourceType.ValidText</div>
+                                            <div class="mb-2"><strong>Valid Text:</strong> @currentResourceType.ValidText</div>
                                         }
                                         @if (!String.IsNullOrEmpty(currentResourceType.Optional))
                                         {
-                                            <div><span class="fw-bold">Optional:</span> @currentResourceType.Optional</div>
+                                            <div class="mb-2"><strong>Optional:</strong> @currentResourceType.Optional</div>
                                         }
                                         @if (!String.IsNullOrEmpty(currentResourceType.Exclude))
                                         {
-                                            <div><span class="fw-bold">Excluded:</span> @currentResourceType.Exclude</div>
+                                            <div class="mb-2"><strong>Excluded:</strong> @currentResourceType.Exclude</div>
                                         }
                                         @if (!String.IsNullOrEmpty(currentResourceType.Regx))
                                         {
-                                            <div><span class="fw-bold">Regx:</span> @currentResourceType.Regx</div>
+                                            <div class="mb-2"><strong>Regx:</strong> @currentResourceType.Regx</div>
                                         }
                                     </div>
                                 </div>
@@ -205,10 +205,10 @@
                                 }
                             </ul>
                             <div class="mt-3">
-                                <button type="button" title="Select" class="modern-btn-primary" @onclick="@(e => OpenMultiSelectModal(false))">
+                                <button type="button" title="Select" class="modern-btn-primary" @onclick="OnSelectResourceTypesClick">
                                     <span class="oi oi-list" aria-hidden="true"></span> Select
                                 </button>
-                                <button type="button" class="modern-btn-success" title="Clear" @onclick="@(e => ResetForm(true))">
+                                <button type="button" class="modern-btn-success" title="Clear" @onclick="OnClearClick">
                                     <span class="oi oi-reload" aria-hidden="true"></span> Clear
                                 </button>
                             </div>
@@ -867,55 +867,95 @@
 
     private async Task OpenMultiSelectModal(bool clearselection)
     {
-        ResetForm(false);
+        try
+        {
+            Logger.LogInformation("OpenMultiSelectModal called");
+            ResetForm(false);
 
-        if (!GeneralHelper.IsNotNull(servicesData))
-        {
-            await SetServicesData();
-        }
-        var parameters = new ModalParameters();
-        parameters.Add("theme", theme);
-        parameters.Add("multiselectedResourceTypes", multiselectedResourceTypes);
-        var options = new ModalOptions()
+            if (!GeneralHelper.IsNotNull(servicesData))
             {
-                HideCloseButton = false,
-                UseCustomLayout = true,
-            };
-        if (GeneralHelper.IsNotNull(Modal))
-        {
-            var modal = Modal.Show<MultiTypeSelectModal>("Select Resource Types", parameters, options);
-            var result = await modal.Result;
-            if (GeneralHelper.IsNotNull(result))
-            {
-                if (result.Confirmed)
+                await SetServicesData();
+            }
+            
+            Logger.LogInformation($"Modal service is null: {Modal == null}");
+            
+            var parameters = new ModalParameters();
+            parameters.Add("theme", theme);
+            parameters.Add("multiselectedResourceTypes", multiselectedResourceTypes);
+            var options = new ModalOptions()
                 {
-                    if (GeneralHelper.IsNotNull(result.Data))
+                    HideCloseButton = false,
+                    UseCustomLayout = true,
+                };
+            if (GeneralHelper.IsNotNull(Modal))
+            {
+                Logger.LogInformation("Showing modal");
+                var modal = Modal.Show<MultiTypeSelectModal>("Select Resource Types", parameters, options);
+                Logger.LogInformation("Waiting for modal result");
+                var result = await modal.Result;
+                Logger.LogInformation("Got modal result");
+                if (GeneralHelper.IsNotNull(result))
+                {
+                    if (result.Confirmed)
                     {
-                        multiselectedResourceTypes = (List<string>)result.Data;
-                        if (GeneralHelper.IsNotNull(multiselectedResourceTypes))
+                        if (GeneralHelper.IsNotNull(result.Data))
                         {
-                            if (multiselectedResourceTypes.Count > 0)
+                            multiselectedResourceTypes = (List<string>)result.Data;
+                            if (GeneralHelper.IsNotNull(multiselectedResourceTypes))
                             {
-                                ResourceType currentmultiresourcertype = servicesData.ResourceTypes!.Find((t) => t.Id == Convert.ToInt32(multiselectedResourceTypes![0].ToString()))!;
-                                if (GeneralHelper.IsNotNull(currentmultiresourcertype))
+                                if (multiselectedResourceTypes.Count > 0)
                                 {
-                                    await OnTypeChanged(currentmultiresourcertype.Resource);
+                                    ResourceType currentmultiresourcertype = servicesData.ResourceTypes!.Find((t) => t.Id == Convert.ToInt32(multiselectedResourceTypes![0].ToString()))!;
+                                    if (GeneralHelper.IsNotNull(currentmultiresourcertype))
+                                    {
+                                        await OnTypeChanged(currentmultiresourcertype.Resource);
+                                    }
+                                    componentsVisible = "";
+                                    optional = String.Empty;
                                 }
-                                componentsVisible = "";
-                                optional = String.Empty;
-                            }
-                            else
-                            {
-                                componentsVisible = "collapse";
+                                else
+                                {
+                                    componentsVisible = "collapse";
+                                }
                             }
                         }
                     }
                 }
             }
-        }
+            else
+            {
+                Logger.LogWarning("Modal service is null!");
+                toastService.ShowError("Modal service is not available");
+            }
 
-        resourcetypeVisible = "collapse";
-        resourcetypesVisible = "";
+            resourcetypeVisible = "collapse";
+            resourcetypesVisible = "";
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error in OpenMultiSelectModal");
+            toastService.ShowError($"Error opening modal: {ex.Message}");
+        }
+    }
+
+    private async Task OnSelectResourceTypesClick()
+    {
+        try
+        {
+            Logger.LogInformation("OnSelectResourceTypesClick called");
+            Logger.LogInformation($"Modal is null: {Modal == null}");
+            await OpenMultiSelectModal(false);
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error in OnSelectResourceTypesClick");
+            toastService.ShowError($"Error opening modal: {ex.Message}");
+        }
+    }
+
+    private void OnClearClick()
+    {
+        ResetForm(true);
     }
 
     private void OnCategoryChanged(string value)
