@@ -598,6 +598,21 @@ select.form-control {
     vertical-align: top;
 }
 
+/* Table Section Header */
+.modern-table-section-header td {
+    background-color: var(--color-bg-secondary);
+    font-weight: var(--font-weight-semibold);
+    padding: var(--spacing-sm) var(--spacing-lg) !important;
+    border-top: 1px solid var(--color-border);
+}
+
+/* Table Label (for key-value pairs) */
+.modern-table-label {
+    width: 25%;
+    font-weight: var(--font-weight-medium);
+    color: var(--color-text-secondary);
+}
+
 /* Table Compact */
 .table-sm thead th,
 .table-sm tbody td {
@@ -712,6 +727,51 @@ select.form-control {
     background-color: rgba(0, 183, 195, 0.1);
     border-left-color: var(--color-azure-teal);
     color: var(--color-azure-teal);
+}
+
+/* Modern Alert Variants (simpler inline alerts) */
+.modern-alert-success,
+.modern-alert-warning,
+.modern-alert-info,
+.modern-alert-error {
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+}
+
+.modern-alert-success {
+    background-color: rgba(5, 150, 105, 0.1);
+    border: 1px solid rgba(5, 150, 105, 0.3);
+    color: var(--color-success);
+}
+
+.modern-alert-warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: var(--color-warning);
+}
+
+.modern-alert-info {
+    background-color: rgba(0, 183, 195, 0.1);
+    border: 1px solid rgba(0, 183, 195, 0.3);
+    color: var(--color-azure-teal);
+}
+
+.modern-alert-error {
+    background-color: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--color-error);
+}
+
+/* ===================================================================
+   FILTER SECTION
+   =================================================================== */
+
+.modern-filter-section {
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-lg);
 }
 
 /* ===================================================================
