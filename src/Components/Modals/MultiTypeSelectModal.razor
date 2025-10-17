@@ -8,16 +8,18 @@
 @inject IJSRuntime JsRuntime
 @inject ServicesHelper ServicesHelper
 
-<div class="modern-modal-content">
-    <div class="modern-modal-body">
-        <div class="modern-card">
-            <div class="modern-card-header bg-navcolor text-white">
-                <h3 class="modern-modal-title">Select Resource Types</h3>
-            </div>
-            <div class="modern-card-body">
-                <p>
-                    Select the resource types.
-                </p>
+<div class="blazored-modal-container">
+    <div class="blazored-modal blazored-modal-large">
+        <div class="modern-modal-content">
+            <div class="modern-modal-body">
+                <div class="modern-card">
+                    <div class="modern-card-header bg-navcolor text-white">
+                        <h3 class="modern-modal-title">Select Resource Types</h3>
+                    </div>
+                    <div class="modern-card-body">
+                        <p>
+                            Select the resource types.
+                        </p>
 
                 <div class="form-group row mt-3">
                 <div class="input-group flex-nowrap">
@@ -93,6 +95,8 @@
 
 <div class="modern-modal-footer">
     <button title="Close" @onclick="Save" class="modern-btn-success">Close</button>
+</div>
+</div>
 </div>
 
 @code {
