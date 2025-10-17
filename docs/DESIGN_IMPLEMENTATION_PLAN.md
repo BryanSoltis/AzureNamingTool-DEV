@@ -37,10 +37,271 @@ This document outlines the plan to implement the new DesignLinear design across 
 - **Transitions**: `0.15s ease` for all interactions
 - **Typography**: `-apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Roboto", "Helvetica Neue", Arial, sans-serif`
 
+## Light/Dark Mode Theme System
+
+### Overview
+The application will support both Light and Dark modes with a user-controlled toggle. The theme preference will be persisted in browser localStorage and respected across sessions. The design system already includes a dark sidebar, so dark mode will primarily affect the main content area.
+
+### Theme Colors
+
+#### Light Mode (Default)
+- **Background**: `#fafafa` (body), `#ffffff` (cards/panels)
+- **Borders**: `#e5e5e5`
+- **Text Primary**: `#171717`
+- **Text Secondary**: `#737373`
+- **Sidebar**: Dark gray gradient (remains same)
+- **Stat Card Hover**: `#f0fafb` (light teal tint)
+- **Activity Item Hover**: `#fafafa`
+
+#### Dark Mode
+- **Background**: `#0d1117` (body), `#161b22` (cards/panels)
+- **Borders**: `#30363d`
+- **Text Primary**: `#e6edf3`
+- **Text Secondary**: `#8b949e`
+- **Sidebar**: Dark gray gradient (remains same)
+- **Stat Card Hover**: `#1c2128` (darker on hover)
+- **Activity Item Hover**: `#1c2128`
+
+### Implementation Strategy
+
+#### 1. CSS Variables Approach
+Use CSS custom properties (variables) for all theme-dependent colors. Toggle theme by changing `data-theme` attribute on `<html>` or `<body>` element.
+
+**CSS Structure**:
+```css
+/* Default Light Theme */
+:root {
+    --color-bg-primary: #fafafa;
+    --color-bg-secondary: #ffffff;
+    --color-border: #e5e5e5;
+    --color-text-primary: #171717;
+    --color-text-secondary: #737373;
+    --color-hover-bg: #fafafa;
+    --color-card-hover-bg: #f0fafb;
+    
+    /* Accent colors remain consistent */
+    --color-azure-blue: #0078d4;
+    --color-azure-teal: #00b7c3;
+    --color-cyan-bright: #50e6ff;
+    --color-purple: #8661c5;
+    --color-green: #059669;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --color-bg-primary: #0d1117;
+    --color-bg-secondary: #161b22;
+    --color-border: #30363d;
+    --color-text-primary: #e6edf3;
+    --color-text-secondary: #8b949e;
+    --color-hover-bg: #1c2128;
+    --color-card-hover-bg: #1c2128;
+}
+```
+
+#### 2. Theme Toggle Component
+**File**: `src/Components/General/ThemeToggle.razor`
+
+**Features**:
+- Toggle button in header (sun/moon icons)
+- Smooth transition between themes
+- Persist preference in localStorage
+- Initialize theme on app load
+
+**Component Structure**:
+```razor
+<button class="theme-toggle-btn" @onclick="ToggleTheme">
+    @if (currentTheme == "light")
+    {
+        <span class="theme-icon">🌙</span>
+        <span class="theme-label">Dark Mode</span>
+    }
+    else
+    {
+        <span class="theme-icon">☀️</span>
+        <span class="theme-label">Light Mode</span>
+    }
+</button>
+
+@code {
+    private string currentTheme = "light";
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            currentTheme = await JSRuntime.InvokeAsync<string>("getTheme");
+            StateHasChanged();
+        }
+    }
+    
+    private async Task ToggleTheme()
+    {
+        currentTheme = currentTheme == "light" ? "dark" : "light";
+        await JSRuntime.InvokeVoidAsync("setTheme", currentTheme);
+    }
+}
+```
+
+#### 3. JavaScript Theme Helper
+**File**: `src/wwwroot/js/theme.js`
+
+```javascript
+// Initialize theme on page load
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    return savedTheme;
+}
+
+// Get current theme
+function getTheme() {
+    return localStorage.getItem('theme') || 'light';
+}
+
+// Set theme
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    
+    // Add transition class temporarily for smooth transition
+    document.documentElement.classList.add('theme-transitioning');
+    setTimeout(() => {
+        document.documentElement.classList.remove('theme-transitioning');
+    }, 300);
+}
+
+// Initialize on load
+initTheme();
+```
+
+#### 4. Theme Transition CSS
+**File**: `src/wwwroot/css/modern-design.css`
+
+```css
+/* Smooth theme transitions */
+html.theme-transitioning,
+html.theme-transitioning *,
+html.theme-transitioning *:before,
+html.theme-transitioning *:after {
+    transition: background-color 0.3s ease, 
+                color 0.3s ease, 
+                border-color 0.3s ease !important;
+    transition-delay: 0s !important;
+}
+```
+
+### Phase Implementation
+
+#### Phase 1.4: Theme System Foundation (New - Est. 3-4 hours)
+**Goal**: Implement CSS variable system and theme infrastructure
+
+**Tasks**:
+- [ ] Create CSS variables for all theme-dependent colors
+- [ ] Add `data-theme` attribute support in CSS
+- [ ] Create `theme.js` file with localStorage management
+- [ ] Add theme transition CSS classes
+- [ ] Test theme switching works correctly
+- [ ] Verify all colors properly use CSS variables
+
+#### Phase 5.5: Theme Toggle Component (New - Est. 2-3 hours)
+**Goal**: Create and integrate theme toggle UI component
+
+**Tasks**:
+- [ ] Create `ThemeToggle.razor` component
+- [ ] Add toggle button styling (consistent with design system)
+- [ ] Integrate component into main header
+- [ ] Add keyboard accessibility (Space/Enter to toggle)
+- [ ] Add screen reader labels (aria-label)
+- [ ] Test theme toggle in all pages
+- [ ] Test theme persistence across page navigation
+- [ ] Test theme initialization on app load
+
+### Considerations
+
+#### Sidebar Theme Behavior
+**Decision**: Keep sidebar dark in both modes
+- The dark gray gradient sidebar remains constant in both themes
+- This provides consistent navigation experience
+- Dark sidebars are common in professional tools
+- Easier to implement (less CSS to maintain)
+
+**Alternative**: Make sidebar theme-aware
+- Light mode: Light gray sidebar
+- Dark mode: Dark gray sidebar (current)
+- Requires additional CSS variables for sidebar
+- Adds complexity but provides full theme consistency
+
+#### Admin-Only Theme Settings
+**Option**: Add admin preference for default theme
+- Admin can set organization-wide default (light/dark)
+- Users can still override with toggle
+- Stored in configuration settings
+- **Recommendation**: Implement in Phase 8 (post-launch enhancement)
+
+#### Respect System Preference
+**Option**: Auto-detect system dark/light mode
+- Use `prefers-color-scheme` media query
+- Check on first visit before localStorage exists
+- **Implementation**:
+```javascript
+function getSystemTheme() {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
+
+function initTheme() {
+    const savedTheme = localStorage.getItem('theme');
+    const theme = savedTheme || getSystemTheme();
+    document.documentElement.setAttribute('data-theme', theme);
+    return theme;
+}
+```
+
+### Testing Requirements
+
+#### Visual Testing
+- [ ] Test all pages in light mode (current design)
+- [ ] Test all pages in dark mode (new implementation)
+- [ ] Test theme toggle button functionality
+- [ ] Test theme transitions are smooth (no flash)
+- [ ] Verify stat card values still use Azure teal in both modes
+- [ ] Verify buttons use Azure blue gradient in both modes
+- [ ] Verify activity icons use purple gradient in both modes
+
+#### Functional Testing
+- [ ] Test theme persists across page navigation
+- [ ] Test theme persists across browser refresh
+- [ ] Test theme persists across browser close/reopen
+- [ ] Test theme toggle works in all major browsers (Chrome, Edge, Firefox, Safari)
+- [ ] Test localStorage fallback if disabled
+- [ ] Test theme initialization on first visit
+
+#### Accessibility Testing
+- [ ] Test theme toggle with keyboard (Tab, Enter, Space)
+- [ ] Test theme toggle with screen reader
+- [ ] Verify color contrast meets WCAG AA in both themes
+  - Light mode: Dark text on light backgrounds
+  - Dark mode: Light text on dark backgrounds
+- [ ] Test focus indicators visible in both themes
+
+### Updated Timeline
+
+**New Time Estimates**:
+- Phase 1.4: Theme System Foundation: **3-4 hours**
+- Phase 5.5: Theme Toggle Component: **2-3 hours**
+- **Additional Testing Time**: **1-2 hours**
+
+**Total Additional Time**: **6-9 hours**
+
+**Original Estimate**: 33-46 hours  
+**New Estimate with Light/Dark Mode**: **39-55 hours**
+
+---
+
 ## Implementation Phases
 
-### Phase 1: Foundation Setup (Est. 4-6 hours)
-**Goal**: Create shared CSS foundation and update layout structure
+### Phase 1: Foundation Setup (Est. 7-10 hours - Updated)
+**Goal**: Create shared CSS foundation, update layout structure, and implement theme system
 
 #### 1.1: Create Global CSS File
 - **File**: `src/wwwroot/css/modern-design.css`
@@ -430,10 +691,19 @@ This document outlines the plan to implement the new DesignLinear design across 
   - `README.md`
   - Any style guide or contributing docs
 - **Action Items**:
-  - [ ] Document new color palette
+  - [ ] Document new color palette (light and dark modes)
   - [ ] Document component styling patterns
-  - [ ] Update screenshots/demos if applicable
+  - [ ] Document theme toggle usage
+  - [ ] Update screenshots/demos if applicable (show both themes)
   - [ ] Add design system reference
+
+#### 8.4: Theme System Documentation
+- **Action Items**:
+  - [ ] Document CSS variable naming conventions
+  - [ ] Document how to add new theme-aware components
+  - [ ] Document localStorage theme persistence
+  - [ ] Document system preference detection (if implemented)
+  - [ ] Create guide for future theme customization
 
 #### 8.4: Performance Optimization
 - **Action Items**:
@@ -530,20 +800,21 @@ This document outlines the plan to implement the new DesignLinear design across 
 
 | Phase | Estimated Time | Priority |
 |-------|---------------|----------|
-| Phase 1: Foundation Setup | 4-6 hours | CRITICAL |
+| Phase 1: Foundation Setup (includes Theme System) | 7-10 hours | CRITICAL |
 | Phase 2: Component Library Updates | 6-8 hours | HIGH |
 | Phase 3: Page Updates | 8-10 hours | HIGH |
 | Phase 4: Modal & Notification Updates | 4-6 hours | MEDIUM |
-| Phase 5: Header & Top Bar Updates | 2-3 hours | MEDIUM |
+| Phase 5: Header & Top Bar Updates (includes Theme Toggle) | 4-6 hours | MEDIUM |
 | Phase 6: Responsive & Mobile Updates | 4-6 hours | HIGH |
 | Phase 7: Polish & Refinement | 3-4 hours | MEDIUM |
-| Phase 8: Cleanup & Documentation | 2-3 hours | LOW |
+| Phase 8: Cleanup & Documentation (includes Theme Docs) | 2-3 hours | LOW |
+| **TOTAL** | **39-55 hours** | |
 
 ### Suggested Schedule
-- **Week 1**: Phases 1-2 (Foundation + Components)
+- **Week 1**: Phases 1-2 (Foundation + Theme System + Components)
 - **Week 2**: Phase 3 (Page Updates)
-- **Week 3**: Phases 4-5 (Modals + Header)
-- **Week 4**: Phases 6-8 (Responsive + Polish + Cleanup)
+- **Week 3**: Phases 4-5 (Modals + Header + Theme Toggle)
+- **Week 4**: Phases 6-8 (Responsive + Polish + Cleanup + Theme Testing)
 
 ---
 
@@ -624,6 +895,13 @@ This document outlines the plan to implement the new DesignLinear design across 
 
 ## Appendix: File Inventory
 
+### Files to Create (NEW)
+- `src/wwwroot/css/modern-design.css` - Main design system CSS with theme variables
+- `src/wwwroot/css/modern-components.css` - Component-specific styles
+- `src/wwwroot/css/modern-responsive.css` - Responsive/mobile styles
+- `src/wwwroot/js/theme.js` - Theme management JavaScript
+- `src/Components/General/ThemeToggle.razor` - Theme toggle component
+
 ### Files to Modify (Estimated)
 - **Layout Components**: 2-3 files
 - **Page Components**: 15-20 files
@@ -644,10 +922,16 @@ This document outlines the plan to implement the new DesignLinear design across 
 
 ## Status Tracking
 
-### Phase 1: Foundation Setup
+### Phase 1: Foundation Setup (includes Theme System)
 - [ ] 1.1: Create Global CSS File
 - [ ] 1.2: Update Main Layout Structure
 - [ ] 1.3: Update Navigation Menu
+- [ ] 1.4: Theme System Foundation (NEW)
+  - [ ] Create CSS variables for light/dark themes
+  - [ ] Add data-theme attribute support
+  - [ ] Create theme.js for localStorage management
+  - [ ] Add theme transition CSS
+  - [ ] Test theme switching
 
 ### Phase 2: Component Library Updates
 - [ ] 2.1: Update Card Components
@@ -668,9 +952,15 @@ This document outlines the plan to implement the new DesignLinear design across 
 - [ ] 4.2: Update Notification/Toast Components
 - [ ] 4.3: Update Confirmation Dialogs
 
-### Phase 5: Header & Top Bar Updates
+### Phase 5: Header & Top Bar Updates (includes Theme Toggle)
 - [ ] 5.1: Update Top Bar
 - [ ] 5.2: Update Page Headers
+- [ ] 5.5: Theme Toggle Component (NEW)
+  - [ ] Create ThemeToggle.razor component
+  - [ ] Add toggle button styling
+  - [ ] Integrate into header
+  - [ ] Add keyboard accessibility
+  - [ ] Test theme persistence
 
 ### Phase 6: Responsive & Mobile Updates
 - [ ] 6.1: Mobile Sidebar
@@ -682,15 +972,26 @@ This document outlines the plan to implement the new DesignLinear design across 
 - [ ] 7.2: Animation & Transitions
 - [ ] 7.3: Accessibility Check
 - [ ] 7.4: Cross-Browser Testing
+- [ ] 7.5: Theme Testing (NEW)
+  - [ ] Test all pages in light mode
+  - [ ] Test all pages in dark mode
+  - [ ] Test theme persistence
+  - [ ] Test color contrast (WCAG AA)
+  - [ ] Test theme toggle accessibility
 
 ### Phase 8: Cleanup & Documentation
 - [ ] 8.1: Remove Bootstrap Dependencies
 - [ ] 8.2: Remove Design Mockups
 - [ ] 8.3: Update Documentation
-- [ ] 8.4: Performance Optimization
+- [ ] 8.4: Theme System Documentation (NEW)
+  - [ ] Document CSS variables
+  - [ ] Document theme customization
+  - [ ] Document localStorage persistence
+  - [ ] Update README with theme screenshots
+- [ ] 8.5: Performance Optimization
 
 ---
 
-**Last Updated**: January 16, 2025
-**Document Version**: 1.0
-**Status**: Planning Phase
+**Last Updated**: October 17, 2025
+**Document Version**: 1.1
+**Status**: Planning Phase - Theme System Added
