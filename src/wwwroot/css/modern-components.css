@@ -1051,3 +1051,255 @@ pre code {
     padding: 0;
     background-color: transparent;
 }
+
+/* ===================================================================
+   DASHBOARD COMPONENTS
+   =================================================================== */
+
+/* Modern Page Header */
+.modern-page-header {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.modern-page-title h1 {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-text-primary);
+    margin: 0;
+    margin-bottom: var(--spacing-xs);
+}
+
+.modern-page-subtitle {
+    font-size: var(--font-size-md);
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+/* Dashboard Container */
+.modern-dashboard-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xl);
+}
+
+/* Stats Grid */
+.modern-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-xl);
+}
+
+.modern-stat-card {
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--spacing-xl);
+    text-align: center;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+}
+
+.modern-stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--color-azure-teal);
+}
+
+.modern-stat-card .stat-icon {
+    font-size: 2.5rem;
+    margin-bottom: var(--spacing-md);
+    filter: grayscale(0.3);
+}
+
+.modern-stat-card .stat-value {
+    font-size: var(--font-size-4xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-azure-teal);
+    margin-bottom: var(--spacing-xs);
+    line-height: 1;
+}
+
+.modern-stat-card .stat-label {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: var(--font-weight-medium);
+}
+
+/* Modern Card */
+.modern-card {
+    background-color: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: all var(--transition-normal);
+}
+
+.modern-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.modern-card-header {
+    padding: var(--spacing-lg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modern-card-header h3 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-cyan-bright);
+    margin: 0;
+}
+
+.modern-card-body {
+    padding: var(--spacing-lg);
+    color: var(--color-text-primary);
+}
+
+.modern-card-body p {
+    margin-bottom: var(--spacing-md);
+    line-height: 1.6;
+}
+
+.modern-card-body p:last-child {
+    margin-bottom: 0;
+}
+
+/* Info Card Variant */
+.modern-info-card {
+    background-color: rgba(var(--color-azure-blue-rgb), 0.05);
+    border-color: rgba(var(--color-azure-blue-rgb), 0.2);
+}
+
+[data-theme="dark"] .modern-info-card {
+    background-color: rgba(var(--color-azure-blue-rgb), 0.1);
+}
+
+/* Feature List */
+.modern-feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+}
+
+.modern-feature-item {
+    display: flex;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-normal);
+}
+
+.modern-feature-item:hover {
+    background-color: var(--color-hover-bg);
+}
+
+.modern-feature-item .feature-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-purple), var(--color-azure-blue));
+    border-radius: var(--radius-md);
+    filter: opacity(0.9);
+}
+
+.modern-feature-item .feature-content h4 {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin: 0;
+    margin-bottom: var(--spacing-xs);
+}
+
+.modern-feature-item .feature-content p {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* Modern Buttons */
+.modern-btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background: linear-gradient(135deg, var(--color-azure-blue), var(--color-azure-blue-hover));
+    color: white;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-sm);
+}
+
+.modern-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+}
+
+.modern-btn-primary:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+}
+
+.modern-btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-sm) var(--spacing-lg);
+    background-color: var(--color-bg-secondary);
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+    transition: all var(--transition-normal);
+}
+
+.modern-btn-secondary:hover {
+    background-color: var(--color-hover-bg);
+    border-color: var(--color-azure-blue);
+}
+
+/* Modern Link */
+.modern-link {
+    color: var(--color-azure-blue);
+    text-decoration: none;
+    font-weight: var(--font-weight-medium);
+    transition: color var(--transition-fast);
+}
+
+.modern-link:hover {
+    color: var(--color-azure-blue-hover);
+    text-decoration: underline;
+}
+
+/* Text Utilities */
+.text-center {
+    text-align: center;
+}
+
+.mt-3 {
+    margin-top: var(--spacing-lg);
+}
+
+.mb-3 {
+    margin-bottom: var(--spacing-lg);
+}
+
+.fw-bold {
+    font-weight: var(--font-weight-bold);
+}
+
