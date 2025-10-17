@@ -846,8 +846,6 @@
     {
         try
         {
-            ResetForm(true);
-
             if (mode == "multi")
             {
                 resourcetypeVisible = "collapse";
@@ -865,8 +863,6 @@
                 resourcetypesVisible = "collapse";
                 StateHasChanged();
             }
-
-            resourceNameRequestResponse = new();
         }
         catch (Exception ex)
         {
