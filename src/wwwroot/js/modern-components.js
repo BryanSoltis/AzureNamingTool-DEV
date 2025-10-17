@@ -21,15 +21,26 @@ document.addEventListener('DOMContentLoaded', function() {
    =================================================================== */
 
 function initializeTabs() {
+    console.log('Initializing tabs...');
+    
     // Handle all tab navigation
     document.querySelectorAll('.modern-tab').forEach(function(tab) {
-        tab.addEventListener('click', function(e) {
+        // Remove existing listeners to prevent duplicates
+        const newTab = tab.cloneNode(true);
+        tab.parentNode.replaceChild(newTab, tab);
+        
+        newTab.addEventListener('click', function(e) {
             e.preventDefault();
-            const targetId = tab.getAttribute('data-tab');
-            if (!targetId) return;
+            console.log('Tab clicked:', newTab.getAttribute('data-tab'));
+            
+            const targetId = newTab.getAttribute('data-tab');
+            if (!targetId) {
+                console.log('No target ID found');
+                return;
+            }
             
             // Get the tab container
-            const tabContainer = tab.closest('.modern-tabs').parentElement;
+            const tabContainer = newTab.closest('.modern-tabs').parentElement;
             
             // Deactivate all tabs in this container
             tabContainer.querySelectorAll('.modern-tab').forEach(function(t) {
@@ -37,20 +48,26 @@ function initializeTabs() {
             });
             
             // Activate clicked tab
-            tab.classList.add('active');
+            newTab.classList.add('active');
             
             // Hide all tab contents in this container
             tabContainer.querySelectorAll('.modern-tab-content').forEach(function(content) {
                 content.classList.remove('active');
+                console.log('Hiding tab:', content.id);
             });
             
             // Show target content
             const targetContent = document.getElementById(targetId);
             if (targetContent) {
                 targetContent.classList.add('active');
+                console.log('Showing tab:', targetId);
+            } else {
+                console.log('Target content not found:', targetId);
             }
         });
     });
+    
+    console.log('Found', document.querySelectorAll('.modern-tab').length, 'tabs');
     
     // Activate first tab by default if none are active
     document.querySelectorAll('.modern-tabs').forEach(function(tabsContainer) {
@@ -63,6 +80,9 @@ function initializeTabs() {
         }
     });
 }
+
+// Expose function globally for Blazor
+window.initializeTabs = initializeTabs;
 
 /* ===================================================================
    COLLAPSIBLE/ACCORDION COMPONENTS

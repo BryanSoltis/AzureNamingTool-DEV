@@ -32,6 +32,9 @@
     @if (admin)
     {
         <div class="modern-page-actions">
+            <button class="modern-btn-secondary" title="Version Information" @onclick="ShowVersionModal">
+                <span class="oi oi-info" aria-hidden="true"></span> Version Info
+            </button>
             <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Admin", String.Empty, "adminconfigurationinstructions", admin))">
                 <span class="oi oi-document" aria-hidden="true"></span> Documentation
             </button>
@@ -67,36 +70,6 @@
             <p class="mb-0">
                 Welcome to the Admin panel. Manage security settings, site configurations, customizations, and system details for the Azure Naming Tool.
             </p>
-        </div>
-
-        <!-- Version Details Banner -->
-        <div class="modern-banner modern-banner-info">
-            <div class="modern-banner-icon">
-                <span class="oi oi-info" aria-hidden="true"></span>
-            </div>
-            <div class="modern-banner-content">
-                <div class="modern-banner-title">Azure Naming Tool v@appversion</div>
-                <div class="modern-banner-text">
-                    <a href="@releasenotesurl" target="_blank" class="modern-link">View Release Notes</a>
-                    @if (!String.IsNullOrEmpty(versionalert))
-                    {
-                        <div class="mt-2">
-                            @((MarkupString)versionalert)
-                        </div>
-                    }
-                </div>
-                <div class="modern-banner-actions">
-                    <button type="button" class="modern-btn-primary modern-btn-small" @onclick="@(e => SubmitGHTopic("feature"))" title="Feature request">
-                        <span class="oi oi-plus" aria-hidden="true"></span> Feature Request
-                    </button>
-                    <button type="button" class="modern-btn-danger modern-btn-small" @onclick="@(e => SubmitGHTopic("bug"))" title="Submit a bug">
-                        <span class="oi oi-bug" aria-hidden="true"></span> Submit Bug
-                    </button>
-                    <button type="button" class="modern-btn-secondary modern-btn-small" @onclick="@(e => SubmitGHTopic("discussion"))" title="Start a discussion">
-                        <span class="oi oi-comment-square" aria-hidden="true"></span> Discussion
-                    </button>
-                </div>
-            </div>
         </div>
 
         <!-- Modern Tab Navigation -->
@@ -808,6 +781,9 @@
     public IAdminService? AdminService { get; set; }
     
     [Inject]
+    protected IJSRuntime? JSRuntime { get; set; }
+    
+    [Inject]
     public IAdminUserService? AdminUserService { get; set; }
     
     [Inject]
@@ -868,6 +844,12 @@
         currentuser = await IdentityHelper.GetCurrentUser(session);
         if (firstRender)
         {
+            // Initialize tab navigation
+            if (JSRuntime != null)
+            {
+                await JSRuntime.InvokeVoidAsync("initializeTabs");
+            }
+            
             appversion = ConfigurationHelper.GetAssemblyVersion();
             releasenotesurl = "https://github.com/mspnp/AzureNamingTool/wiki/v" + appversion;
 
@@ -1799,6 +1781,23 @@
         {
             ConfigurationHelper.DismissVersionAlert();
         }
+    }
+
+    private async void ShowVersionModal()
+    {
+        var parameters = new ModalParameters();
+        parameters.Add("VersionNumber", appversion);
+        parameters.Add("ReleaseNotesUrl", releasenotesurl);
+        parameters.Add("VersionAlert", versionalert);
+        
+        var options = new ModalOptions()
+        {
+            HideHeader = false,
+            HideCloseButton = false,
+            Size = ModalSize.Large
+        };
+        
+        Modal!.Show<VersionInfoModal>("Version Information", parameters, options);
     }
 
     private async void SubmitGHTopic(string type)
