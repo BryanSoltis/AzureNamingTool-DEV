@@ -15,25 +15,27 @@
 @inject ServicesHelper ServicesHelper
 
 <PageTitle>Azure Naming Tool - Generate</PageTitle>
-<div class="card @theme.ThemeStyle">
-    <div class="card-body">
-        <div style="float:left;">
-            <h1>
+<div class="modern-card">
+    <div class="modern-card-header">
+        <div class="modern-page-header">
+            <h1 class="modern-page-title">
+                <span class="oi oi-loop-circular" aria-hidden="true"></span>
                 Generate
             </h1>
-        </div>
-        <div style="float:right;">
-            <button class="btn btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Generate", String.Empty, "generateinstructions", false))">
+            <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Generate", String.Empty, "generateinstructions", false))">
                 <span class="oi oi-document" aria-hidden="true"></span> Documentation
             </button>
         </div>
-        <div style="clear:both;"></div>
+    </div>
+    <div class="modern-card-body">
         <div class="mb-3">This page generates a name for the selected resource type.</div>
-        <div class="card mb-3">
-            <h5 class="card-header bg-default text-dark">
-                Instructions
-            </h5>
-            <div class="card card-body @theme.ThemeStyle">
+        
+        <div class="modern-card mb-4">
+            <div class="modern-card-header modern-card-header-collapsible" data-bs-toggle="collapse" data-bs-target="#instructions" aria-expanded="true">
+                <span class="oi oi-chevron-bottom modern-collapse-icon" aria-hidden="true"></span>
+                <span class="modern-card-title">Instructions</span>
+            </div>
+            <div class="collapse show modern-card-body" id="instructions">
                 <ol>
                     <li>
                         Select the desired Resource Type / Resource Types
@@ -48,7 +50,7 @@
                         Click <span class="fw-bold">Generate</span> to generate the Azure resource name(s)
                     </li>
                     <li>
-                        View generated names in the <a href="/generatednameslog">Generated Names Log</a>
+                        View generated names in the <a href="/generatednameslog" class="modern-link">Generated Names Log</a>
                     </li>
                 </ol>
             </div>
@@ -65,39 +67,43 @@
                 <DataAnnotationsValidator />
                 <ValidationSummary />
                 <div id="generator">
-                    <div class="card @theme.ThemeStyle mb-3">
-                        <h5 class="card-header text-white bg-secondary">
-                            Generate Mode
-                        </h5>
-                        <div class="card card-body @theme.ThemeStyle">
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="generateselect" id="singleselect" value="single" checked @onclick="@(e => OnGenerateModeChange("single"))">
-                                <label class="form-check-label" for="singleselect">
-                                    <span class="fw-bold">Generate Single Resouce Type Name</span><br />This option will allow the generation of a single resource type name using the selected components.
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="generateselect" id="multiselect" value="multi" @onclick="@(e => OnGenerateModeChange("multi"))">
-                                <label class="form-check-label" for="multiselect">
-                                    <span class="fw-bold">Generate Multiple Resource Type Names</span><br />This option will allow the generatation of names for multiple resource types using the selected components. <span class="warning-message">All components will be required (Optional and Excluded Components).</span>
-                                </label>
+                    <div class="modern-card mb-3">
+                        <div class="modern-card-header">
+                            <h5 class="modern-card-title mb-0">Generate Mode</h5>
+                        </div>
+                        <div class="modern-card-body">
+                            <div class="modern-radio-group">
+                                <div class="modern-radio-item">
+                                    <input class="modern-radio-input" type="radio" name="generateselect" id="singleselect" value="single" checked @onclick="@(e => OnGenerateModeChange("single"))">
+                                    <label class="modern-radio-label" for="singleselect">
+                                        <div class="modern-radio-title">Generate Single Resource Type Name</div>
+                                        <div class="modern-radio-description">This option will allow the generation of a single resource type name using the selected components.</div>
+                                    </label>
+                                </div>
+                                <div class="modern-radio-item">
+                                    <input class="modern-radio-input" type="radio" name="generateselect" id="multiselect" value="multi" @onclick="@(e => OnGenerateModeChange("multi"))">
+                                    <label class="modern-radio-label" for="multiselect">
+                                        <div class="modern-radio-title">Generate Multiple Resource Type Names</div>
+                                        <div class="modern-radio-description">This option will allow the generation of names for multiple resource types using the selected components. <span class="modern-text-warning">All components will be required (Optional and Excluded Components).</span></div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="card @theme.ThemeStyle mb-3 @resourcetypeVisible" id="single">
-                        <h5 class="card-header text-white bg-secondary">
-                            Resource Type
-                        </h5>
-                        <div class="card card-body @theme.ThemeStyle">
+                    <div class="modern-card mb-3 @resourcetypeVisible" id="single">
+                        <div class="modern-card-header">
+                            <h5 class="modern-card-title mb-0">Resource Type</h5>
+                        </div>
+                        <div class="modern-card-body">
                             <p>
                                 Select the desired resource type.
                             </p>
                             <div class="mb-3">
-                                <div class="input-group flex-nowrap">
-                                    <span class="input-group-text" id="addon-wrapping">
-                                        <span class="oi oi-magnifying-glass" id="addon-wrapping"></span>
+                                <div class="modern-input-group">
+                                    <span class="modern-input-group-icon">
+                                        <span class="oi oi-magnifying-glass"></span>
                                     </span>
-                                    <input @bind-value="@selectedResourceTypeCategory" @oninput="(EventArgs) => { OnCategoryChanged(EventArgs.Value!.ToString()!);}" class="@GetControlStyle()" list="categorieslist" id="generatecategories" placeholder="Type to filter by category..." autocomplete="off">
+                                    <input @bind-value="@selectedResourceTypeCategory" @oninput="(EventArgs) => { OnCategoryChanged(EventArgs.Value!.ToString()!);}" class="modern-form-input" list="categorieslist" id="generatecategories" placeholder="Type to filter by category..." autocomplete="off">
                                     <datalist id="categorieslist">
                                         @foreach (var category in @categories)
                                         {
@@ -105,11 +111,11 @@
                                         }
                                     </datalist>
                                 </div>
-                                <div class="input-group flex-nowrap">
-                                    <span class="input-group-text" id="addon-wrapping">
-                                        <span class="oi oi-magnifying-glass" id="addon-wrapping"></span>
+                                <div class="modern-input-group mt-2">
+                                    <span class="modern-input-group-icon">
+                                        <span class="oi oi-magnifying-glass"></span>
                                     </span>
-                                    <input @bind-value="@selectedResourceTypeDisplayName" @oninput="(EventArgs) => { OnTypeChanged(EventArgs.Value!.ToString()!).GetAwaiter();}" class="@GetControlStyle()" list="typeslist" id="generatetypes" placeholder="Type to search resource types..." autocomplete="off">
+                                    <input @bind-value="@selectedResourceTypeDisplayName" @oninput="(EventArgs) => { OnTypeChanged(EventArgs.Value!.ToString()!).GetAwaiter();}" class="modern-form-input" list="typeslist" id="generatetypes" placeholder="Type to search resource types..." autocomplete="off">
                                     <datalist id="typeslist">
                                         @foreach (var type in @ResourceTypeService.GetFilteredResourceTypes(servicesData.ResourceTypes, selectedResourceTypeCategory))
                                         {
@@ -126,29 +132,24 @@
                                 </div>
                             </div>
                             <div class="mb-3">
-                                <input type="button" class="btn btn-success" title="Clear" value="Clear" @onclick="@(e => ResetForm(true))" />
+                                <button type="button" class="modern-btn-success" title="Clear" @onclick="@(e => ResetForm(true))">
+                                    <span class="oi oi-reload" aria-hidden="true"></span> Clear
+                                </button>
                             </div>
                             @if (GeneralHelper.IsNotNull(currentResourceType))
                             {
                                 @if (!filteredscopes.Contains(currentResourceType.Scope))
                                 {
-                                    <table class="table table-warning w-100 mt-3" style="margin-bottom:0;">
-                                        <tbody>
-                                            <tr>
-                                                <td>
-                                                    <span class="fw-bold">This resource has a lower-level scope and does not require a unique name.</span><a id="@currentResourceType.Id"></a>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                }
-                                <div id="guidelines" class="card mt-3">
-                                    <div class="card-header bg-default text-dark">
-                                        <a id="NamingGuidlines" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="#namingguidelines" role="button" aria-expanded="false" aria-controls="namingguidelines">
-                                            <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Naming Guidelines
-                                        </a>
+                                    <div class="modern-alert-warning mt-3">
+                                        <strong>Note:</strong> This resource has a lower-level scope and does not require a unique name.
                                     </div>
-                                    <div class="collapse card card-body @theme.ThemeStyle" id="namingguidelines">
+                                }
+                                <div id="guidelines" class="modern-card mt-3">
+                                    <div class="modern-card-header modern-card-header-collapsible" data-bs-toggle="collapse" data-bs-target="#namingguidelines" aria-expanded="false">
+                                        <span class="oi oi-chevron-bottom modern-collapse-icon" aria-hidden="true"></span>
+                                        <span class="modern-card-title">Naming Guidelines</span>
+                                    </div>
+                                    <div class="collapse modern-card-body" id="namingguidelines">
                                         @if (!String.IsNullOrEmpty(currentResourceType.LengthMin))
                                         {
                                             <div><span class="fw-bold">Minimum Length:</span> @currentResourceType.LengthMin</div>

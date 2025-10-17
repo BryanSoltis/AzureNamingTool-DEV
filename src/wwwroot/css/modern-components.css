@@ -1541,6 +1541,94 @@ pre code {
     display: block;
 }
 
+/* Modern Radio Buttons */
+.modern-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.modern-radio-item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    padding: var(--spacing-md);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    transition: all var(--transition-fast);
+    cursor: pointer;
+}
+
+.modern-radio-item:hover {
+    background-color: var(--color-bg-hover);
+    border-color: var(--color-azure-blue);
+}
+
+.modern-radio-item:has(.modern-radio-input:checked) {
+    background-color: rgba(0, 120, 212, 0.05);
+    border-color: var(--color-azure-blue);
+}
+
+.modern-radio-input {
+    margin-top: 2px;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.modern-radio-label {
+    flex: 1;
+    cursor: pointer;
+}
+
+.modern-radio-title {
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.modern-radio-description {
+    font-size: var(--font-size-sm);
+    color: var(--color-text-secondary);
+    line-height: 1.5;
+}
+
+/* Modern Input Group with Icon */
+.modern-input-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.modern-input-group-icon {
+    position: absolute;
+    left: var(--spacing-md);
+    color: var(--color-text-secondary);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.modern-input-group .modern-form-input {
+    padding-left: calc(var(--spacing-md) * 3);
+}
+
+/* Modern Text Warning */
+.modern-text-warning {
+    color: var(--color-warning);
+    font-weight: var(--font-weight-medium);
+}
+
+/* Modern Link */
+.modern-link {
+    color: var(--color-azure-blue);
+    text-decoration: none;
+    transition: color var(--transition-fast);
+}
+
+.modern-link:hover {
+    color: #006ab8;
+    text-decoration: underline;
+}
+
 .modern-code-block {
     display: inline-block;
     padding: 8px 12px;
