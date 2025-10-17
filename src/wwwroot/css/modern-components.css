@@ -1521,3 +1521,609 @@ pre code {
     margin-bottom: var(--spacing-md);
 }
 
+/* ===================================================================
+   BOOTSTRAP REPLACEMENT COMPONENTS
+   =================================================================== */
+
+/* Modern Container System (replaces Bootstrap .container, .container-fluid) */
+.modern-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.modern-container-fluid {
+    width: 100%;
+    padding: 0 24px;
+}
+
+/* Modern Section System (replaces Bootstrap .card without collapse) */
+.modern-section {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.modern-section-header {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modern-section-body {
+    color: var(--color-text-primary);
+}
+
+/* Enhanced Modern Collapsible for Bootstrap data-bs-toggle compatibility */
+.modern-collapsible-header.primary {
+    background: linear-gradient(135deg, var(--color-azure-blue) 0%, #005a9e 100%);
+    color: white;
+}
+
+.modern-collapsible-header[aria-expanded="false"] .header-icon {
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+}
+
+.modern-collapsible-header[aria-expanded="true"] .header-icon {
+    transform: rotate(180deg);
+    transition: transform 0.2s ease;
+}
+
+.modern-collapsible-body.collapse {
+    display: none;
+}
+
+.modern-collapsible-body.collapse.show {
+    display: block;
+}
+
+/* Modern Button System Extensions (Bootstrap replacement) */
+.modern-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    text-decoration: none;
+}
+
+.modern-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.modern-btn-success {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: white;
+}
+
+.modern-btn-success:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.modern-btn-danger {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+}
+
+.modern-btn-danger:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.modern-btn-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+.modern-btn-warning:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.modern-btn-info {
+    background: linear-gradient(135deg, var(--color-azure-blue) 0%, #005a9e 100%);
+    color: white;
+}
+
+.modern-btn-info:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+}
+
+.modern-btn-small {
+    padding: 6px 12px;
+    font-size: 12px;
+}
+
+.modern-btn-large {
+    padding: 14px 28px;
+    font-size: 16px;
+}
+
+/* Modern Form System Extensions */
+.modern-form-group {
+    margin-bottom: 20px;
+}
+
+.modern-form-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.modern-form-check-input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--color-azure-blue);
+}
+
+.modern-form-check-label {
+    font-size: 14px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    user-select: none;
+}
+
+.modern-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.modern-input-group .modern-form-input {
+    flex: 1;
+}
+
+/* Modern Alert/Notification System (replaces Bootstrap alerts) */
+.modern-notification {
+    padding: 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border-left: 4px solid;
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.modern-notification-info {
+    background: #eff6ff;
+    border-left-color: #0078d4;
+    color: #1e3a8a;
+}
+
+.modern-notification-success {
+    background: #f0fdf4;
+    border-left-color: #059669;
+    color: #14532d;
+}
+
+.modern-notification-warning {
+    background: #fffbeb;
+    border-left-color: #f59e0b;
+    color: #78350f;
+}
+
+.modern-notification-danger {
+    background: #fef2f2;
+    border-left-color: #dc2626;
+    color: #7f1d1d;
+}
+
+.modern-notification-dismissible {
+    padding-right: 40px;
+    position: relative;
+}
+
+.modern-notification-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.15s ease;
+}
+
+.modern-notification-close:hover {
+    opacity: 1;
+}
+
+/* Modern Modal System (replaces Bootstrap modals) */
+.modern-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    display: none;
+    animation: fadeIn 0.15s ease;
+}
+
+.modern-modal-backdrop.show {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.modern-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    background: var(--color-bg-secondary);
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    z-index: 1050;
+    display: none;
+    animation: modalSlideIn 0.2s ease forwards;
+}
+
+.modern-modal.show {
+    display: block;
+}
+
+@keyframes modalSlideIn {
+    from {
+        transform: translate(-50%, -50%) scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+    }
+}
+
+.modern-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modern-modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.modern-modal-close {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--color-text-secondary);
+    transition: color 0.15s ease;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modern-modal-close:hover {
+    color: var(--color-text-primary);
+}
+
+.modern-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 140px);
+    color: var(--color-text-primary);
+}
+
+.modern-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+.modern-modal-lg {
+    max-width: 900px;
+}
+
+.modern-modal-sm {
+    max-width: 400px;
+}
+
+/* Modern Spinner/Loading (replaces Bootstrap spinners) */
+.modern-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--color-border);
+    border-top-color: var(--color-azure-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+.modern-spinner-small {
+    width: 20px;
+    height: 20px;
+    border-width: 2px;
+}
+
+.modern-spinner-large {
+    width: 60px;
+    height: 60px;
+    border-width: 6px;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Modern Badge System (replaces Bootstrap badges) */
+.modern-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.modern-badge-primary {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.modern-badge-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.modern-badge-warning {
+    background: #fef3c7;
+    color: #78350f;
+}
+
+.modern-badge-danger {
+    background: #fee2e2;
+    color: #7f1d1d;
+}
+
+.modern-badge-info {
+    background: #e0f2fe;
+    color: #075985;
+}
+
+.modern-badge-secondary {
+    background: #f3f4f6;
+    color: #4b5563;
+}
+
+/* Modern Dropdown System (replaces Bootstrap dropdowns) */
+.modern-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.modern-dropdown-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.modern-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 1000;
+    display: none;
+    min-width: 200px;
+    padding: 8px 0;
+    margin-top: 4px;
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.modern-dropdown-menu.show {
+    display: block;
+}
+
+.modern-dropdown-item {
+    display: block;
+    width: 100%;
+    padding: 10px 16px;
+    border: none;
+    background: none;
+    text-align: left;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    text-decoration: none;
+}
+
+.modern-dropdown-item:hover {
+    background: var(--color-hover-bg);
+}
+
+.modern-dropdown-divider {
+    height: 1px;
+    margin: 8px 0;
+    background: var(--color-border);
+}
+
+/* Modern Progress Bar (replaces Bootstrap progress) */
+.modern-progress {
+    width: 100%;
+    height: 8px;
+    background: var(--color-border);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.modern-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-azure-blue) 0%, #00b7c3 100%);
+    transition: width 0.3s ease;
+}
+
+.modern-progress-bar-success {
+    background: linear-gradient(90deg, #059669 0%, #047857 100%);
+}
+
+.modern-progress-bar-warning {
+    background: linear-gradient(90deg, #f59e0b 0%, #d97706 100%);
+}
+
+.modern-progress-bar-danger {
+    background: linear-gradient(90deg, #dc2626 0%, #b91c1c 100%);
+}
+
+/* Modern Breadcrumb (replaces Bootstrap breadcrumb) */
+.modern-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 0;
+    list-style: none;
+    margin: 0;
+}
+
+.modern-breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--color-text-secondary);
+    font-size: 14px;
+}
+
+.modern-breadcrumb-item a {
+    color: var(--color-azure-blue);
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.modern-breadcrumb-item a:hover {
+    color: #005a9e;
+}
+
+.modern-breadcrumb-item.active {
+    color: var(--color-text-primary);
+    font-weight: 500;
+}
+
+.modern-breadcrumb-separator {
+    color: var(--color-text-secondary);
+}
+
+/* Modern Utility Classes (replaces Bootstrap utilities) */
+.modern-mb-1 { margin-bottom: 8px !important; }
+.modern-mb-2 { margin-bottom: 16px !important; }
+.modern-mb-3 { margin-bottom: 24px !important; }
+.modern-mb-4 { margin-bottom: 32px !important; }
+.modern-mb-5 { margin-bottom: 48px !important; }
+
+.modern-mt-1 { margin-top: 8px !important; }
+.modern-mt-2 { margin-top: 16px !important; }
+.modern-mt-3 { margin-top: 24px !important; }
+.modern-mt-4 { margin-top: 32px !important; }
+.modern-mt-5 { margin-top: 48px !important; }
+
+.modern-ml-1 { margin-left: 8px !important; }
+.modern-ml-2 { margin-left: 16px !important; }
+.modern-ml-3 { margin-left: 24px !important; }
+
+.modern-mr-1 { margin-right: 8px !important; }
+.modern-mr-2 { margin-right: 16px !important; }
+.modern-mr-3 { margin-right: 24px !important; }
+
+.modern-p-1 { padding: 8px !important; }
+.modern-p-2 { padding: 16px !important; }
+.modern-p-3 { padding: 24px !important; }
+.modern-p-4 { padding: 32px !important; }
+
+.modern-px-1 { padding-left: 8px !important; padding-right: 8px !important; }
+.modern-px-2 { padding-left: 16px !important; padding-right: 16px !important; }
+.modern-px-3 { padding-left: 24px !important; padding-right: 24px !important; }
+
+.modern-py-1 { padding-top: 8px !important; padding-bottom: 8px !important; }
+.modern-py-2 { padding-top: 16px !important; padding-bottom: 16px !important; }
+.modern-py-3 { padding-top: 24px !important; padding-bottom: 24px !important; }
+
+.modern-text-center { text-align: center !important; }
+.modern-text-right { text-align: right !important; }
+.modern-text-left { text-align: left !important; }
+
+.modern-flex { display: flex !important; }
+.modern-flex-column { flex-direction: column !important; }
+.modern-flex-row { flex-direction: row !important; }
+.modern-items-center { align-items: center !important; }
+.modern-items-start { align-items: flex-start !important; }
+.modern-items-end { align-items: flex-end !important; }
+.modern-justify-between { justify-content: space-between !important; }
+.modern-justify-center { justify-content: center !important; }
+.modern-justify-start { justify-content: flex-start !important; }
+.modern-justify-end { justify-content: flex-end !important; }
+
+.modern-gap-1 { gap: 8px !important; }
+.modern-gap-2 { gap: 16px !important; }
+.modern-gap-3 { gap: 24px !important; }
+.modern-gap-4 { gap: 32px !important; }
+
+.modern-w-100 { width: 100% !important; }
+.modern-h-100 { height: 100% !important; }
+
+.modern-d-none { display: none !important; }
+.modern-d-block { display: block !important; }
+.modern-d-inline { display: inline !important; }
+.modern-d-inline-block { display: inline-block !important; }
+
+.modern-text-primary { color: var(--color-text-primary) !important; }
+.modern-text-secondary { color: var(--color-text-secondary) !important; }
+.modern-text-muted { color: var(--color-text-muted) !important; }
+.modern-text-white { color: white !important; }
+.modern-text-dark { color: #1f2937 !important; }
+
+.modern-bg-primary { background-color: var(--color-bg-primary) !important; }
+.modern-bg-secondary { background-color: var(--color-bg-secondary) !important; }
+
+/* Responsive utilities */
+@media (max-width: 768px) {
+    .modern-container {
+        padding: 0 16px;
+    }
+    
+    .modern-modal {
+        width: 95%;
+    }
+    
+    .modern-modal-body {
+        padding: 16px;
+    }
+}
+

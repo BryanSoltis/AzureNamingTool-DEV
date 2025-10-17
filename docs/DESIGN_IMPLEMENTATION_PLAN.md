@@ -298,6 +298,688 @@ function initTheme() {
 
 ---
 
+## Bootstrap Removal & Modern Component System
+
+### Overview
+**CRITICAL DECISION**: Remove Bootstrap entirely from the application and replace it with a custom, modern design system. Bootstrap's dated collapsible card pattern and general styling conflicts with the DesignLinear vision.
+
+### Why Remove Bootstrap?
+
+#### Current Problems with Bootstrap
+1. **Dated UI Patterns**: Bootstrap collapsible cards (`.card`, `.card-header`, `data-bs-toggle="collapse"`) feel old and clunky
+2. **Inconsistent Design Language**: Bootstrap's design system conflicts with Azure's modern aesthetic
+3. **Heavy CSS Overhead**: Shipping entire Bootstrap library when we only need custom components
+4. **Limited Customization**: Hard to override Bootstrap's opinionated styles
+5. **Accessibility Issues**: Bootstrap's collapse mechanism is complex and can have a11y problems
+6. **Mobile Experience**: Bootstrap modals and cards don't provide the smooth mobile UX we want
+
+#### Benefits of Custom Design System
+1. **Modern UI Patterns**: Clean, minimal components with smooth animations
+2. **Performance**: Only load CSS we actually use (~70% smaller stylesheet)
+3. **Full Control**: Every component designed exactly as we want
+4. **Consistency**: Single source of truth for design tokens (colors, spacing, typography)
+5. **Maintainability**: Easier to update and extend without framework conflicts
+6. **Better Mobile UX**: Custom components optimized for touch interactions
+
+### Current Bootstrap Usage Analysis
+
+#### Bootstrap Components Currently Used
+Based on codebase analysis, we're using:
+
+**Layout & Grid**
+- `.container`, `.container-fluid` → Replace with custom `.modern-container`
+- `.row`, `.col-*` → Replace with CSS Grid or Flexbox
+
+**Cards**
+- `.card`, `.card-body`, `.card-header` → Replace with `.modern-card`, `.modern-section`
+- `.card.mb-3`, `.card.@theme.ThemeStyle` → Replace with modern section components
+- Collapsible cards with `data-bs-toggle="collapse"` → Replace with custom accordion/disclosure pattern
+
+**Buttons**
+- `.btn`, `.btn-primary`, `.btn-secondary`, `.btn-success`, `.btn-danger`, `.btn-warning` → Replace with `.modern-btn-*`
+- `.btn-sm`, `.btn-lg` → Replace with `.modern-btn-small`, `.modern-btn-large`
+
+**Forms**
+- `.form-control`, `.form-group`, `.form-check`, `.form-check-input`, `.form-check-label` → Replace with `.modern-form-*` classes
+- `.input-group` → Replace with `.modern-input-group`
+- `.form-select` → Replace with custom select or `.modern-select`
+
+**Alerts & Notifications**
+- `.alert`, `.alert-success`, `.alert-danger`, `.alert-warning`, `.alert-info` → Replace with `.modern-notification-*`, `.modern-info-box`, `.modern-warning-box`, `.modern-success-box`
+- `.alert-dismissible` → Replace with custom dismissible notification
+
+**Modals**
+- `.modal`, `.modal-dialog`, `.modal-content`, `.modal-header`, `.modal-body`, `.modal-footer` → Replace with custom `.modern-modal` system
+- `data-bs-toggle="modal"`, `data-bs-dismiss="modal"` → Replace with JavaScript modal API
+
+**Tables**
+- `.table`, `.table-striped`, `.table-hover`, `.table-responsive` → Replace with `.modern-table`, `.modern-table-container`
+
+**Utilities**
+- `.mb-3`, `.mt-3`, `.p-3`, etc. → Replace with custom utility classes or CSS variables
+- `.text-center`, `.text-white`, `.text-dark` → Replace with custom utilities
+- `.d-flex`, `.justify-content-*`, `.align-items-*` → Keep (native CSS, not Bootstrap-specific)
+
+**Navigation**
+- `.navbar`, `.nav`, `.nav-item`, `.nav-link` → Already replaced in sidebar
+
+**Progress Bars**
+- `.progress`, `.progress-bar` → Replace with `.modern-progress` (if used)
+
+**Badges & Pills**
+- `.badge`, `.badge-primary` → Replace with `.modern-badge`
+
+**Dropdowns**
+- `.dropdown`, `.dropdown-menu`, `.dropdown-item` → Replace with custom `.modern-dropdown`
+
+**Spinners/Loading**
+- `.spinner-border` → Replace with `.modern-spinner`
+
+### Replacement Strategy
+
+#### Phase 1: Create Modern Component CSS Library
+**File**: `src/wwwroot/css/modern-components.css`
+
+Create comprehensive modern component system covering all Bootstrap use cases:
+
+```css
+/* Modern Container System */
+.modern-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+}
+
+.modern-container-fluid {
+    width: 100%;
+    padding: 0 24px;
+}
+
+/* Modern Section/Card System */
+.modern-section {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.modern-section-header {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.modern-section-body {
+    color: var(--color-text-primary);
+}
+
+/* Modern Collapsible/Accordion System (replaces Bootstrap collapse cards) */
+.modern-collapsible-section {
+    background: var(--color-bg-secondary);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    margin-bottom: 16px;
+    overflow: hidden;
+}
+
+.modern-collapsible-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    background: var(--color-bg-secondary);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s ease;
+    user-select: none;
+}
+
+.modern-collapsible-header:hover {
+    background: var(--color-hover-bg);
+}
+
+.modern-collapsible-header.primary {
+    background: linear-gradient(135deg, var(--color-azure-blue) 0%, #005a9e 100%);
+    color: white;
+}
+
+.modern-collapsible-header.secondary {
+    background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+    color: white;
+}
+
+.modern-collapsible-body {
+    padding: 20px;
+    border-top: 1px solid var(--color-border);
+}
+
+.modern-collapsible-body.collapse {
+    display: none;
+}
+
+.modern-collapsible-body.collapse.show {
+    display: block;
+}
+
+/* Chevron rotation for collapsed state */
+.modern-collapsible-header[aria-expanded="false"] .header-icon {
+    transform: rotate(0deg);
+    transition: transform 0.2s ease;
+}
+
+.modern-collapsible-header[aria-expanded="true"] .header-icon {
+    transform: rotate(180deg);
+    transition: transform 0.2s ease;
+}
+
+/* Modern Button System */
+.modern-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.modern-btn-primary {
+    background: linear-gradient(135deg, var(--color-azure-blue) 0%, #005a9e 100%);
+    color: white;
+}
+
+.modern-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+}
+
+.modern-btn-secondary {
+    background: #f3f4f6;
+    color: var(--color-text-primary);
+    border: 1px solid var(--color-border);
+}
+
+.modern-btn-success {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    color: white;
+}
+
+.modern-btn-danger {
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    color: white;
+}
+
+.modern-btn-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    color: white;
+}
+
+/* Modern Form System */
+.modern-form-group {
+    margin-bottom: 20px;
+}
+
+.modern-form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+    margin-bottom: 8px;
+}
+
+.modern-form-input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 14px;
+    color: var(--color-text-primary);
+    background: var(--color-bg-secondary);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.modern-form-input:focus {
+    outline: none;
+    border-color: var(--color-azure-blue);
+    box-shadow: 0 0 0 3px rgba(0, 120, 212, 0.1);
+}
+
+.modern-form-select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-size: 14px;
+    background: var(--color-bg-secondary);
+    cursor: pointer;
+}
+
+/* Modern Checkbox/Radio */
+.modern-form-check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.modern-form-check-input {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.modern-form-check-label {
+    font-size: 14px;
+    color: var(--color-text-primary);
+    cursor: pointer;
+}
+
+/* Modern Alert/Notification Boxes */
+.modern-notification {
+    padding: 16px;
+    border-radius: 6px;
+    margin-bottom: 16px;
+    border-left: 4px solid;
+}
+
+.modern-notification-info {
+    background: #eff6ff;
+    border-left-color: #0078d4;
+    color: #1e3a8a;
+}
+
+.modern-notification-success {
+    background: #f0fdf4;
+    border-left-color: #059669;
+    color: #14532d;
+}
+
+.modern-notification-warning {
+    background: #fffbeb;
+    border-left-color: #f59e0b;
+    color: #78350f;
+}
+
+.modern-notification-danger {
+    background: #fef2f2;
+    border-left-color: #dc2626;
+    color: #7f1d1d;
+}
+
+/* Modern Info/Warning/Success Boxes (for Admin settings) */
+.modern-info-box {
+    background: var(--color-info-bg, #eff6ff);
+    border: 1px solid var(--color-info-border, #bfdbfe);
+    border-radius: 6px;
+    padding: 16px;
+    color: var(--color-info-text, #1e40af);
+}
+
+.modern-warning-box {
+    background: var(--color-warning-bg, #fffbeb);
+    border: 1px solid var(--color-warning-border, #fde68a);
+    border-radius: 6px;
+    padding: 16px;
+    color: var(--color-warning-text, #78350f);
+}
+
+.modern-success-box {
+    background: var(--color-success-bg, #f0fdf4);
+    border: 1px solid var(--color-success-border, #86efac);
+    border-radius: 6px;
+    padding: 16px;
+    color: var(--color-success-text, #14532d);
+}
+
+/* Modern Table System */
+.modern-table-container {
+    overflow-x: auto;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    margin-bottom: 24px;
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.modern-table thead {
+    background: var(--color-bg-primary);
+    border-bottom: 2px solid var(--color-border);
+}
+
+.modern-table th {
+    padding: 12px 16px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.modern-table td {
+    padding: 12px 16px;
+    border-top: 1px solid var(--color-border);
+    font-size: 14px;
+    color: var(--color-text-primary);
+}
+
+.modern-table tbody tr:hover {
+    background: var(--color-hover-bg);
+}
+
+/* Modern Modal System */
+.modern-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1040;
+    display: none;
+}
+
+.modern-modal-backdrop.show {
+    display: block;
+}
+
+.modern-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--color-bg-secondary);
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow: hidden;
+    z-index: 1050;
+    display: none;
+}
+
+.modern-modal.show {
+    display: block;
+}
+
+.modern-modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.modern-modal-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+.modern-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+    max-height: calc(90vh - 140px);
+}
+
+.modern-modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+}
+
+/* Modern Spinner/Loading */
+.modern-spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid var(--color-border);
+    border-top-color: var(--color-azure-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Modern Badge System */
+.modern-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 500;
+    line-height: 1;
+}
+
+.modern-badge-primary {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+.modern-badge-success {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.modern-badge-warning {
+    background: #fef3c7;
+    color: #78350f;
+}
+
+.modern-badge-danger {
+    background: #fee2e2;
+    color: #7f1d1d;
+}
+
+/* Modern Utility Classes */
+.modern-mb-1 { margin-bottom: 8px; }
+.modern-mb-2 { margin-bottom: 16px; }
+.modern-mb-3 { margin-bottom: 24px; }
+.modern-mb-4 { margin-bottom: 32px; }
+
+.modern-mt-1 { margin-top: 8px; }
+.modern-mt-2 { margin-top: 16px; }
+.modern-mt-3 { margin-top: 24px; }
+.modern-mt-4 { margin-top: 32px; }
+
+.modern-p-1 { padding: 8px; }
+.modern-p-2 { padding: 16px; }
+.modern-p-3 { padding: 24px; }
+.modern-p-4 { padding: 32px; }
+
+.modern-text-center { text-align: center; }
+.modern-text-right { text-align: right; }
+.modern-text-left { text-align: left; }
+
+.modern-flex { display: flex; }
+.modern-flex-column { flex-direction: column; }
+.modern-items-center { align-items: center; }
+.modern-justify-between { justify-content: space-between; }
+.modern-justify-center { justify-content: center; }
+.modern-gap-2 { gap: 16px; }
+.modern-gap-3 { gap: 24px; }
+```
+
+#### Phase 2: JavaScript for Interactive Components
+**File**: `src/wwwroot/js/modern-components.js`
+
+Create JavaScript to handle interactive components (modals, collapsibles, etc.):
+
+```javascript
+// Modern Collapsible/Accordion Handler
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle collapsible sections
+    document.querySelectorAll('[data-bs-toggle="collapse"]').forEach(function(trigger) {
+        trigger.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(trigger.getAttribute('href'));
+            const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+            
+            // Toggle collapsed state
+            target.classList.toggle('show');
+            trigger.setAttribute('aria-expanded', !isExpanded);
+        });
+    });
+    
+    // Modern Modal Handler
+    window.ModernModal = {
+        show: function(modalId) {
+            const modal = document.getElementById(modalId);
+            const backdrop = document.createElement('div');
+            backdrop.className = 'modern-modal-backdrop show';
+            backdrop.id = modalId + '-backdrop';
+            document.body.appendChild(backdrop);
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+        },
+        hide: function(modalId) {
+            const modal = document.getElementById(modalId);
+            const backdrop = document.getElementById(modalId + '-backdrop');
+            modal.classList.remove('show');
+            if (backdrop) backdrop.remove();
+            document.body.style.overflow = '';
+        }
+    };
+});
+```
+
+#### Phase 3: Remove Bootstrap References
+**Files to Update**:
+- `src/App.razor` or `src/Components/_Imports.razor`
+- `src/Components/Layout/MainLayout.razor`
+- `src/wwwroot/index.html` or equivalent
+
+**Actions**:
+1. Remove Bootstrap CSS link: `<link href="bootstrap/bootstrap.min.css" rel="stylesheet" />`
+2. Remove Bootstrap JS: `<script src="bootstrap/bootstrap.bundle.min.js"></script>`
+3. Add modern component CSS: `<link href="css/modern-components.css" rel="stylesheet" />`
+4. Add modern component JS: `<script src="js/modern-components.js"></script>`
+
+#### Phase 4: Page-by-Page Migration
+
+**Migration Order** (by complexity and impact):
+
+1. **Admin.razor** ✅ (COMPLETED - cb93a3e)
+   - Status: Fully modernized with collapsible sections
+   - Components used: `modern-collapsible-section`, `modern-setting-row`, `modern-form-input`, `modern-info-box`
+
+2. **Configuration.razor** (HIGH PRIORITY)
+   - Replace ~50+ Bootstrap collapse cards with modern collapsible sections
+   - Pattern: Resource Type cards, Location cards, Environment cards, etc.
+   - Estimated time: 4-6 hours
+
+3. **Generate.razor** (HIGH PRIORITY)
+   - Replace collapsible instruction cards
+   - Replace form controls with modern inputs
+   - Update component selection UI
+   - Estimated time: 3-4 hours
+
+4. **Reference.razor** (MEDIUM PRIORITY)
+   - Replace documentation cards
+   - Update code example styling
+   - Estimated time: 2-3 hours
+
+5. **Instructions.razor** (MEDIUM PRIORITY)
+   - Replace instruction cards
+   - Update step-by-step guides
+   - Estimated time: 2-3 hours
+
+6. **GeneratedNamesLog.razor** (LOW PRIORITY)
+   - Replace table Bootstrap classes
+   - Update filter/search inputs
+   - Estimated time: 2-3 hours
+
+7. **AdminLog.razor** (LOW PRIORITY)
+   - Similar to GeneratedNamesLog
+   - Estimated time: 1-2 hours
+
+8. **Resource Component Pages** (MEDIUM PRIORITY)
+   - Multiple files (ResourceTypes, Locations, Environments, etc.)
+   - All follow same pattern - can use template approach
+   - Estimated time: 4-6 hours total
+
+### Migration Pattern Template
+
+**Old Bootstrap Pattern**:
+```razor
+<div class="card mb-3" style="width:auto;">
+    <div class="card-header bg-default text-dark">
+        <a class="text-decoration-none text-dark" data-bs-toggle="collapse" 
+           href="#sectionId" role="button" aria-expanded="false">
+            <span class="oi oi-chevron-bottom"></span> Section Title
+        </a>
+    </div>
+    <div class="collapse show card card-body @theme.ThemeStyle" id="sectionId">
+        <p>Section content...</p>
+        <button class="btn btn-primary">Action</button>
+    </div>
+</div>
+```
+
+**New Modern Pattern**:
+```razor
+<div class="modern-collapsible-section">
+    <div class="modern-collapsible-header secondary" data-bs-toggle="collapse" 
+         href="#sectionId" role="button" aria-expanded="false">
+        <div class="header-title">
+            <span class="oi oi-cog" aria-hidden="true"></span>
+            <span>Section Title</span>
+        </div>
+        <span class="oi oi-chevron-bottom header-icon" aria-hidden="true"></span>
+    </div>
+    <div class="collapse modern-collapsible-body" id="sectionId">
+        <p class="text-secondary">Section content...</p>
+        <button class="modern-btn-primary">Action</button>
+    </div>
+</div>
+```
+
+### Testing Strategy
+
+1. **Visual Testing**: Test each page after migration in multiple browsers
+2. **Functional Testing**: Verify all collapse/expand, form submissions, modals work
+3. **Responsive Testing**: Test mobile, tablet, desktop layouts
+4. **Accessibility Testing**: Verify keyboard navigation, screen reader compatibility
+5. **Theme Testing**: Verify light/dark mode works correctly with new components
+6. **Performance Testing**: Measure page load time improvement after Bootstrap removal
+
+### Rollback Safety
+
+- **Git Commits**: Commit after each page migration for easy rollback
+- **Feature Flag**: Consider temporary feature flag to toggle between Bootstrap and modern design
+- **Documentation**: Document all component replacements in this file
+
+### Time Estimates
+
+| Task | Estimated Time |
+|------|----------------|
+| Create modern-components.css | 3-4 hours |
+| Create modern-components.js | 2-3 hours |
+| Remove Bootstrap references | 1 hour |
+| Migrate Configuration.razor | 4-6 hours |
+| Migrate Generate.razor | 3-4 hours |
+| Migrate Reference.razor | 2-3 hours |
+| Migrate Instructions.razor | 2-3 hours |
+| Migrate GeneratedNamesLog.razor | 2-3 hours |
+| Migrate AdminLog.razor | 1-2 hours |
+| Migrate Resource Component Pages | 4-6 hours |
+| Testing & Bug Fixes | 4-6 hours |
+| **TOTAL** | **28-41 hours** |
+
+---
+
 ## Implementation Phases
 
 ### Phase 1: Foundation Setup (Est. 7-10 hours - Updated)

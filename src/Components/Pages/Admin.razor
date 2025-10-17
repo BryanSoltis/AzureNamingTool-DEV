@@ -95,7 +95,7 @@
                     <button type="button" class="modern-btn-primary" @onclick="@(e => SubmitGHTopic("feature"))" title="Feature request">
                         <span class="oi oi-plus" aria-hidden="true"></span> Feature Request
                     </button>
-                    <button type="button" class="btn btn-danger" @onclick="@(e => SubmitGHTopic("bug"))" title="Submit a bug">
+                    <button type="button" class="modern-btn-danger" @onclick="@(e => SubmitGHTopic("bug"))" title="Submit a bug">
                         <span class="oi oi-bug" aria-hidden="true"></span> Submit Bug
                     </button>
                     <button type="button" class="modern-btn-secondary" @onclick="@(e => SubmitGHTopic("discussion"))" title="Start a discussion">
@@ -137,7 +137,7 @@
                             Clear all cached data to force a refresh of configuration and resource data.
                         </div>
                         <div class="setting-actions">
-                            <button type="button" class="btn btn-success" @onclick="@(e => AdminFormAction("clearcache"))" title="Clear Cache">
+                            <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("clearcache"))" title="Clear Cache">
                                 <span class="oi oi-trash" aria-hidden="true"></span> Clear Cache
                             </button>
                         </div>
@@ -189,7 +189,7 @@
                         <MarkdownEditor @bind-Value="@customhomecontent" @ref="mdCustomHomeContent" />
                     </div>
                     <div class="setting-actions">
-                        <button type="button" class="btn btn-success" @onclick="@(e => AdminFormAction("customhomecontentsave"))" title="Save Custom Home Content">
+                        <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("customhomecontentsave"))" title="Save Custom Home Content">
                             <span class="oi oi-check" aria-hidden="true"></span> Save
                         </button>
                         <button type="button" class="modern-btn-secondary" @onclick="@(e => AdminFormAction("customhomecontentclear"))" title="Clear Custom Home Content">
@@ -210,7 +210,7 @@
                             <img src="@customlogopath" height="100" alt="Custom Logo" class="border rounded p-2" />
                         </div>
                         <div class="setting-actions">
-                            <button type="button" class="btn btn-danger" @onclick="@(e => AdminFormAction("customlogopathclear"))" title="Delete Custom Logo">
+                            <button type="button" class="modern-btn-danger" @onclick="@(e => AdminFormAction("customlogopathclear"))" title="Delete Custom Logo">
                                 <span class="oi oi-trash" aria-hidden="true"></span> Delete Logo
                             </button>
                         </div>
@@ -331,7 +331,7 @@
                     
                     <div class="mt-3">
                         <h6><i class="bi bi-info-circle"></i> Current Provider</h6>
-                        <div class="alert @(currentStorageProvider == "SQLite" ? "alert-success" : "alert-info")">
+                        <div class="@(currentStorageProvider == "SQLite" ? "modern-notification-success" : "modern-notification-info")">
                             <strong>@currentStorageProvider</strong>
                             @if (currentStorageProvider == "SQLite")
                             {
@@ -354,26 +354,26 @@
                             
                             @if (!preMigrationBackupCompleted)
                             {
-                                <div class="alert alert-warning">
+                                <div class="modern-notification-warning">
                                     <i class="bi bi-exclamation-triangle"></i>
                                     <strong>Step 1: Backup Required</strong><br />
                                     Before migrating to SQLite, you must create a backup of your current configuration. This backup will allow you to restore your data if needed.
                                 </div>
-                                <button type="button" class="btn btn-primary" @onclick="@(e => CreatePreMigrationBackup())" title="Create Backup">
+                                <button type="button" class="modern-btn-primary" @onclick="@(e => CreatePreMigrationBackup())" title="Create Backup">
                                     <i class="bi bi-download"></i>
                                     <span>Create Backup (Step 1)</span>
                                 </button>
                             }
                             else
                             {
-                                <div class="alert alert-success">
+                                <div class="modern-notification-success">
                                     <i class="bi bi-check-circle"></i>
                                     <strong>Backup Complete!</strong><br />
                                     Backup file: <code>@preMigrationBackupFileName</code><br />
                                     You can now proceed with the migration.
                                 </div>
                                 
-                                <div class="alert alert-danger mt-3">
+                                <div class="modern-notification-danger mt-3">
                                     <i class="bi bi-exclamation-triangle-fill"></i>
                                     <strong>IMPORTANT: Migration is one-way only!</strong>
                                     <ul class="mb-0 mt-2">
@@ -384,10 +384,10 @@
                                     </ul>
                                 </div>
                                 
-                                <button type="button" class="btn btn-warning" @onclick="@(e => InitiateMigration())" disabled="@isMigrating" title="Migrate to SQLite">
+                                <button type="button" class="modern-btn-warning" @onclick="@(e => InitiateMigration())" disabled="@isMigrating" title="Migrate to SQLite">
                                     @if (isMigrating)
                                     {
-                                        <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                        <span class="modern-spinner-small me-2" role="status" aria-hidden="true"></span>
                                         <span>Migrating...</span>
                                     }
                                     else
@@ -415,7 +415,7 @@
 
                     @if (!String.IsNullOrEmpty(migrationErrorMessage))
                     {
-                        <div class="alert alert-danger mt-3">
+                        <div class="modern-notification-danger mt-3">
                             <i class="bi bi-exclamation-triangle-fill"></i>
                             <strong>Error:</strong> @migrationErrorMessage
                         </div>
@@ -525,7 +525,7 @@
                         <input title="Generation Webhook" id="currentgenerationwebhook" class="modern-form-input" type="text" @onchange="@((ui) => { SetFormValue("generationwebhook",(string)ui.Value!);})" value="@currentgenerationwebhook" />
                     </div>
                     <div class="setting-actions">
-                        <button type="button" class="btn btn-success" @onclick="@(e => AdminFormAction("generationwebhooksave"))" title="Save Generate Webhook">
+                        <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("generationwebhooksave"))" title="Save Generate Webhook">
                             <span class="oi oi-check" aria-hidden="true"></span> Save
                         </button>
                     </div>
@@ -538,7 +538,7 @@
                         This will reset <strong>ALL</strong> site settings to the default values. This includes site settings and customizations. This cannot be undone!
                     </div>
                     <div class="setting-actions">
-                        <button type="button" class="btn btn-danger" @onclick="@(e => AdminFormAction("resetsitesettings"))" title="Reset Site Settings">
+                        <button type="button" class="modern-btn-danger" @onclick="@(e => AdminFormAction("resetsitesettings"))" title="Reset Site Settings">
                             <span class="oi oi-warning" aria-hidden="true"></span> Reset Site Settings
                         </button>
                     </div>
@@ -581,7 +581,7 @@
                             <input title="New Password" id="newpassword" class="modern-form-input mb-3" type="password" @onchange="@((ui) => { SetFormValue("password",(string)ui.Value!);})" />
                         </div>
                         <div class="setting-actions">
-                            <button title="Save Password" type="button" disabled="@disabled" class="btn btn-success" @onclick="@(e => AdminFormAction("password"))">
+                            <button title="Save Password" type="button" disabled="@disabled" class="modern-btn-success" @onclick="@(e => AdminFormAction("password"))">
                                 <span class="oi oi-check" aria-hidden="true"></span> Save Password
                             </button>
                         </div>
@@ -605,7 +605,7 @@
                                 <input title="Full Access API Key" id="currentapikey" class="modern-form-input mb-3" type="text" @onchange="@((ui) => { SetFormValue("apikey",(string)ui.Value!);})" value="@currentapikey" />
                             </div>
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-success" @onclick="@(e => AdminFormAction("apikeysave"))" title="Save Full Access API Key">
+                                <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("apikeysave"))" title="Save Full Access API Key">
                                     <span class="oi oi-check" aria-hidden="true"></span> Save
                                 </button>
                                 <button type="button" class="modern-btn-secondary" @onclick="@(e => AdminFormAction("apikeygenerate"))" title="Generate Full Access API Key">
@@ -625,7 +625,7 @@
                                 <input title="Name Generation API Key" id="currentnamegenerationapikey" class="modern-form-input mb-3" type="text" @onchange="@((ui) => { SetFormValue("namegenerationapikey",(string)ui.Value!);})" value="@currentnamegenerationapikey" />
                             </div>
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-success" @onclick="@(e => AdminFormAction("namegenerationapikeysave"))" title="Save Name Generation API Key">
+                                <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("namegenerationapikeysave"))" title="Save Name Generation API Key">
                                     <span class="oi oi-check" aria-hidden="true"></span> Save
                                 </button>
                                 <button type="button" class="modern-btn-secondary" @onclick="@(e => AdminFormAction("namegenerationapikeygenerate"))" title="Generate Name Generation API Key">
@@ -645,7 +645,7 @@
                                 <input title="Read-Only API Key" id="currentreadonlyapikey" class="modern-form-input mb-3" type="text" @onchange="@((ui) => { SetFormValue("readonlyapikey",(string)ui.Value!);})" value="@currentreadonlyapikey" />
                             </div>
                             <div class="d-flex gap-2">
-                                <button type="button" class="btn btn-success" @onclick="@(e => AdminFormAction("readonlyapikeysave"))" title="Save Read-Only API Key">
+                                <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("readonlyapikeysave"))" title="Save Read-Only API Key">
                                     <span class="oi oi-check" aria-hidden="true"></span> Save
                                 </button>
                                 <button type="button" class="modern-btn-secondary" @onclick="@(e => AdminFormAction("readonlyapikeygenerate"))" title="Generate Read-Only API Key">
@@ -702,7 +702,7 @@
                             <input title="Identity Header Name" id="currentidentityheadername" class="modern-form-input mb-3" type="text" @onchange="@((ui) => { SetFormValue("identityheadername",(string)ui.Value!);})" value="@currentidentityheadername" />
                         </div>
                         <div class="setting-actions">
-                            <button type="button" class="btn btn-success" @onclick="@(e => AdminFormAction("identityheadernamesave"))" title="Save Identity Header Name">
+                            <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("identityheadernamesave"))" title="Save Identity Header Name">
                                 <span class="oi oi-check" aria-hidden="true"></span> Save
                             </button>
                         </div>
@@ -743,7 +743,7 @@
                         }
 
                         <div class="mt-3">
-                            <button type="button" class="btn btn-success" @onclick="@(e => AdminFormAction("adminuseradd"))" title="Add Admin User">
+                            <button type="button" class="modern-btn-success" @onclick="@(e => AdminFormAction("adminuseradd"))" title="Add Admin User">
                                 <span class="oi oi-plus" aria-hidden="true"></span> Add Admin User
                             </button>
                         </div>
@@ -768,7 +768,7 @@
                                                     <td>
                                                         @if (GeneralHelper.NormalizeName(currentuser, true) != GeneralHelper.NormalizeName(@item.Name, true))
                                                         {
-                                                            <button type="button" class="btn btn-danger btn-sm" @onclick="@(e => AdminFormAction("adminuserdelete",item.Id))" title="Delete">
+                                                            <button type="button" class="modern-btn-danger modern-btn-small" @onclick="@(e => AdminFormAction("adminuserdelete",item.Id))" title="Delete">
                                                                 <span class="oi oi-trash" aria-hidden="true"></span>
                                                             </button>
                                                         }
