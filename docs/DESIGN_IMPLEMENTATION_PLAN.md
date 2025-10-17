@@ -1013,4 +1013,23 @@ To ensure easy rollback and traceability, record the commit hashes for the follo
   - Message: feat: Begin DesignLinear implementation - rollback point
   - Description: Initial commit for DesignLinear modernization (foundation CSS, theme system, MainLayout, NavMenu sidebar styling).
 
+- **DASHBOARD MODERNIZATION COMMIT**: Dashboard page modernized with stats grid, feature list, and modern cards.
+  - Commit hash: `4e68208`
+  - Date: 2025-10-17
+  - Message: feat: modernize Dashboard with stats grid and feature cards
+  - Description: Completed Dashboard (Index.razor) modernization with live stats, feature highlights, and modern card design.
+
+- **ADMIN PAGE START COMMIT**: Initial admin page modernization - login card and CSS components.
+  - Commit hash: `faae420`
+  - Date: 2025-10-17
+  - Message: feat: Begin Admin page modernization - login card and CSS components
+  - Description: Started Admin.razor modernization with modern login card and admin-specific CSS components.
+
+- **ADMIN PAGE COMPLETE COMMIT**: Completed admin page modernization with all sections.
+  - Commit hash: `cb93a3e`
+  - Date: 2025-10-17
+  - Message: feat: modernize Admin page with DesignLinear - Customization, Site Settings, Security, Identity Provider sections
+  - Description: Completed Admin.razor modernization with all major sections: Customization (home content, logo, navigation), Site Settings (storage provider, toggles, webhook), Security (password, API keys), and Identity Provider Settings (header name, admin users). All sections use modern collapsible design, setting rows, and form components.
+
 > Update these hashes after each commit to keep a clear record for rollback and auditing.
+
