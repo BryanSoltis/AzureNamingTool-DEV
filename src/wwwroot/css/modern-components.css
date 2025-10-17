@@ -548,6 +548,56 @@ select.form-control {
     border: 1px solid var(--color-border);
 }
 
+/* Table Container */
+.modern-table-container {
+    width: 100%;
+    overflow-x: auto;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    margin-bottom: var(--spacing-lg);
+}
+
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: var(--color-bg-secondary);
+}
+
+.modern-table thead {
+    background-color: var(--color-bg-tertiary);
+}
+
+.modern-table thead th {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--color-text-primary);
+    text-align: left;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid var(--color-border);
+}
+
+.modern-table tbody tr {
+    border-bottom: 1px solid var(--color-border);
+    transition: background-color var(--transition-fast);
+}
+
+.modern-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.modern-table tbody tr:hover {
+    background-color: var(--color-bg-hover);
+}
+
+.modern-table tbody td {
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-base);
+    color: var(--color-text-primary);
+    vertical-align: top;
+}
+
 /* Table Compact */
 .table-sm thead th,
 .table-sm tbody td {
@@ -1608,12 +1658,13 @@ pre code {
 }
 
 .modern-btn-primary {
-    background: linear-gradient(135deg, var(--color-azure-blue), var(--color-azure-blue-hover));
-    color: white;
+    background-color: #1b6ec2;
+    color: #ffffff;
     box-shadow: var(--shadow-sm);
 }
 
 .modern-btn-primary:hover:not(:disabled) {
+    background-color: #1861ac;
     transform: translateY(-1px);
     box-shadow: var(--shadow-md);
 }
@@ -1630,43 +1681,47 @@ pre code {
 }
 
 .modern-btn-success {
-    background: linear-gradient(135deg, #059669 0%, #047857 100%);
-    color: white;
+    background-color: #28a745;
+    color: #ffffff;
 }
 
 .modern-btn-success:hover:not(:disabled) {
+    background-color: #218838;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+    box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
 }
 
 .modern-btn-danger {
-    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-    color: white;
+    background-color: #dc3545;
+    color: #ffffff;
 }
 
 .modern-btn-danger:hover:not(:disabled) {
+    background-color: #c82333;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
 }
 
 .modern-btn-warning {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-    color: white;
+    background-color: #ffc107;
+    color: #212529;
 }
 
 .modern-btn-warning:hover:not(:disabled) {
+    background-color: #e0a800;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
 }
 
 .modern-btn-info {
-    background: linear-gradient(135deg, var(--color-azure-blue) 0%, #005a9e 100%);
-    color: white;
+    background-color: #17a2b8;
+    color: #ffffff;
 }
 
 .modern-btn-info:hover:not(:disabled) {
+    background-color: #138496;
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 120, 212, 0.3);
+    box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
 }
 
 /* Button Size Modifiers */
