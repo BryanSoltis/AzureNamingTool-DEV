@@ -23,37 +23,45 @@
 @inject IStorageMigrationService MigrationService
 
 <PageTitle>Azure Naming Tool - Admin</PageTitle>
-<div class="card  @theme.ThemeStyle">
-    <div class="card-body">
-        <!-- Pop it above the backdrop  -->
-        <div class="@theme.ThemeStyle">
-            <div style="float:left;">
-                <h1>
-                    Admin
-                </h1>
-            </div>
-            @if (admin)
-            {
-                <div style="float:right;">
-                    <button class="btn btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Admin", String.Empty, "adminconfigurationinstructions", admin))">
-                        <span class="oi oi-document" aria-hidden="true"></span> Documentation
-                    </button>
+
+<div class="modern-page-header">
+    <div class="modern-page-title">
+        <h1>Admin</h1>
+        <p class="modern-page-subtitle">Manage security, configuration, and customization settings</p>
+    </div>
+    @if (admin)
+    {
+        <div class="modern-page-actions">
+            <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Admin", String.Empty, "adminconfigurationinstructions", admin))">
+                <span class="oi oi-document" aria-hidden="true"></span> Documentation
+            </button>
+        </div>
+    }
+</div>
+
+<div class="modern-admin-container">
+    @if (!admin)
+    {
+        <!-- Login Card -->
+        <div class="modern-card modern-login-card">
+            <div class="modern-card-body">
+                <div class="login-icon">🔐</div>
+                <h3 class="text-center mb-3">Admin Access Required</h3>
+                <p class="text-center text-secondary mb-4">
+                    Enter the Global Admin Password to configure the Azure Naming Tool site.
+                </p>
+                <div class="form-group">
+                    <label for="password" class="modern-form-label">Global Admin Password</label>
+                    <input title="Password" class="modern-form-input" type="password" @onchange="@((ui) => { SetFormValue("login",(string)ui.Value!);})" />
                 </div>
-            }
-            <div style="clear:both;"></div>
-            <div>
-                @if (!admin)
-                {
-                    <p>
-                        Enter the Global Admin Password to configure the Azure Naming Tool site.
-                    </p>
-                    <div class="form-group">
-                        <label for="password" style="font-weight:bold">Global Admin Password</label>
-                        <input title="Password" class="form-control mb-3" type="password" @onchange="@((ui) => { SetFormValue("login",(string)ui.Value!);})" />
-                    </div>
-                }
-                else
-                {
+                <div class="text-center mt-3">
+                    <button type="submit" class="modern-btn-primary" @onclick="@(e => AdminFormAction("login"))" title="Login">Login</button>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
                     <p>
                         This page allows you to security settings, view cache data, and site configurations for the Azure Naming Tool.
                     </p>
@@ -910,15 +918,8 @@
                         </div>
                     </div>
                 }
-            </div>
-            <div>
-                @if (!admin)
-                {
-                    <button type="submit" class="btn btn-success" @onclick="@(e => AdminFormAction("login"))" title="Login">Login</button>
-                }
-            </div>
-        </div>
-    </div>
+            }
+    }
 </div>
 
 @code {
