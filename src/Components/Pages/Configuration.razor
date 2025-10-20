@@ -2292,7 +2292,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceEnvironments))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceEnvironments, false);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceEnvironments!, false, 
+                                                async (item) => await ResourceEnvironmentService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -2317,7 +2318,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceEnvironments))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceEnvironments, true);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceEnvironments!, true, 
+                                                async (item) => await ResourceEnvironmentService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -2526,7 +2528,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceFunctions))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceFunctions, false);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceFunctions!, false, 
+                                                async (item) => await ResourceFunctionService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -2551,7 +2554,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceFunctions))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceFunctions, true);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceFunctions!, true, 
+                                                async (item) => await ResourceFunctionService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -2753,7 +2757,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceLocations))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceLocations, false);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceLocations!, false, 
+                                                async (item) => await ResourceLocationService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -2778,7 +2783,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceLocations))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceLocations, true);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceLocations!, true, 
+                                                async (item) => await ResourceLocationService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -2999,7 +3005,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceOrgs))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceOrgs, false);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceOrgs!, false, 
+                                                async (item) => await ResourceOrgService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -3024,7 +3031,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceOrgs))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceOrgs, true);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceOrgs!, true, 
+                                                async (item) => await ResourceOrgService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -3233,7 +3241,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceProjAppSvcs))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceProjAppSvcs, false);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceProjAppSvcs!, false, 
+                                                async (item) => await ResourceProjAppSvcService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -3258,7 +3267,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceProjAppSvcs))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceProjAppSvcs, true);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceProjAppSvcs!, true, 
+                                                async (item) => await ResourceProjAppSvcService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -3461,7 +3471,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceTypes))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceTypes, false);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceTypes!, false, 
+                                                async (item) => await ResourceTypeService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -3476,7 +3487,7 @@
                                         else
                                         {
                                             message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = "Options update failed! Please check the Admin Log for details.";
+                                            message.Message = "Options updated failed! Please check the Admin Log for details.";
                                         }
                                     }
                                     break;
@@ -3486,7 +3497,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceTypes))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceTypes, true);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceTypes!, true, 
+                                                async (item) => await ResourceTypeService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -3714,7 +3726,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceUnitDepts))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceUnitDepts, false);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceUnitDepts!, false, 
+                                                async (item) => await ResourceUnitDeptService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -3739,7 +3752,8 @@
                                     {
                                         if (GeneralHelper.IsNotNull(servicesData.ResourceUnitDepts))
                                         {
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(servicesData.ResourceUnitDepts, true);
+                                            serviceResponse = await ConvertCaseAsync(servicesData.ResourceUnitDepts!, true, 
+                                                async (item) => await ResourceUnitDeptService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -3951,7 +3965,8 @@
                                         if (GeneralHelper.IsNotNull(servicesData.CustomComponents))
                                         {
                                             List<CustomComponent> lstcomponents = servicesData.CustomComponents.Where(x => x.ParentComponent == GeneralHelper.NormalizeName(parentcomponent, true)).ToList();
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(lstcomponents, false);
+                                            serviceResponse = await ConvertCaseAsync(lstcomponents, false, 
+                                                async (item) => await CustomComponentService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -3977,7 +3992,8 @@
                                         if (GeneralHelper.IsNotNull(servicesData.CustomComponents))
                                         {
                                             List<CustomComponent> lstcomponents = servicesData.CustomComponents.Where(x => x.ParentComponent == GeneralHelper.NormalizeName(parentcomponent, true)).ToList();
-                                            serviceResponse = await ConfigurationHelper.ConvertCase(lstcomponents, true);
+                                            serviceResponse = await ConvertCaseAsync(lstcomponents, true, 
+                                                async (item) => await CustomComponentService!.PostItemAsync(item));
                                             if (serviceResponse.Success)
                                             {
                                                 message.Type = MessageTypesEnum.SUCCESS;
@@ -5190,6 +5206,61 @@
             });
             return (false, $"Configuration reset failed: {ex.Message}", ex.StackTrace);
         }
+    }
+
+    /// <summary>
+    /// Converts the ShortName property of items to uppercase or lowercase and persists changes using the provided service.
+    /// </summary>
+    /// <typeparam name="T">Type of items to convert</typeparam>
+    /// <param name="items">List of items to convert</param>
+    /// <param name="lowercase">True for lowercase, false for uppercase</param>
+    /// <param name="postItemFunc">Function to call to persist each item</param>
+    /// <returns>ServiceResponse indicating success or failure</returns>
+    private async Task<ServiceResponse> ConvertCaseAsync<T>(List<T> items, bool lowercase, Func<T, Task<ServiceResponse>> postItemFunc)
+    {
+        ServiceResponse serviceResponse = new() { Success = true };
+        try
+        {
+            foreach (dynamic item in items)
+            {
+                // Update the ShortName property
+                item!.ShortName = lowercase ? item.ShortName.ToLower() : item.ShortName.ToUpper();
+                
+                // Persist the change using the provided service function
+                serviceResponse = await postItemFunc(item);
+                
+                // Stop if any save fails
+                if (!serviceResponse.Success)
+                {
+                    await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                    { 
+                        Title = "ERROR", 
+                        Message = $"Convert case failed for item: {item.ShortName}. Error: {serviceResponse.ResponseMessage}" 
+                    });
+                    break;
+                }
+            }
+            
+            if (serviceResponse.Success)
+            {
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                { 
+                    Title = "INFORMATION", 
+                    Message = $"Successfully converted {items.Count} items to {(lowercase ? "lowercase" : "uppercase")}" 
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            serviceResponse.Success = false;
+            serviceResponse.ResponseMessage = ex.Message;
+            await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+            { 
+                Title = "ERROR", 
+                Message = $"Convert case exception: {ex.Message}" 
+            });
+        }
+        return serviceResponse;
     }
 }
 
