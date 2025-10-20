@@ -132,12 +132,6 @@
     <span class="oi oi-chevron-top"></span>
 </button>
 
-@if (MigrationPromptModalOpen)
-{
-    <MigrationPromptModal OnClose="@OnMigrationPromptModalClose">
-    </MigrationPromptModal>
-}
-
 @code {
     [CascadingParameter]
     private IdentityProviderDetails? identityProviderDetails { get; set; }
@@ -156,7 +150,6 @@
 
     private string? details = String.Empty;
 
-    public bool MigrationPromptModalOpen { get; set; }
     public Type? PageType { get; set; }
 
     protected override void OnParametersSet()
@@ -388,8 +381,7 @@
             if (migrationStatus.JsonFilesExist && !migrationStatus.IsMigrated)
             {
                 // Show the migration prompt
-                MigrationPromptModalOpen = true;
-                StateHasChanged();
+                await OpenMigrationPromptModal();
             }
         }
         catch (Exception ex)
@@ -398,18 +390,36 @@
         }
     }
 
-    private async void OnMigrationPromptModalClose(MigrationPromptModal.MigrationChoice choice)
+    private async Task OpenMigrationPromptModal()
     {
-        MigrationPromptModalOpen = false;
-        StateHasChanged();
-
-        if (choice == MigrationPromptModal.MigrationChoice.Migrated)
+        var modalOptions = new ModalOptions()
         {
-            // Migration completed - need to restart the app
-            toastService.ShowWarning("Please restart the application to complete the migration.", settings =>
+            HideCloseButton = true,
+            DisableBackgroundCancel = true
+        };
+
+        if (GeneralHelper.IsNotNull(Modal))
+        {
+            var modalReference = Modal.Show<MigrationPromptModal>("Upgrade to SQLite Storage", new ModalParameters(), modalOptions);
+            var result = await modalReference.Result;
+            
+            if (!result.Cancelled && result.Data != null)
             {
-                settings.Timeout = 10;
-            });
+                var choice = (MigrationPromptModal.MigrationChoice)result.Data;
+                
+                if (choice == MigrationPromptModal.MigrationChoice.Migrated)
+                {
+                    // Migration completed - need to restart the app
+                    toastService.ShowWarning("Please restart the application to complete the migration.", settings =>
+                    {
+                        settings.Timeout = 10;
+                    });
+                }
+            }
+        }
+        else
+        {
+            Logger.LogError("Modal service is null - cannot show migration prompt modal");
         }
     }
 
