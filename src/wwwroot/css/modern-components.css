@@ -3252,4 +3252,28 @@ pre code {
     color: #0284c7;
 }
 
+/* Modern Info Box */
+.modern-info-box {
+    background: #e0f2fe;
+    border: 1px solid #7dd3fc;
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.modern-info-box h4 {
+    margin: 0 0 12px 0;
+    color: #075985;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.modern-info-box p {
+    margin-bottom: 12px;
+    color: #0c4a6e;
+}
+
+.modern-info-box p:last-child {
+    margin-bottom: 0;
+}
+
 
