@@ -2021,6 +2021,14 @@ pre code {
     gap: 8px;
 }
 
+/* Button Group */
+.modern-button-group {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+    flex-wrap: wrap;
+}
+
 /* Modern Form System Extensions */
 .modern-form-group {
     margin-bottom: 20px;
@@ -2156,16 +2164,7 @@ pre code {
 }
 
 .action-card-icon {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 48px;
-    height: 48px;
-    margin-bottom: var(--spacing-md);
-    background: linear-gradient(135deg, var(--color-azure-blue), var(--color-azure-blue-dark));
-    border-radius: var(--radius-lg);
-    color: white;
-    font-size: 24px;
+    display: none; /* Hidden - no longer needed */
 }
 
 .action-card-content {

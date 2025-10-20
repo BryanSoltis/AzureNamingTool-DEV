@@ -33,11 +33,11 @@
     @if (admin)
     {
         <div class="modern-page-actions">
-            <button class="modern-btn-secondary" title="Version Information" @onclick="ShowVersionModal">
-                <span class="oi oi-info" aria-hidden="true"></span> Version Info
-            </button>
             <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Admin", String.Empty, "adminconfigurationinstructions", admin))">
                 <span class="oi oi-document" aria-hidden="true"></span> Documentation
+            </button>
+            <button class="modern-btn-secondary" title="Version Information" @onclick="ShowVersionModal">
+                <span class="oi oi-info" aria-hidden="true"></span> Version Info
             </button>
         </div>
     }
@@ -67,10 +67,12 @@
     else
     {
         <!-- Admin Welcome Message -->
-        <div class="modern-info-box">
-            <p class="mb-0">
-                Welcome to the Admin panel. Manage security settings, site configurations, customizations, and system details for the Azure Naming Tool.
-            </p>
+        <div class="modern-card mb-3">
+            <div class="modern-card-body">
+                <p class="mb-0 text-secondary">
+                    Manage security settings, site configurations, customizations, and system details for the Azure Naming Tool.
+                </p>
+            </div>
         </div>
 
         <!-- Modern Tab Navigation -->
@@ -83,16 +85,8 @@
                         System
                     </button>
                 }
-                <button class="modern-tab @(((currentuser != "GlobalAdmin") && (!showadmindetailstoallusers)) ? "active" : "")" data-tab="tab-customization">
-                    <span class="oi oi-brush tab-icon" aria-hidden="true"></span>
-                    Customization
-                </button>
-                <button class="modern-tab" data-tab="tab-settings">
-                    <span class="oi oi-cog tab-icon" aria-hidden="true"></span>
-                    Site Settings
-                </button>
                 <button class="modern-tab" data-tab="tab-configuration">
-                    <span class="oi oi-database tab-icon" aria-hidden="true"></span>
+                    <span class="oi oi-hard-drive tab-icon" aria-hidden="true"></span>
                     Configuration
                 </button>
                 <button class="modern-tab" data-tab="tab-security">
@@ -102,6 +96,14 @@
                 <button class="modern-tab" data-tab="tab-identity">
                     <span class="oi oi-people tab-icon" aria-hidden="true"></span>
                     Identity Provider
+                </button>
+                <button class="modern-tab @(((currentuser != "GlobalAdmin") && (!showadmindetailstoallusers)) ? "active" : "")" data-tab="tab-customization">
+                    <span class="oi oi-brush tab-icon" aria-hidden="true"></span>
+                    Customization
+                </button>
+                <button class="modern-tab" data-tab="tab-settings">
+                    <span class="oi oi-cog tab-icon" aria-hidden="true"></span>
+                    Site Settings
                 </button>
             </div>
 
