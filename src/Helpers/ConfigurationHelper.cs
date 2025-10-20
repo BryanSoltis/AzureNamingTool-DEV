@@ -1,5 +1,6 @@
 using AzureNamingTool.Models;
 using AzureNamingTool.Services;
+using AzureNamingTool.Services.Interfaces;
 using System.Collections;
 using System.Data.SqlTypes;
 using System.Net;
@@ -154,7 +155,8 @@ namespace AzureNamingTool.Helpers
         /// Verifies the configuration by performing various checks and operations.
         /// </summary>
         /// <param name="state">The state container object.</param>
-        public static async void VerifyConfiguration(StateContainer state)
+        /// <param name="resourceComponentService">The resource component service (optional, for configuration sync).</param>
+        public static async void VerifyConfiguration(StateContainer state, IResourceComponentService? resourceComponentService = null)
         {
             try
             {
@@ -181,7 +183,7 @@ namespace AzureNamingTool.Helpers
                 // Sync configuration data
                 if (!state.ConfigurationDataSynced)
                 {
-                    await SyncConfigurationData("ResourceComponent");
+                    await SyncConfigurationData("ResourceComponent", resourceComponentService);
                     state.SetConfigurationDataSynced(true);
                 }
             }
@@ -851,7 +853,8 @@ namespace AzureNamingTool.Helpers
         /// Synchronizes the configuration data based on the specified type.
         /// </summary>
         /// <param name="type">The type of configuration data to synchronize.</param>
-        public static async Task SyncConfigurationData(string type)
+        /// <param name="resourceComponentService">The resource component service (required for ResourceComponent type).</param>
+        public static async Task SyncConfigurationData(string type, IResourceComponentService? resourceComponentService = null)
         {
             try
             {
@@ -860,10 +863,14 @@ namespace AzureNamingTool.Helpers
                 switch (type)
                 {
                     case "ResourceComponent":
+                        if (resourceComponentService == null)
+                        {
+                            throw new ArgumentNullException(nameof(resourceComponentService), "ResourceComponentService is required for ResourceComponent sync");
+                        }
+                        
                         // Get all the existing components
                         List<ResourceComponent> currentComponents = [];
-                        ServiceResponse serviceResponse = new();
-                        // TODO: Modernize - serviceResponse = await ResourceComponentService.GetItems(true);
+                        ServiceResponse serviceResponse = await resourceComponentService.GetItemsAsync(true);
                         if (serviceResponse.Success)
                         {
                             if (GeneralHelper.IsNotNull(serviceResponse))
@@ -915,7 +922,7 @@ namespace AzureNamingTool.Helpers
                                         }
                                         if (update)
                                         {
-// TODO: Modernize -                                             await ResourceComponentService.PostItem(newComponent);
+                                            await resourceComponentService.PostItemAsync(newComponent);
                                         }
                                     }
                                 }
@@ -954,13 +961,13 @@ namespace AzureNamingTool.Helpers
         /// Checks if the generated name already exists.
         /// </summary>
         /// <param name="name">The name to check.</param>
+        /// <param name="generatedNamesService">The generated names service.</param>
         /// <returns>True if the name exists, otherwise false.</returns>
-        public static async Task<bool> CheckIfGeneratedNameExists(string name)
+        public static async Task<bool> CheckIfGeneratedNameExists(string name, IGeneratedNamesService generatedNamesService)
         {
             bool nameexists = false;
             // Check if the name already exists
-            ServiceResponse serviceResponse = new();
-// TODO: Modernize -             serviceResponse = await GeneratedNamesService.GetItems();
+            ServiceResponse serviceResponse = await generatedNamesService.GetItemsAsync();
             if (serviceResponse.Success)
             {
                 if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))

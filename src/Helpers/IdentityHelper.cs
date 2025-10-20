@@ -1,5 +1,6 @@
 using AzureNamingTool.Models;
 using AzureNamingTool.Services;
+using AzureNamingTool.Services.Interfaces;
 using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 using System;
 
@@ -16,15 +17,15 @@ namespace AzureNamingTool.Helpers
         /// <param name="state">The state container.</param>
         /// <param name="session">The protected session storage.</param>
         /// <param name="name">The username.</param>
+        /// <param name="adminUserService">The admin user service.</param>
         /// <returns>True if the user is an admin user, otherwise false.</returns>
-        public static async Task<bool> IsAdminUser(StateContainer state, ProtectedSessionStorage session, string name)
+        public static async Task<bool> IsAdminUser(StateContainer state, ProtectedSessionStorage session, string name, IAdminUserService adminUserService)
         {
             bool result = false;
             try
             {
                 // Check if the username is in the list of Admin Users
-// TODO: Modernize - ServiceResponse serviceResponse = await AdminUserService.GetItems();
-                ServiceResponse serviceResponse = new ServiceResponse();
+                ServiceResponse serviceResponse = await adminUserService.GetItemsAsync();
                 if (serviceResponse.Success)
                 {
                     if (GeneralHelper.IsNotNull(serviceResponse.ResponseObject))
@@ -39,8 +40,10 @@ namespace AzureNamingTool.Helpers
                     }
                 }
             }
-            catch (Exception) {
-                // TODO: Modernize helper - AdminLogService.PostItem(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+            catch (Exception ex)
+            {
+                // Log error but don't expose to user
+                Console.WriteLine($"Error checking admin user: {ex.Message}");
             }
             return result;
         }

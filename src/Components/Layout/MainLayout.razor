@@ -16,6 +16,7 @@
 @inject ProtectedSessionStorage session
 @inject IHttpContextAccessor httpContextAccessor
 @inject IStorageMigrationService MigrationService
+@inject IAdminUserService AdminUserService
 
 <PageTitle>Azure Naming Tool</PageTitle>
 <BlazoredToasts Position="ToastPosition.BottomRight" ShowProgressBar="true" />
@@ -217,7 +218,7 @@
                                 await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "INFORMATION", Message = "User accessed the site.", Source = currentuser });
 
                                 // CHeck if the user is an admin
-                                admin = await IdentityHelper.IsAdminUser(state, session, currentuser);
+                                admin = await IdentityHelper.IsAdminUser(state, session, currentuser, AdminUserService);
                                 // Close modal
                                 workingmodal.Close();
                             }
@@ -319,27 +320,38 @@
     {
         try
         {
+            Logger.LogInformation("CheckMigrationPrompt: Starting check");
+            
             // Only check if password is set (don't show migration prompt before password is set)
             if (!state.Password)
             {
+                Logger.LogInformation("CheckMigrationPrompt: Password not set, skipping");
                 return;
             }
 
             var config = ConfigurationHelper.GetConfigurationData();
+            Logger.LogInformation("CheckMigrationPrompt: StorageProvider={StorageProvider}, MigrationPromptDismissed={Dismissed}", 
+                config.StorageProvider ?? "null", config.MigrationPromptDismissed ?? "null");
             
-            // If user has already chosen (either migrated or dismissed), don't show prompt
-            if (!String.IsNullOrEmpty(config.StorageProvider) && config.StorageProvider != "FileSystem")
+            // If already using SQLite, don't show prompt
+            if (!String.IsNullOrEmpty(config.StorageProvider) && 
+                config.StorageProvider.Equals("SQLite", StringComparison.OrdinalIgnoreCase))
             {
-                return; // Already using SQLite
+                Logger.LogInformation("CheckMigrationPrompt: Already using SQLite, skipping");
+                return;
             }
 
+            // If user explicitly chose to keep JSON files, don't show prompt
             if (config.MigrationPromptDismissed == "True")
             {
-                return; // User chose to keep JSON
+                Logger.LogInformation("CheckMigrationPrompt: Migration prompt dismissed, skipping");
+                return;
             }
 
             // Check migration status
             var migrationStatus = await MigrationService.GetMigrationStatusAsync();
+            Logger.LogInformation("CheckMigrationPrompt: JsonFilesExist={JsonFiles}, IsMigrated={Migrated}", 
+                migrationStatus.JsonFilesExist, migrationStatus.IsMigrated);
             
             // NEW INSTALL SCENARIO: No JSON files in settings folder
             // This means it's a fresh install - automatically configure SQLite and load repository data
@@ -380,8 +392,14 @@
             // Show the migration prompt to let user decide
             if (migrationStatus.JsonFilesExist && !migrationStatus.IsMigrated)
             {
+                Logger.LogInformation("CheckMigrationPrompt: Opening migration prompt modal");
                 // Show the migration prompt
                 await OpenMigrationPromptModal();
+            }
+            else
+            {
+                Logger.LogInformation("CheckMigrationPrompt: No migration needed - JsonFilesExist={JsonFiles}, IsMigrated={Migrated}", 
+                    migrationStatus.JsonFilesExist, migrationStatus.IsMigrated);
             }
         }
         catch (Exception ex)
@@ -392,6 +410,8 @@
 
     private async Task OpenMigrationPromptModal()
     {
+        Logger.LogInformation("OpenMigrationPromptModal: Starting");
+        
         var modalOptions = new ModalOptions()
         {
             HideCloseButton = true,
@@ -400,12 +420,18 @@
 
         if (GeneralHelper.IsNotNull(Modal))
         {
+            Logger.LogInformation("OpenMigrationPromptModal: Showing modal");
             var modalReference = Modal.Show<MigrationPromptModal>("Upgrade to SQLite Storage", new ModalParameters(), modalOptions);
+            Logger.LogInformation("OpenMigrationPromptModal: Waiting for result");
             var result = await modalReference.Result;
+            
+            Logger.LogInformation("OpenMigrationPromptModal: Result received - Cancelled={Cancelled}, HasData={HasData}", 
+                result.Cancelled, result.Data != null);
             
             if (!result.Cancelled && result.Data != null)
             {
                 var choice = (MigrationPromptModal.MigrationChoice)result.Data;
+                Logger.LogInformation("OpenMigrationPromptModal: User choice={Choice}", choice);
                 
                 if (choice == MigrationPromptModal.MigrationChoice.Migrated)
                 {

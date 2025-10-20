@@ -868,7 +868,7 @@ namespace AzureNamingTool.Services
                 if (valid)
                 {
                     bool nameallowed = true;
-                    bool nameexists = await ConfigurationHelper.CheckIfGeneratedNameExists(name);
+                    bool nameexists = await ConfigurationHelper.CheckIfGeneratedNameExists(name, _generatedNamesService);
                     if (nameexists)
                     {
                         // Check if the request contains Resource Instance is a selected componoent
@@ -888,7 +888,7 @@ namespace AzureNamingTool.Services
                                     // Determine the next instance value
                                     string newinstance = String.Empty;
                                     int i = 1;
-                                    while (await ConfigurationHelper.CheckIfGeneratedNameExists(name))
+                                    while (await ConfigurationHelper.CheckIfGeneratedNameExists(name, _generatedNamesService))
                                     {
                                         newinstance = (Convert.ToInt32(originalinstance) + i).ToString();
                                         // Make sure the instance pattern matches the entered values (leading zeros)
