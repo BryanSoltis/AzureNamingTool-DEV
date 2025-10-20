@@ -1991,6 +1991,17 @@ pre code {
     box-shadow: 0 4px 12px rgba(23, 162, 184, 0.3);
 }
 
+.modern-btn-dark {
+    background-color: #343a40;
+    color: #ffffff;
+}
+
+.modern-btn-dark:hover:not(:disabled) {
+    background-color: #23272b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(52, 58, 64, 0.3);
+}
+
 /* Button Size Modifiers */
 .modern-btn-small {
     padding: 6px 14px;
