@@ -938,33 +938,34 @@
                         case "ResourceOrg":
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceOrgs))
                             {
-                                <div class="card">
-                                    <h5 class="card-header text-white bg-secondary text-white">
-                                        <a id="@resourceComponent.Name" class="link-light text-decoration-none" data-bs-toggle="collapse" style="display:block;" href="#orgs" role="button" aria-expanded="false" aria-controls="orgs">
+                                <!-- Orgs Card -->
+                                <div class="modern-card mb-3">
+                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("orgs"))">
+                                        <h3>
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
-                                        </a>
-                                    </h5>
-                                    <div class="collapse card card-body @theme.ThemeStyle" id="orgs">
+                                        </h3>
+                                    </div>
+                                    <div class="modern-card-body @(GetCollapseClass("orgs"))">
                                         @if (!String.IsNullOrEmpty(resourceComponent.Description))
                                         {
                                             <p>@resourceComponent.Description</p>
                                         }
-                                        <div class="card mb-3">
-                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                        <div class="modern-sub-card mb-3">
+                                            <div class="modern-sub-card-header">
                                                 Current Orgs
                                             </div>
-                                            <div class="card card-body @theme.ThemeStyle">
+                                            <div class="modern-sub-card-body">
                                                 <p>The current Orgs.</p>
                                                 @if (admin)
                                                 {
                                                     <p>
-                                                        <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceOrg",0,"add"))" title="Add Org">
+                                                        <button type="button" class="modern-btn-success modern-btn-sm" @onclick="@(e => FormAction("ResourceOrg",0,"add"))" title="Add Org">
                                                             <span class="oi oi-plus" aria-hidden="true"></span> Add Org
                                                         </button>
                                                     </p>
                                                 }
-                                                <div class="table-responsive">
-                                                    <table class="table @theme.ThemeStyle">
+                                                <div class="modern-table-container">
+                                                    <table class="modern-table">
                                                         <thead>
                                                             <tr>
                                                                 <th>Name</th>
@@ -984,24 +985,23 @@
                                                                     @if (admin)
                                                                     {
                                                                         <td>
-                                                                            <button type="button" class="btn btn-primary" @onclick="@(e => FormAction("ResourceOrg",item.Id,"up"))" title="Move up">
-                                                                                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            <span> </span>
-                                                                            <button type="button" class="btn btn-primary" @onclick="@(e => FormAction("ResourceOrg",item.Id,"down"))" title="Move down">
-                                                                                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            <span> </span>
-                                                                            <button type="button" class="btn btn-secondary" @onclick="@(e => FormAction("ResourceOrg",item.Id,"edit"))" title="Edit">
-                                                                                <span class="oi oi-pencil" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            @if (servicesData.ResourceOrgs.Count > 1)
-                                                                            {
-                                                                                <span> </span>
-                                                                                <button type="button" class="btn btn-danger" @onclick="@(e => FormAction("ResourceOrg",item.Id,"delete"))" title="Delete">
-                                                                                    <span class="oi oi-x" aria-hidden="true"></span>
+                                                                            <div class="modern-btn-group">
+                                                                                <button type="button" class="modern-btn-primary modern-btn-sm" @onclick="@(e => FormAction("ResourceOrg",item.Id,"up"))" title="Move up">
+                                                                                    <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>
                                                                                 </button>
-                                                                            }
+                                                                                <button type="button" class="modern-btn-primary modern-btn-sm" @onclick="@(e => FormAction("ResourceOrg",item.Id,"down"))" title="Move down">
+                                                                                    <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span>
+                                                                                </button>
+                                                                                <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@(e => FormAction("ResourceOrg",item.Id,"edit"))" title="Edit">
+                                                                                    <span class="oi oi-pencil" aria-hidden="true"></span>
+                                                                                </button>
+                                                                                @if (servicesData.ResourceOrgs.Count > 1)
+                                                                                {
+                                                                                    <button type="button" class="modern-btn-danger modern-btn-sm" @onclick="@(e => FormAction("ResourceOrg",item.Id,"delete"))" title="Delete">
+                                                                                        <span class="oi oi-x" aria-hidden="true"></span>
+                                                                                    </button>
+                                                                                }
+                                                                            </div>
                                                                         </td>
                                                                     }
                                                                 </tr>
@@ -1013,36 +1013,34 @@
                                         </div>
                                         @if (admin)
                                         {
-                                            <div class="card mb-3">
-                                                <div class="card-header bg-default text-dark">
-                                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#orgsconfig" role="button" aria-expanded="false" aria-controls="orgsconfig">
-                                                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
-                                                    </a>
+                                            <div class="modern-sub-card mb-3">
+                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("orgsconfig"))">
+                                                    <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
-                                                <div class="collapse card card-body @theme.ThemeStyle" id="orgsconfig">
-                                                    <div class="card w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                                <div class="modern-sub-card-body @(GetCollapseClass("orgsconfig"))">
+                                                    <div class="modern-sub-card mb-3">
+                                                        <div class="modern-sub-card-header">
                                                             Bulk Update
                                                         </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
+                                                        <div class="modern-sub-card-body">
                                                             <p>
                                                                 Use the options below to bulk update all component options.
                                                             </p>
                                                             <p>
-                                                                <button type="button" class="btn btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"uppercase")) title="Uppercase">
+                                                                <button type="button" class="modern-btn-success modern-btn-sm" @onclick=@(e => FormAction(resourceComponent.Name,0,"uppercase")) title="Uppercase">
                                                                     <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> Convert to Uppercase
                                                                 </button>
-                                                                <button type="button" class="btn btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"lowercase")) title="Uppercase">
+                                                                <button type="button" class="modern-btn-success modern-btn-sm" @onclick=@(e => FormAction(resourceComponent.Name,0,"lowercase")) title="Uppercase">
                                                                     <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> Convert to Lowercase
                                                                 </button>
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div class="card  w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                                    <div class="modern-warning-box mb-3">
+                                                        <div class="modern-sub-card-header">
                                                             Reset the Orgs Configuration
                                                         </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
+                                                        <div class="modern-sub-card-body">
                                                             <p>
                                                                 Click <span class="fw-bold">Reset</span> to reset the Orgs Configuration back to the default values at the time of installation.
                                                             </p>
@@ -1050,7 +1048,7 @@
                                                                 <span class="fw-bold">NOTE:</span> This will reset the current Orgs Configuration and cannot be undone!
                                                             </p>
                                                             <p>
-                                                                <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceOrg",0,"reset")) title="Reset">
+                                                                <button type="button" class="modern-btn-danger modern-btn-sm" @onclick=@(e => FormAction("ResourceOrg",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
                                                                 </button>
                                                             </p>
@@ -1066,33 +1064,33 @@
                         case "ResourceProjAppSvc":
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceProjAppSvcs))
                             {
-                                <div class="card">
-                                    <h5 class="card-header text-white bg-secondary text-white">
-                                        <a id="@resourceComponent.Name" class="link-light text-decoration-none" data-bs-toggle="collapse" style="display:block;" href="#projsappssvcs" role="button" aria-expanded="false" aria-controls="projsappssvcs">
+                                <div class="modern-card mb-3">
+                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("projsappssvcs"))">
+                                        <h3 id="@resourceComponent.Name" class="modern-card-title">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
-                                        </a>
-                                    </h5>
-                                    <div class="collapse card card-body @theme.ThemeStyle" id="projsappssvcs">
+                                        </h3>
+                                    </div>
+                                    <div class="modern-card-body @(GetCollapseClass("projsappssvcs"))">
                                         @if (!String.IsNullOrEmpty(resourceComponent.Description))
                                         {
                                             <p>@resourceComponent.Description</p>
                                         }
-                                        <div class="card mb-3">
-                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                        <div class="modern-sub-card mb-3">
+                                            <div class="modern-sub-card-header">
                                                 Current Projects/Apps/Services
                                             </div>
-                                            <div class="card card-body @theme.ThemeStyle">
+                                            <div class="modern-sub-card-body">
                                                 <p>The current Projects/Apps/Services.</p>
                                                 @if (admin)
                                                 {
                                                     <p>
-                                                        <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceProjAppSvc",0,"add"))" title="Add Project/App/Service">
+                                                        <button type="button" class="modern-btn-success modern-btn-sm" @onclick="@(e => FormAction("ResourceProjAppSvc",0,"add"))" title="Add Project/App/Service">
                                                             <span class="oi oi-plus" aria-hidden="true"></span> Add Project/App/Service
                                                         </button>
                                                     </p>
                                                 }
-                                                <div class="table-responsive">
-                                                    <table class="table @theme.ThemeStyle">
+                                                <div class="modern-table-container">
+                                                    <table class="modern-table">
                                                         <thead>
                                                             <tr>
                                                                 <th>Name</th>
@@ -1112,24 +1110,23 @@
                                                                     @if (admin)
                                                                     {
                                                                         <td>
-                                                                            <button type="button" class="btn btn-primary" @onclick="@(e => FormAction("ResourceProjAppSvc",item.Id,"up"))" title="Move up">
-                                                                                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            <span> </span>
-                                                                            <button type="button" class="btn btn-primary" @onclick="@(e => FormAction("ResourceProjAppSvc",item.Id,"down"))" title="Move down">
-                                                                                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            <span> </span>
-                                                                            <button type="button" class="btn btn-secondary" @onclick="@(e => FormAction("ResourceProjAppSvc",item.Id,"edit"))" title="Edit">
-                                                                                <span class="oi oi-pencil" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            @if (servicesData.ResourceProjAppSvcs.Count > 1)
-                                                                            {
-                                                                                <span> </span>
-                                                                                <button type="button" class="btn btn-danger" @onclick="@(e => FormAction("ResourceProjAppSvc",item.Id,"delete"))" title="Delete">
-                                                                                    <span class="oi oi-x" aria-hidden="true"></span>
+                                                                            <div class="modern-btn-group">
+                                                                                <button type="button" class="modern-btn-primary modern-btn-sm" @onclick="@(e => FormAction("ResourceProjAppSvc",item.Id,"up"))" title="Move up">
+                                                                                    <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>
                                                                                 </button>
-                                                                            }
+                                                                                <button type="button" class="modern-btn-primary modern-btn-sm" @onclick="@(e => FormAction("ResourceProjAppSvc",item.Id,"down"))" title="Move down">
+                                                                                    <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span>
+                                                                                </button>
+                                                                                <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@(e => FormAction("ResourceProjAppSvc",item.Id,"edit"))" title="Edit">
+                                                                                    <span class="oi oi-pencil" aria-hidden="true"></span>
+                                                                                </button>
+                                                                                @if (servicesData.ResourceProjAppSvcs.Count > 1)
+                                                                                {
+                                                                                    <button type="button" class="modern-btn-danger modern-btn-sm" @onclick="@(e => FormAction("ResourceProjAppSvc",item.Id,"delete"))" title="Delete">
+                                                                                        <span class="oi oi-x" aria-hidden="true"></span>
+                                                                                    </button>
+                                                                                }
+                                                                            </div>
                                                                         </td>
                                                                     }
                                                                 </tr>
@@ -1141,36 +1138,34 @@
                                         </div>
                                         @if (admin)
                                         {
-                                            <div class="card mb-3">
-                                                <div class="card-header bg-default text-dark">
-                                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#projappsvcsconfig" role="button" aria-expanded="false" aria-controls="projappsvcsconfig">
-                                                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
-                                                    </a>
+                                            <div class="modern-sub-card mb-3">
+                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("projappsvcsconfig"))">
+                                                    <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
-                                                <div class="collapse card card-body @theme.ThemeStyle" id="projappsvcsconfig">
-                                                    <div class="card w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                                <div class="modern-sub-card-body @(GetCollapseClass("projappsvcsconfig"))">
+                                                    <div class="modern-sub-card mb-3">
+                                                        <div class="modern-sub-card-header">
                                                             Bulk Update
                                                         </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
+                                                        <div class="modern-sub-card-body">
                                                             <p>
                                                                 Use the options below to bulk update all component options.
                                                             </p>
                                                             <p>
-                                                                <button type="button" class="btn btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"uppercase")) title="Uppercase">
+                                                                <button type="button" class="modern-btn-success modern-btn-sm" @onclick=@(e => FormAction(resourceComponent.Name,0,"uppercase")) title="Uppercase">
                                                                     <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> Convert to Uppercase
                                                                 </button>
-                                                                <button type="button" class="btn btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"lowercase")) title="Uppercase">
+                                                                <button type="button" class="modern-btn-success modern-btn-sm" @onclick=@(e => FormAction(resourceComponent.Name,0,"lowercase")) title="Uppercase">
                                                                     <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> Convert to Lowercase
                                                                 </button>
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div class="card  w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                                    <div class="modern-warning-box mb-3">
+                                                        <div class="modern-sub-card-header">
                                                             Reset the Projects/Apps/Services Configuration
                                                         </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
+                                                        <div class="modern-sub-card-body">
                                                             <p>
                                                                 Click <span class="fw-bold">Reset</span> to reset the Project/App/Services Configuration back to the default values at the time of installation.
                                                             </p>
@@ -1178,7 +1173,7 @@
                                                                 <span class="fw-bold">NOTE:</span> This will reset the current Project/App/Services Configuration and cannot be undone!
                                                             </p>
                                                             <p>
-                                                                <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceProjAppSvc",0,"reset")) title="Reset">
+                                                                <button type="button" class="modern-btn-danger modern-btn-sm" @onclick=@(e => FormAction("ResourceProjAppSvc",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
                                                                 </button>
                                                             </p>
@@ -1194,22 +1189,22 @@
                         case "ResourceType":
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceTypes))
                             {
-                                <div class="card">
-                                    <h5 class="card-header text-white bg-secondary text-white">
-                                        <a id="@resourceComponent.Name" class="link-light text-decoration-none" data-bs-toggle="collapse" style="display:block;" href="#types" role="button" aria-expanded="false" aria-controls="types">
+                                <div class="modern-card mb-3">
+                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("types"))">
+                                        <h3 id="@resourceComponent.Name" class="modern-card-title">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
-                                        </a>
-                                    </h5>
-                                    <div class="collapse card card-body @theme.ThemeStyle" id="types">
+                                        </h3>
+                                    </div>
+                                    <div class="modern-card-body @(GetCollapseClass("types"))">
                                         @if (!String.IsNullOrEmpty(resourceComponent.Description))
                                         {
                                             <p>@resourceComponent.Description</p>
                                         }
-                                        <div class="card mb-3">
-                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                        <div class="modern-sub-card mb-3">
+                                            <div class="modern-sub-card-header">
                                                 Current Resource Types
                                             </div>
-                                            <div class="card card-body @theme.ThemeStyle">
+                                            <div class="modern-sub-card-body">
                                                 <p>The current Resource Types.</p>
                                                 <p>
                                                     Use the filters below to jump to a specifc resource type.
@@ -1252,14 +1247,14 @@
                                                     @if ((admin) && (Convert.ToBoolean(config.ResourceTypeEditingAllowed)))
                                                     {
                                                     <p>
-                                                        <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceType",0,"add"))" title="Add Resource Type">
+                                                        <button type="button" class="modern-btn-success modern-btn-sm" @onclick="@(e => FormAction("ResourceType",0,"add"))" title="Add Resource Type">
                                                             <span class="oi oi-plus" aria-hidden="true"></span> Add Resource Type
                                                         </button>
                                                     </p>
                                                     }
                                                 </p>
-                                                <div class="table-responsive">
-                                                    <table class="table @theme.ThemeStyle">
+                                                <div class="modern-table-container">
+                                                    <table class="modern-table">
                                                         <thead>
                                                             <tr>
                                                                 <th>Name</th>
@@ -1320,31 +1315,29 @@
                                                                             }
                                                                         </td>
                                                                         <td>
-                                                                            <button type="button" class="btn btn-secondary" @onclick="@(e => FormAction("ResourceType",item.Id,"edit"))" title="Edit">
-                                                                                <span class="oi oi-pencil" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            @if (item.Enabled)
-                                                                            {
-                                                                                <span> </span>
-                                                                                <button type="button" class="btn btn-dark" @onclick="@(e => FormAction("ResourceType",item.Id,"disable"))" title="Disable">
-                                                                                    <span class="oi oi-ban" aria-hidden="true"></span>
+                                                                            <div class="modern-btn-group">
+                                                                                <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@(e => FormAction("ResourceType",item.Id,"edit"))" title="Edit">
+                                                                                    <span class="oi oi-pencil" aria-hidden="true"></span>
                                                                                 </button>
-                                                                            }
-                                                                            else
-                                                                            {
-
-                                                                                <span> </span>
-                                                                                <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceType",item.Id,"enable"))" title="Enable">
-                                                                                    <span class="oi oi-plus" aria-hidden="true"></span>
-                                                                                </button>
-                                                                            }
-                                                                            @if ((servicesData.ResourceTypes.Count > 1) && (Convert.ToBoolean(config.ResourceTypeEditingAllowed)))
-                                                                            {
-                                                                                <span> </span>
-                                                                                <button type="button" class="btn btn-danger" @onclick="@(e => FormAction("ResourceType",item.Id,"delete"))" title="Delete">
-                                                                                    <span class="oi oi-x" aria-hidden="true"></span>
-                                                                                </button>
-                                                                            }
+                                                                                @if (item.Enabled)
+                                                                                {
+                                                                                    <button type="button" class="modern-btn-dark modern-btn-sm" @onclick="@(e => FormAction("ResourceType",item.Id,"disable"))" title="Disable">
+                                                                                        <span class="oi oi-ban" aria-hidden="true"></span>
+                                                                                    </button>
+                                                                                }
+                                                                                else
+                                                                                {
+                                                                                    <button type="button" class="modern-btn-success modern-btn-sm" @onclick="@(e => FormAction("ResourceType",item.Id,"enable"))" title="Enable">
+                                                                                        <span class="oi oi-plus" aria-hidden="true"></span>
+                                                                                    </button>
+                                                                                }
+                                                                                @if ((servicesData.ResourceTypes.Count > 1) && (Convert.ToBoolean(config.ResourceTypeEditingAllowed)))
+                                                                                {
+                                                                                    <button type="button" class="modern-btn-danger modern-btn-sm" @onclick="@(e => FormAction("ResourceType",item.Id,"delete"))" title="Delete">
+                                                                                        <span class="oi oi-x" aria-hidden="true"></span>
+                                                                                    </button>
+                                                                                }
+                                                                            </div>
                                                                         </td>
                                                                     }
                                                                 </tr>
@@ -1356,30 +1349,28 @@
                                         </div>
                                         @if (admin)
                                         {
-                                            <div class="card mb-3">
-                                                <div class="card-header bg-default text-dark">
-                                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#typesconfig" role="button" aria-expanded="false" aria-controls="typesconfig">
-                                                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
-                                                    </a>
+                                            <div class="modern-sub-card mb-3">
+                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("typesconfig"))">
+                                                    <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
-                                                <div class="collapse card card-body @theme.ThemeStyle" id="typesconfig">
+                                                <div class="modern-sub-card-body @(GetCollapseClass("typesconfig"))">
                                                     @if (!String.IsNullOrEmpty(resourceComponent.Description))
                                                     {
                                                         <p>@resourceComponent.Description</p>
                                                     }
-                                                    <div class="card w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                                    <div class="modern-sub-card mb-3">
+                                                        <div class="modern-sub-card-header">
                                                             Bulk Update
                                                         </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
+                                                        <div class="modern-sub-card-body">
                                                             <p>
                                                                 Use the options below to bulk update all component options.
                                                             </p>
                                                             <p>
-                                                                <button type="button" class="btn btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"uppercase")) title="Uppercase">
+                                                                <button type="button" class="modern-btn-success modern-btn-sm" @onclick=@(e => FormAction(resourceComponent.Name,0,"uppercase")) title="Uppercase">
                                                                     <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> Convert to Uppercase
                                                                 </button>
-                                                                <button type="button" class="btn btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"lowercase")) title="Uppercase">
+                                                                <button type="button" class="modern-btn-success modern-btn-sm" @onclick=@(e => FormAction(resourceComponent.Name,0,"lowercase")) title="Uppercase">
                                                                     <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> Convert to Lowercase
                                                                 </button>
                                                             </p>
@@ -1387,11 +1378,11 @@
                                                     </div>
                                                     @if (ConfigurationHelper.VerifyConnectivity().Result)
                                                     {
-                                                        <div class="card  w-auto mb-3">
-                                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                                        <div class="modern-info-box mb-3">
+                                                            <div class="modern-sub-card-header">
                                                                 Refresh the Resource Types Configuration
                                                             </div>
-                                                            <div class="card card-body @theme.ThemeStyle">
+                                                            <div class="modern-sub-card-body">
                                                                 <p>
                                                                     Click <span class="fw-bold">Refresh</span> to download the latest Resource Types Configuration file from the Azure Naming Tool GitHub repository.
                                                                 </p>
@@ -1418,19 +1409,19 @@
                                                                     </ul>
                                                                 </p>
                                                                 <p>
-                                                                    <button type="button" class="btn btn-success" @onclick=@(e => FormAction("ResourceType",0,"refresh")) title="Refresh">
+                                                                    <button type="button" class="modern-btn-success modern-btn-sm" @onclick=@(e => FormAction("ResourceType",0,"refresh")) title="Refresh">
                                                                         <span class="oi oi-reload" aria-hidden="true"></span> Refresh
                                                                     </button>
-                                                                    <input title="Refresh Short Names" class="form-check-input" type="checkbox" @onchange="@((ChangeEventArgs e) =>OnRefreshTypesCheckboxClicked(e))" style="margin-top: 9px; margin-left:10px;"> Refresh short names?
+                                                                    <input title="Refresh Short Names" class="modern-form-check" type="checkbox" @onchange="@((ChangeEventArgs e) =>OnRefreshTypesCheckboxClicked(e))" style="margin-top: 9px; margin-left:10px;"> Refresh short names?
                                                                 </p>
                                                             </div>
                                                         </div>
                                                     }
-                                                    <div class="card  w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                                    <div class="modern-warning-box mb-3">
+                                                        <div class="modern-sub-card-header">
                                                             Reset the Resource Types Configuration
                                                         </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
+                                                        <div class="modern-sub-card-body">
                                                             <p>
                                                                 Click <span class="fw-bold">Reset</span> to reset the Resource Types Configuration back to the default values at the time of installation.
                                                             </p>
@@ -1438,7 +1429,7 @@
                                                                 <span class="fw-bold">NOTE:</span> This will reset the current Resource Types Configuration and cannot be undone!
                                                             </p>
                                                             <p>
-                                                                <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceType",0,"reset")) title="Reset">
+                                                                <button type="button" class="modern-btn-danger modern-btn-sm" @onclick=@(e => FormAction("ResourceType",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
                                                                 </button>
                                                             </p>
@@ -1454,33 +1445,33 @@
                         case "ResourceUnitDept":
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceUnitDepts))
                             {
-                                <div class="card">
-                                    <h5 class="card-header text-white bg-secondary text-white">
-                                        <a id="@resourceComponent.Name" class="link-light text-decoration-none" data-bs-toggle="collapse" style="display:block;" href="#unitsdepts" role="button" aria-expanded="false" aria-controls="unitsdepts">
+                                <div class="modern-card mb-3">
+                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("unitsdepts"))">
+                                        <h3 id="@resourceComponent.Name" class="modern-card-title">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
-                                        </a>
-                                    </h5>
-                                    <div class="collapse card card-body @theme.ThemeStyle" id="unitsdepts">
+                                        </h3>
+                                    </div>
+                                    <div class="modern-card-body @(GetCollapseClass("unitsdepts"))">
                                         @if (!String.IsNullOrEmpty(resourceComponent.Description))
                                         {
                                             <p>@resourceComponent.Description</p>
                                         }
-                                        <div class="card mb-3">
-                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                        <div class="modern-sub-card mb-3">
+                                            <div class="modern-sub-card-header">
                                                 Current Units/Depts
                                             </div>
-                                            <div class="card card-body @theme.ThemeStyle">
+                                            <div class="modern-sub-card-body">
                                                 <p>The current Units/Depts.</p>
                                                 @if (admin)
                                                 {
                                                     <p>
-                                                        <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceUnitDept",0,"add"))" title="Add Unit/Dept">
+                                                        <button type="button" class="modern-btn-success modern-btn-sm" @onclick="@(e => FormAction("ResourceUnitDept",0,"add"))" title="Add Unit/Dept">
                                                             <span class="oi oi-plus" aria-hidden="true"></span> Add Unit/Dept
                                                         </button>
                                                     </p>
                                                 }
-                                                <div class="table-responsive">
-                                                    <table class="table @theme.ThemeStyle">
+                                                <div class="modern-table-container">
+                                                    <table class="modern-table">
                                                         <thead>
                                                             <tr>
                                                                 <th>Name</th>
@@ -1500,25 +1491,23 @@
                                                                     @if (admin)
                                                                     {
                                                                         <td>
-                                                                            <button type="button" class="btn btn-primary" @onclick="@(e => FormAction("ResourceUnitDept",item.Id,"up"))" title="Move up">
-                                                                                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            <span> </span>
-                                                                            <button type="button" class="btn btn-primary" @onclick="@(e => FormAction("ResourceUnitDept",item.Id,"down"))" title="Move down">
-                                                                                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            <span> </span>
-                                                                            <button type="button" class="btn btn-secondary" @onclick="@(e => FormAction("ResourceUnitDept",item.Id,"edit"))" title="Edit">
-                                                                                <span class="oi oi-pencil" aria-hidden="true"></span>
-                                                                            </button>
-
-                                                                            @if (servicesData.ResourceUnitDepts.Count > 1)
-                                                                            {
-                                                                                <span> </span>
-                                                                                <button type="button" class="btn btn-danger" @onclick="@(e => FormAction("ResourceUnitDept",item.Id,"delete"))" title="Delete">
-                                                                                    <span class="oi oi-x" aria-hidden="true"></span>
+                                                                            <div class="modern-btn-group">
+                                                                                <button type="button" class="modern-btn-primary modern-btn-sm" @onclick="@(e => FormAction("ResourceUnitDept",item.Id,"up"))" title="Move up">
+                                                                                    <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>
                                                                                 </button>
-                                                                            }
+                                                                                <button type="button" class="modern-btn-primary modern-btn-sm" @onclick="@(e => FormAction("ResourceUnitDept",item.Id,"down"))" title="Move down">
+                                                                                    <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span>
+                                                                                </button>
+                                                                                <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@(e => FormAction("ResourceUnitDept",item.Id,"edit"))" title="Edit">
+                                                                                    <span class="oi oi-pencil" aria-hidden="true"></span>
+                                                                                </button>
+                                                                                @if (servicesData.ResourceUnitDepts.Count > 1)
+                                                                                {
+                                                                                    <button type="button" class="modern-btn-danger modern-btn-sm" @onclick="@(e => FormAction("ResourceUnitDept",item.Id,"delete"))" title="Delete">
+                                                                                        <span class="oi oi-x" aria-hidden="true"></span>
+                                                                                    </button>
+                                                                                }
+                                                                            </div>
                                                                         </td>
                                                                     }
                                                                 </tr>
@@ -1530,36 +1519,34 @@
                                         </div>
                                         @if (admin)
                                         {
-                                            <div class="card mb-3">
-                                                <div class="card-header bg-default text-dark">
-                                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#unitdeptsconfig" role="button" aria-expanded="false" aria-controls="unitdeptsconfig">
-                                                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
-                                                    </a>
+                                            <div class="modern-sub-card mb-3">
+                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("unitdeptsconfig"))">
+                                                    <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
-                                                <div class="collapse card card-body @theme.ThemeStyle" id="unitdeptsconfig">
-                                                    <div class="card w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                                <div class="modern-sub-card-body @(GetCollapseClass("unitdeptsconfig"))">
+                                                    <div class="modern-sub-card mb-3">
+                                                        <div class="modern-sub-card-header">
                                                             Bulk Update
                                                         </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
+                                                        <div class="modern-sub-card-body">
                                                             <p>
                                                                 Use the options below to bulk update all component options.
                                                             </p>
                                                             <p>
-                                                                <button type="button" class="btn btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"uppercase")) title="Uppercase">
+                                                                <button type="button" class="modern-btn-success modern-btn-sm" @onclick=@(e => FormAction(resourceComponent.Name,0,"uppercase")) title="Uppercase">
                                                                     <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> Convert to Uppercase
                                                                 </button>
-                                                                <button type="button" class="btn btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"lowercase")) title="Uppercase">
+                                                                <button type="button" class="modern-btn-success modern-btn-sm" @onclick=@(e => FormAction(resourceComponent.Name,0,"lowercase")) title="Uppercase">
                                                                     <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> Convert to Lowercase
                                                                 </button>
                                                             </p>
                                                         </div>
                                                     </div>
-                                                    <div class="card  w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                                    <div class="modern-warning-box mb-3">
+                                                        <div class="modern-sub-card-header">
                                                             Reset the Units/Depts Configuration
                                                         </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
+                                                        <div class="modern-sub-card-body">
                                                             <p>
                                                                 Click <span class="fw-bold">Reset</span> to reset the Units/Depts Configuration back to the default values at the time of installation.
                                                             </p>
@@ -1567,7 +1554,7 @@
                                                                 <span class="fw-bold">NOTE:</span> This will reset the current Units/Depts configuration and cannot be undone!
                                                             </p>
                                                             <p>
-                                                                <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceUnitDept",0,"reset")) title="Reset">
+                                                                <button type="button" class="modern-btn-danger modern-btn-sm" @onclick=@(e => FormAction("ResourceUnitDept",0,"reset")) title="Reset">
                                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
                                                                 </button>
                                                             </p>
