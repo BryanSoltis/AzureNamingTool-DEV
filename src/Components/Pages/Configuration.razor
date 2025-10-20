@@ -109,7 +109,7 @@
                 @if (GeneralHelper.IsNotNull(servicesData))
                 {
                     <!-- Components Card -->
-                    <div class="modern-card mb-2">
+                    <div class="modern-card mb-2" id="ResourceComponent">
                         <div class="modern-card-header collapsible @(GetCollapseClass("components"))" @onclick="@(() => ToggleCollapse("components"))">
                             <h3>
                                 <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Components
@@ -232,7 +232,7 @@
                 @if (GeneralHelper.IsNotNull(servicesData!.ResourceDelimiters))
                 {
                     <!-- Delimiters Card -->
-                    <div class="modern-card mb-2">
+                    <div class="modern-card mb-2" id="ResourceDelimiter">
                         <div class="modern-card-header collapsible @(GetCollapseClass("delimiters"))" @onclick="@(() => ToggleCollapse("delimiters"))">
                             <h3>
                                 <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Delimiters
@@ -460,7 +460,7 @@
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceEnvironments))
                             {
                                 <!-- Environments Card -->
-                                <div class="modern-card mb-2">
+                                <div class="modern-card mb-2" id="@resourceComponent.Name">
                                     <div class="modern-card-header collapsible @(GetCollapseClass("environments"))" @onclick="@(() => ToggleCollapse("environments"))">
                                         <h3>
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
@@ -584,7 +584,7 @@
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceFunctions))
                             {
                                 <!-- Functions Card -->
-                                <div class="modern-card mb-2">
+                                <div class="modern-card mb-2" id="@resourceComponent.Name">
                                     <div class="modern-card-header collapsible @(GetCollapseClass("functions"))" @onclick="@(() => ToggleCollapse("functions"))">
                                         <h3>
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
@@ -708,7 +708,7 @@
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceLocations))
                             {
                                 <!-- Locations Card -->
-                                <div class="modern-card mb-2">
+                                <div class="modern-card mb-2" id="@resourceComponent.Name">
                                     <div class="modern-card-header collapsible @(GetCollapseClass("locations"))" @onclick="@(() => ToggleCollapse("locations"))">
                                         <h3>
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
@@ -880,7 +880,7 @@
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceOrgs))
                             {
                                 <!-- Orgs Card -->
-                                <div class="modern-card mb-2">
+                                <div class="modern-card mb-2" id="@resourceComponent.Name">
                                     <div class="modern-card-header collapsible @(GetCollapseClass("orgs"))" @onclick="@(() => ToggleCollapse("orgs"))">
                                         <h3>
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
@@ -1005,9 +1005,9 @@
                         case "ResourceProjAppSvc":
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceProjAppSvcs))
                             {
-                                <div class="modern-card mb-2">
+                                <div class="modern-card mb-2" id="@resourceComponent.Name">
                                     <div class="modern-card-header collapsible @(GetCollapseClass("projsappssvcs"))" @onclick="@(() => ToggleCollapse("projsappssvcs"))">
-                                        <h3 id="@resourceComponent.Name" class="modern-card-title">
+                                        <h3 class="modern-card-title">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
                                         </h3>
                                     </div>
@@ -1130,9 +1130,9 @@
                         case "ResourceType":
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceTypes))
                             {
-                                <div class="modern-card mb-2">
+                                <div class="modern-card mb-2" id="@resourceComponent.Name">
                                     <div class="modern-card-header collapsible @(GetCollapseClass("types"))" @onclick="@(() => ToggleCollapse("types"))">
-                                        <h3 id="@resourceComponent.Name" class="modern-card-title">
+                                        <h3 class="modern-card-title">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
                                         </h3>
                                     </div>
@@ -1386,9 +1386,9 @@
                         case "ResourceUnitDept":
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceUnitDepts))
                             {
-                                <div class="modern-card mb-2">
+                                <div class="modern-card mb-2" id="@resourceComponent.Name">
                                     <div class="modern-card-header collapsible @(GetCollapseClass("unitsdepts"))" @onclick="@(() => ToggleCollapse("unitsdepts"))">
-                                        <h3 id="@resourceComponent.Name" class="modern-card-title">
+                                        <h3 class="modern-card-title">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
                                         </h3>
                                     </div>

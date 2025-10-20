@@ -928,6 +928,50 @@ select.form-control {
 }
 
 /* ===================================================================
+   JUMP TO NAVIGATION (Sidebar)
+   =================================================================== */
+
+.modern-jump-to-section {
+    margin-top: 1.5rem;
+    padding: 0;
+}
+
+.modern-jump-to-header {
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    padding: 0.5rem 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.modern-jump-to-links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+}
+
+.modern-jump-to-link {
+    padding: 0.375rem 1rem;
+    color: var(--color-primary);
+    text-decoration: none;
+    transition: all var(--transition-fast);
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: var(--font-size-sm);
+    display: block;
+}
+
+.modern-jump-to-link:hover {
+    background-color: var(--color-hover);
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+/* ===================================================================
    PAGINATION
    =================================================================== */
 

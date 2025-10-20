@@ -641,3 +641,18 @@
         padding: 0;
     }
 }
+
+/* Jump To menu specific styles */
+.modern-sidebar .card .nav-item .nav-link {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    font-size: 0.875rem;
+    white-space: normal;
+    word-wrap: break-word;
+    line-height: 1.3;
+    min-height: auto;
+}
+
+.modern-sidebar .card .nav-item {
+    margin: 1px var(--spacing-xs);
+}
+

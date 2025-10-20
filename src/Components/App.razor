@@ -80,6 +80,43 @@
     // Scroll into view helper function
     function scrollIntoView(id) {
         const element = document.getElementById(id);
+        if (!element) {
+            console.warn('Element not found:', id);
+            return;
+        }
+        
+        // Check if element is a Bootstrap collapse and expand it
+        if (element.classList.contains('collapse') && !element.classList.contains('show')) {
+            const bsCollapse = new bootstrap.Collapse(element, {
+                toggle: true
+            });
+            
+            // Wait for collapse animation before scrolling
+            setTimeout(() => {
+                scrollToElement(element);
+            }, 300);
+        } 
+        // Check if element uses custom collapse (Configuration page style)
+        else if (element.querySelector('.modern-card-header.collapsible.collapsed')) {
+            // Find the collapsed header and click it to expand
+            const collapsedHeader = element.querySelector('.modern-card-header.collapsible.collapsed');
+            if (collapsedHeader) {
+                collapsedHeader.click();
+                
+                // Wait for collapse animation before scrolling
+                setTimeout(() => {
+                    scrollToElement(element);
+                }, 300);
+            } else {
+                scrollToElement(element);
+            }
+        }
+        else {
+            scrollToElement(element);
+        }
+    }
+    
+    function scrollToElement(element) {
         var headerOffset = 70;
         var elementPosition = element.getBoundingClientRect().top;
         var offsetPosition = elementPosition + window.pageYOffset - headerOffset;
