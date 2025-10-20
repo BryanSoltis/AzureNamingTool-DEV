@@ -568,8 +568,8 @@ select.form-control {
 }
 
 .modern-table thead th {
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-size: var(--font-size-sm);
+    padding: 10px 12px;
+    font-size: 12px;
     font-weight: var(--font-weight-semibold);
     color: var(--color-text-primary);
     text-align: left;
@@ -592,8 +592,8 @@ select.form-control {
 }
 
 .modern-table tbody td {
-    padding: var(--spacing-md) var(--spacing-lg);
-    font-size: var(--font-size-base);
+    padding: 10px 12px;
+    font-size: 14px;
     color: var(--color-text-primary);
     vertical-align: top;
 }
@@ -1254,7 +1254,7 @@ pre code {
 }
 
 .modern-card-header {
-    padding: var(--spacing-lg);
+    padding: 12px 16px;
     border-bottom: 1px solid var(--color-border);
     background-color: transparent;
 }
@@ -1279,17 +1279,18 @@ pre code {
 }
 
 .modern-card-header h3 {
-    font-size: var(--font-size-xl);
-    font-weight: var(--font-weight-semibold);
+    font-size: 16px;
+    font-weight: 600;
     color: var(--color-cyan-bright);
     margin: 0;
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 8px;
 }
 
 .modern-card-header h3 .oi-chevron-bottom {
     transition: transform 0.2s ease;
+    font-size: 12px;
 }
 
 .modern-card-header.collapsible:not(.collapsed) h3 .oi-chevron-bottom {
@@ -1304,7 +1305,7 @@ pre code {
 }
 
 .modern-card-body {
-    padding: var(--spacing-lg);
+    padding: 16px;
     color: var(--color-text-primary);
 }
 
@@ -1313,7 +1314,7 @@ pre code {
 }
 
 .modern-card-body p {
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 12px;
     line-height: 1.6;
 }
 
@@ -3173,8 +3174,8 @@ pre code {
     border: none;
     border-radius: 0;
     overflow: visible;
-    margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-xl);
+    margin-bottom: 20px;
+    padding-bottom: 20px;
     border-bottom: 1px solid var(--color-border);
 }
 
@@ -3186,16 +3187,16 @@ pre code {
 
 .modern-sub-card-header {
     background: transparent;
-    padding: var(--spacing-md) 0;
+    padding: 10px 0;
     font-weight: 600;
-    font-size: 1.1rem;
+    font-size: 15px;
     color: var(--color-text-primary);
     border-bottom: 1px solid var(--color-border);
     cursor: default;
     transition: color 0.2s ease;
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: 6px;
 }
 
 .modern-sub-card-header.collapsible {
@@ -3207,7 +3208,7 @@ pre code {
 .modern-sub-card-header.collapsible:hover {
     color: var(--color-cyan-bright);
     background-color: rgba(6, 182, 212, 0.03);
-    padding-left: var(--spacing-sm);
+    padding-left: 8px;
 }
 
 .modern-sub-card-header.collapsible:active {
@@ -3216,7 +3217,7 @@ pre code {
 
 .modern-sub-card-header .oi-chevron-bottom {
     transition: transform 0.2s ease;
-    font-size: 0.9rem;
+    font-size: 11px;
 }
 
 .modern-sub-card-header.collapsible:not(.collapsed) .oi-chevron-bottom {
@@ -3224,7 +3225,7 @@ pre code {
 }
 
 .modern-sub-card-body {
-    padding: var(--spacing-lg) 0;
+    padding: 16px 0;
     border: none;
 }
 
@@ -3431,10 +3432,10 @@ pre code {
 }
 
 .modern-subsection-title {
-    font-size: 1.1rem;
-    font-weight: var(--font-weight-medium);
+    font-size: 14px;
+    font-weight: 600;
     color: var(--color-text-primary);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: 12px;
 }
 
 
