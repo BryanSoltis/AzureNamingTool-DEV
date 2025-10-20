@@ -818,7 +818,7 @@ select.form-control {
 }
 
 .modal-header {
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: var(--spacing-md) var(--spacing-lg);
     border-bottom: 1px solid var(--color-border);
     display: flex;
     align-items: center;
@@ -849,13 +849,13 @@ select.form-control {
 }
 
 .modal-body {
-    padding: var(--spacing-xl);
+    padding: var(--spacing-md) var(--spacing-lg);
     overflow-y: auto;
     flex: 1;
 }
 
 .modal-footer {
-    padding: var(--spacing-lg) var(--spacing-xl);
+    padding: var(--spacing-md) var(--spacing-lg);
     border-top: 1px solid var(--color-border);
     display: flex;
     align-items: center;
@@ -1895,7 +1895,8 @@ pre code {
 .modern-btn-success,
 .modern-btn-danger,
 .modern-btn-warning,
-.modern-btn-info {
+.modern-btn-info,
+.modern-btn-dark {
     display: inline-flex;
     align-items: center;
     justify-content: center;
