@@ -1919,7 +1919,8 @@ pre code {
 .modern-btn-success:disabled,
 .modern-btn-danger:disabled,
 .modern-btn-warning:disabled,
-.modern-btn-info:disabled {
+.modern-btn-info:disabled,
+.modern-btn-dark:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
@@ -2003,11 +2004,13 @@ pre code {
 }
 
 /* Button Size Modifiers */
-.modern-btn-small {
+.modern-btn-small,
+.modern-btn-sm {
     padding: 6px 14px;
     font-size: 13px;
     min-height: 32px;
     gap: 4px;
+    min-width: 42px;
 }
 
 .modern-btn-large {
