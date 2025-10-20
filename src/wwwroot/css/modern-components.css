@@ -733,10 +733,34 @@ select.form-control {
 .modern-alert-success,
 .modern-alert-warning,
 .modern-alert-info,
+.modern-alert-danger,
 .modern-alert-error {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-md);
     padding: var(--spacing-md) var(--spacing-lg);
     border-radius: var(--radius-md);
     font-size: var(--font-size-sm);
+}
+
+.modern-alert-icon {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+}
+
+.modern-alert-content {
+    flex: 1;
+    line-height: 1.6;
+}
+
+.modern-alert-content strong {
+    display: inline-block;
+    margin-right: 4px;
 }
 
 .modern-alert-success {
@@ -757,6 +781,7 @@ select.form-control {
     color: var(--color-azure-teal);
 }
 
+.modern-alert-danger,
 .modern-alert-error {
     background-color: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3);

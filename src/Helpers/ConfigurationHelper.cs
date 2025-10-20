@@ -33,6 +33,32 @@ namespace AzureNamingTool.Helpers
         /// <returns>The site configuration data.</returns>
         public static SiteConfiguration GetConfigurationData()
         {
+            // Ensure settings folder exists
+            string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings");
+            if (!Directory.Exists(settingsPath))
+            {
+                Directory.CreateDirectory(settingsPath);
+            }
+            
+            // Check if appsettings.json exists, if not copy from repository
+            string appsettingsPath = Path.Combine(settingsPath, "appsettings.json");
+            if (!File.Exists(appsettingsPath))
+            {
+                try
+                {
+                    // Copy appsettings.json from repository to settings
+                    string repositoryFile = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "repository", "appsettings.json");
+                    if (File.Exists(repositoryFile))
+                    {
+                        File.Copy(repositoryFile, appsettingsPath);
+                    }
+                }
+                catch (Exception)
+                {
+                    // If copy fails, continue - will be handled by VerifyConfiguration later
+                }
+            }
+            
             var config = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
                     .AddJsonFile("settings/appsettings.json")

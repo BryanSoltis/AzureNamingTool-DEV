@@ -132,12 +132,6 @@
     <span class="oi oi-chevron-top"></span>
 </button>
 
-@if (PasswordModalOpen)
-{
-    <PasswordModal OnClose="@OnPasswordModalClose">
-    </PasswordModal>
-}
-
 @if (MigrationPromptModalOpen)
 {
     <MigrationPromptModal OnClose="@OnMigrationPromptModalClose">
@@ -162,7 +156,6 @@
 
     private string? details = String.Empty;
 
-    public bool PasswordModalOpen { get; set; }
     public bool MigrationPromptModalOpen { get; set; }
     public Type? PageType { get; set; }
 
@@ -173,11 +166,7 @@
 
     protected override void OnInitialized()
     {
-        // Check that the Global admin password is set
-        if (!state.Password)
-        {
-            OpenPasswordModal();
-        }
+        // Initial password check will happen in OnAfterRenderAsync
     }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -192,6 +181,16 @@
         }
         if (firstRender)
         {
+            // Check password after first render (after VerifySecurity completes)
+            await InvokeAsync(async () =>
+            {
+                if (!state.Password)
+                {
+                    await OpenPasswordModal();
+                    StateHasChanged();
+                }
+            });
+            
             // Check if the user has manually logged out. If so, don't attempt to identity them.
             var logout = await session.GetAsync<bool>("logout");
             if (!(bool)logout.Value)
@@ -280,15 +279,47 @@
         state.OnChange -= StateHasChanged;
     }
 
-    private void OpenPasswordModal()
+    private async Task OpenPasswordModal()
     {
-        PasswordModalOpen = true;
-        StateHasChanged();
+        var modalParameters = new ModalParameters();
+        
+        var modalOptions = new ModalOptions()
+        {
+            HideCloseButton = true,
+            DisableBackgroundCancel = true
+        };
+
+        if (GeneralHelper.IsNotNull(Modal))
+        {
+            var modalReference = Modal.Show<PasswordModal>("Set Global Admin Password", modalParameters, modalOptions);
+            var result = await modalReference.Result;
+            
+            if (!result.Cancelled && result.Data != null)
+            {
+                // Password was set successfully
+                state.Password = true;
+                await session.SetAsync("password", true);
+                state.SetAdmin(true);
+                await session.SetAsync("admin", true);
+                StateHasChanged();
+            }
+        }
+        else
+        {
+            Logger.LogError("Modal service is null - cannot show password modal");
+        }
     }
 
-    private void OnPasswordModalClose(bool accepted)
+    private async void OnPasswordModalClose(bool accepted)
     {
-        PasswordModalOpen = false;
+        if (accepted)
+        {
+            state.Password = true;
+            await session.SetAsync("password", true);
+            state.SetAdmin(true);
+            await session.SetAsync("admin", true);
+        }
+        StateHasChanged();
     }
 
     private async Task CheckMigrationPrompt()
@@ -296,7 +327,7 @@
         try
         {
             // Only check if password is set (don't show migration prompt before password is set)
-            if (!state.Password || PasswordModalOpen)
+            if (!state.Password)
             {
                 return;
             }
@@ -401,7 +432,7 @@
 
             toastService.ShowSuccess("The site has been reset.");
 
-            OpenPasswordModal();
+            await OpenPasswordModal();
         }
     }
 
