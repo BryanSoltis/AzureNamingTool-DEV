@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDropdowns();
     initializeDismissibles();
     initializeTabs();
+    initializeScrollToTop();
 });
 
 /* ===================================================================
@@ -471,4 +472,27 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+/* ===================================================================
+   SCROLL TO TOP BUTTON
+   Modern floating button that appears when user scrolls down
+   =================================================================== */
+
+let scrollToTopInitialized = false;
+
+function initializeScrollToTop() {
+    if (scrollToTopInitialized) {
+        return;
+    }
+    
+    const scrollBtn = document.getElementById('btnScrollToTop');
+    
+    if (!scrollBtn) {
+        setTimeout(initializeScrollToTop, 500);
+        return;
+    }
+    
+    scrollToTopInitialized = true;
+}
+
 console.log('Modern Components JavaScript initialized successfully');
+

@@ -247,7 +247,79 @@
    NAVIGATION MENU STYLES (for NavMenu.razor)
    =================================================================== */
 
-/* Top row with logo */
+/* Modern Sidebar Header */
+.modern-sidebar-header {
+    padding: var(--spacing-lg) var(--spacing-md);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 64px;
+}
+
+.sidebar-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    flex: 1;
+    min-width: 0; /* Allows text truncation */
+    text-decoration: none;
+    color: var(--sidebar-text);
+}
+
+.brand-logo {
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.05) 100%);
+    border-radius: var(--radius-md);
+    padding: var(--spacing-xs);
+    transition: all var(--transition-fast);
+}
+
+.brand-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.brand-text {
+    flex: 1;
+    min-width: 0;
+    opacity: 1;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.brand-title {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: #ffffff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: block;
+}
+
+/* Collapsed state - hide brand text */
+.modern-sidebar.collapsed .brand-text {
+    opacity: 0;
+    transform: translateX(-10px);
+    width: 0;
+    overflow: hidden;
+}
+
+.modern-sidebar.collapsed .sidebar-brand {
+    justify-content: center;
+}
+
+.modern-sidebar.collapsed .brand-logo {
+    margin: 0 auto;
+}
+
+/* Top row with logo - Legacy support */
 .modern-sidebar .top-row {
     padding: var(--spacing-lg) var(--spacing-md);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
@@ -313,6 +385,8 @@
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-medium);
     background-color: transparent;
+    position: relative;
+    overflow: hidden;
 }
 
 .modern-sidebar .nav-item .nav-link:hover,
@@ -328,20 +402,47 @@
     font-weight: var(--font-weight-semibold);
 }
 
+/* Navigation icons */
+.modern-sidebar .nav-link .nav-icon,
 .modern-sidebar .nav-link .oi {
-    font-size: var(--font-size-base);
+    font-size: 18px;
     width: 20px;
     text-align: center;
     flex-shrink: 0;
+    color: inherit;
+    transition: transform var(--transition-fast);
 }
 
+.modern-sidebar .nav-link:hover .nav-icon,
+.modern-sidebar .nav-link:hover .oi {
+    transform: scale(1.1);
+}
+
+/* Navigation text */
+.modern-sidebar .nav-link .nav-text {
+    flex: 1;
+    white-space: nowrap;
+    opacity: 1;
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+/* Collapsed state - center icons and hide text */
 .modern-sidebar.collapsed .nav-link {
     justify-content: center;
     padding: var(--spacing-sm);
 }
 
-.modern-sidebar.collapsed .nav-link span:not(.oi) {
-    display: none;
+.modern-sidebar.collapsed .nav-link .nav-text {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
+    transform: translateX(-10px);
+}
+
+.modern-sidebar.collapsed .nav-link span:not(.oi):not(.nav-icon) {
+    opacity: 0;
+    width: 0;
+    overflow: hidden;
 }
 
 /* Section headers in sidebar */
@@ -383,14 +484,75 @@
    SCROLL TO TOP BUTTON
    =================================================================== */
 
+/* Modern Scroll to Top Button */
+.modern-scroll-top-btn,
 #btnScrollToTop {
     position: fixed;
-    bottom: var(--spacing-lg);
-    right: var(--spacing-lg);
-    z-index: var(--z-sticky);
-    display: none;
+    bottom: var(--spacing-xl);
+    right: var(--spacing-xl);
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
     border-radius: var(--radius-full);
-    box-shadow: var(--shadow-lg);
+    background: linear-gradient(135deg, var(--color-azure-blue) 0%, #005a9e 100%);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 6px rgba(0, 114, 198, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 20px;
+    padding: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.9);
+    pointer-events: none;
+}
+
+.modern-scroll-top-btn.visible,
+#btnScrollToTop.visible {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+}
+
+.modern-scroll-top-btn:hover,
+#btnScrollToTop:hover {
+    background: linear-gradient(135deg, #005a9e 0%, var(--color-azure-blue) 100%);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2), 0 3px 8px rgba(0, 114, 198, 0.4);
+    transform: translateY(-2px) scale(1);
+}
+
+.modern-scroll-top-btn:active,
+#btnScrollToTop:active {
+    transform: translateY(0) scale(0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 114, 198, 0.3);
+}
+
+/* Show state with animation */
+.modern-scroll-top-btn.show,
+#btnScrollToTop.show {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    opacity: 1 !important;
+    transform: translateY(0) scale(1) !important;
+    pointer-events: auto !important;
+}
+
+/* Icon styling - Perfect centering */
+.modern-scroll-top-btn .oi,
+#btnScrollToTop .oi {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    vertical-align: middle;
+    margin: 0;
+    padding: 0;
 }
 
 /* ===================================================================

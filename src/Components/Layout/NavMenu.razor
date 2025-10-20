@@ -9,32 +9,40 @@
 @inject NavigationManager NavigationManager
 @inject ServicesHelper ServicesHelper
 
-<div class="top-row ps-2 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="/"><img src="@logopath" height="20" style="vertical-align:top;margin-top:2px;padding-right:10px;" alt="@toolname" />@toolname</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
+<div class="modern-sidebar-header">
+    <div class="sidebar-brand">
+        <div class="brand-logo">
+            <img src="@logopath" alt="@toolname Logo" />
+        </div>
+        <div class="brand-text">
+            <span class="brand-title">@toolname</span>
+        </div>
     </div>
+    <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+        <span class="navbar-toggler-icon"></span>
+    </button>
 </div>
 
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-2">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
+                <span class="nav-icon oi oi-home" aria-hidden="true"></span>
+                <span class="nav-text">Home</span>
             </NavLink>
         </div>
         <div class="nav-item px-2">
             <NavLink class="nav-link" href="admin">
-                <span class="oi oi-lock-locked" aria-hidden="true"></span> Admin
+                <span class="nav-icon oi oi-wrench" aria-hidden="true"></span>
+                <span class="nav-text">Admin</span>
             </NavLink>
         </div>
         @if (admin)
         {
             <div class="nav-item px-2">
                 <NavLink class="nav-link" href="adminlog">
-                    <span class="oi oi-box" aria-hidden="true"></span> Admin Log
+                    <span class="nav-icon oi oi-box" aria-hidden="true"></span>
+                    <span class="nav-text">Admin Log</span>
                 </NavLink>
             </div>
         }
@@ -42,7 +50,8 @@
         {
             <div class="nav-item px-2">
                 <NavLink class="nav-link" href="instructions">
-                    <span class="oi oi-info" aria-hidden="true"></span> Instructions
+                    <span class="nav-icon oi oi-book" aria-hidden="true"></span>
+                    <span class="nav-text">Instructions</span>
                 </NavLink>
             </div>
         }
@@ -50,7 +59,8 @@
         {
             <div class="nav-item px-2">
                 <NavLink class="nav-link" href="configuration">
-                    <span class="oi oi-cog" aria-hidden="true"></span> Configuration
+                    <span class="nav-icon oi oi-cog" aria-hidden="true"></span>
+                    <span class="nav-text">Configuration</span>
                 </NavLink>
             </div>
         }
@@ -58,20 +68,23 @@
         {
             <div class="nav-item px-2">
                 <NavLink class="nav-link" href="reference">
-                    <span class="oi oi-spreadsheet" aria-hidden="true"></span> Reference
+                    <span class="nav-icon oi oi-book" aria-hidden="true"></span>
+                    <span class="nav-text">Reference</span>
                 </NavLink>
             </div>
         }
         <div class="nav-item px-2">
             <NavLink class="nav-link" href="generate">
-                <span class="oi oi-check" aria-hidden="true"></span> Generate
+                <span class="nav-icon oi oi-target" aria-hidden="true"></span>
+                <span class="nav-text">Generate</span>
             </NavLink>
         </div>
         @if (Convert.ToBoolean(config.GeneratedNamesLogEnabled) || admin)
         {
             <div class="nav-item px-2">
                 <NavLink class="nav-link" href="generatednameslog">
-                    <span class="oi oi-list" aria-hidden="true"></span> Generated Names Log
+                    <span class="nav-icon oi oi-spreadsheet" aria-hidden="true"></span>
+                    <span class="nav-text">Generated Names Log</span>
                 </NavLink>
             </div>
         }

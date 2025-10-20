@@ -122,7 +122,16 @@
     </div>
 </div>
 
-<button onclick="topFunction()" type="button" id="btnScrollToTop" class="btn btn-success btn-sm" title="Go to top"><span class="oi oi-arrow-circle-top" style="vertical-align:text-top;"></span> Top</button>
+<!-- Modern Scroll to Top Button -->
+<button type="button" 
+        id="btnScrollToTop" 
+        title="Scroll to top" 
+        aria-label="Scroll to top"
+        onclick="window.scrollTo({top: 0, behavior: 'smooth'}); return false;"
+        style="position: fixed !important; bottom: 24px !important; right: 24px !important; z-index: 99999 !important; display: flex !important; align-items: center !important; justify-content: center !important; width: 48px !important; height: 48px !important; border-radius: 50% !important; background: linear-gradient(135deg, #0072C6 0%, #005a9e 100%) !important; color: white !important; border: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important; cursor: pointer !important; font-size: 20px !important; padding: 0 !important; opacity: 1 !important; visibility: visible !important; pointer-events: auto !important;">
+    <span class="oi oi-chevron-top"></span>
+</button>
+
 @if (PasswordModalOpen)
 {
     <PasswordModal OnClose="@OnPasswordModalClose">

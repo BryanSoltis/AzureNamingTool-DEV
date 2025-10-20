@@ -450,12 +450,14 @@
         padding-bottom: 0 !important;
     }
     
-    /* Scroll to top button */
+    /* Modern Scroll to top button - smaller on mobile */
+    .modern-scroll-top-btn,
     #btnScrollToTop {
-        bottom: var(--spacing-sm);
-        right: var(--spacing-sm);
-        padding: var(--spacing-xs) var(--spacing-sm);
-        font-size: var(--font-size-xs);
+        bottom: var(--spacing-md);
+        right: var(--spacing-md);
+        width: 44px;
+        height: 44px;
+        font-size: 18px;
     }
 }
 
