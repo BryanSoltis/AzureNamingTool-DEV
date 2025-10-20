@@ -518,33 +518,35 @@
                         case "ResourceEnvironment":
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceEnvironments))
                             {
-                                <div class="card">
-                                    <h5 class="card-header bg-secondary text-white">
-                                        <a id="@resourceComponent.Name" class="link-light text-decoration-none" data-bs-toggle="collapse" style="display:block;" href="#environments" role="button" aria-expanded="false" aria-controls="environments">
+                                <!-- Environments Card -->
+                                <div class="modern-card mb-3">
+                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("environments"))">
+                                        <h3>
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
-                                        </a>
-                                    </h5>
-                                    <div class="collapse card card-body @theme.ThemeStyle" id="environments">
+                                        </h3>
+                                    </div>
+                                    <div class="modern-card-body @(GetCollapseClass("environments"))">
                                         @if (!String.IsNullOrEmpty(resourceComponent.Description))
                                         {
                                             <p>@resourceComponent.Description</p>
                                         }
-                                        <div class="card mb-3">
-                                            <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                        <!-- Current Environments -->
+                                        <div class="modern-sub-card mb-3">
+                                            <div class="modern-sub-card-header">
                                                 Current Environments
                                             </div>
-                                            <div class="card card-body @theme.ThemeStyle">
+                                            <div class="modern-sub-card-body">
                                                 <p>The current Environments.</p>
                                                 @if (admin)
                                                 {
-                                                    <p>
-                                                        <button type="button" class="btn btn-success" @onclick="@(e => FormAction("ResourceEnvironment",0,"add"))" title="Add Environment">
+                                                    <div class="mb-3">
+                                                        <button type="button" class="modern-btn-success" @onclick="@(e => FormAction("ResourceEnvironment",0,"add"))" title="Add Environment">
                                                             <span class="oi oi-plus" aria-hidden="true"></span> Add Environment
                                                         </button>
-                                                    </p>
+                                                    </div>
                                                 }
-                                                <div class="table-responsive">
-                                                    <table class="table @theme.ThemeStyle">
+                                                <div class="modern-table-container">
+                                                    <table class="modern-table">
                                                         <thead>
                                                             <tr>
                                                                 <th>Name</th>
@@ -564,24 +566,23 @@
                                                                     @if (admin)
                                                                     {
                                                                         <td>
-                                                                            <button type="button" class="btn btn-primary" @onclick="@(e => FormAction("ResourceEnvironment",item.Id,"up"))" title="Move up">
-                                                                                <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            <span> </span>
-                                                                            <button type="button" class="btn btn-primary" @onclick="@(e => FormAction("ResourceEnvironment",item.Id,"down"))" title="Move down">
-                                                                                <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            <span> </span>
-                                                                            <button type="button" class="btn btn-secondary" @onclick="@(e => FormAction("ResourceEnvironment",item.Id,"edit"))" title="Edit">
-                                                                                <span class="oi oi-pencil" aria-hidden="true"></span>
-                                                                            </button>
-                                                                            @if (servicesData.ResourceEnvironments.Count > 1)
-                                                                            {
-                                                                                <span> </span>
-                                                                                <button type="button" class="btn btn-danger" @onclick="@(e => FormAction("ResourceEnvironment",item.Id,"delete"))" title="Delete">
-                                                                                    <span class="oi oi-x" aria-hidden="true"></span>
+                                                                            <div class="modern-btn-group">
+                                                                                <button type="button" class="modern-btn-primary modern-btn-sm" @onclick="@(e => FormAction("ResourceEnvironment",item.Id,"up"))" title="Move up">
+                                                                                    <span class="oi oi-arrow-thick-top" aria-hidden="true"></span>
                                                                                 </button>
-                                                                            }
+                                                                                <button type="button" class="modern-btn-primary modern-btn-sm" @onclick="@(e => FormAction("ResourceEnvironment",item.Id,"down"))" title="Move down">
+                                                                                    <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span>
+                                                                                </button>
+                                                                                <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@(e => FormAction("ResourceEnvironment",item.Id,"edit"))" title="Edit">
+                                                                                    <span class="oi oi-pencil" aria-hidden="true"></span>
+                                                                                </button>
+                                                                                @if (servicesData.ResourceEnvironments.Count > 1)
+                                                                                {
+                                                                                    <button type="button" class="modern-btn-danger modern-btn-sm" @onclick="@(e => FormAction("ResourceEnvironment",item.Id,"delete"))" title="Delete">
+                                                                                        <span class="oi oi-x" aria-hidden="true"></span>
+                                                                                    </button>
+                                                                                }
+                                                                            </div>
                                                                         </td>
                                                                     }
                                                                 </tr>
@@ -593,48 +594,43 @@
                                         </div>
                                         @if (admin)
                                         {
-                                            <div class="card mb-3">
-                                                <div class="card-header bg-default text-dark">
-                                                    <a class="text-decoration-none text-dark" data-bs-toggle="collapse" style="display:block;font-weight:bold;" href="#environmentsconfig" role="button" aria-expanded="false" aria-controls="environmentsconfig">
-                                                        <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
-                                                    </a>
+                                            <!-- Configuration Section -->
+                                            <div class="modern-sub-card">
+                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("environmentsconfig"))">
+                                                    <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
-                                                <div class="collapse card card-body @theme.ThemeStyle" id="environmentsconfig">
-                                                    <div class="card w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
+                                                <div class="modern-sub-card-body @(GetCollapseClass("environmentsconfig"))">
+                                                    <div class="modern-sub-card mb-3">
+                                                        <div class="modern-sub-card-header">
                                                             Bulk Update
                                                         </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
+                                                        <div class="modern-sub-card-body">
                                                             <p>
                                                                 Use the options below to bulk update all component options.
                                                             </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"uppercase")) title="Uppercase">
+                                                            <div class="modern-btn-group">
+                                                                <button type="button" class="modern-btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"uppercase")) title="Uppercase">
                                                                     <span class="oi oi-arrow-thick-top" aria-hidden="true"></span> Convert to Uppercase
                                                                 </button>
-                                                                <button type="button" class="btn btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"lowercase")) title="Uppercase">
+                                                                <button type="button" class="modern-btn-success" @onclick=@(e => FormAction(resourceComponent.Name,0,"lowercase")) title="Lowercase">
                                                                     <span class="oi oi-arrow-thick-bottom" aria-hidden="true"></span> Convert to Lowercase
                                                                 </button>
-                                                            </p>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                    <div class="card w-auto mb-3">
-                                                        <div class="card card-header bg-default text-dark" style="font-weight:bold;">
-                                                            Reset the Environments Configuration
-                                                        </div>
-                                                        <div class="card card-body @theme.ThemeStyle">
-                                                            <p>
-                                                                Click <span class="fw-bold">Reset</span> to reset the Environments Configuration back to the default values at the time of installation.
-                                                            </p>
-                                                            <p>
-                                                                <span class="fw-bold">NOTE:</span> This will reset the current Environments Configuration and cannot be undone!
-                                                            </p>
-                                                            <p>
-                                                                <button type="button" class="btn btn-danger" @onclick=@(e => FormAction("ResourceEnvironment",0,"reset")) title="Reset">
-                                                                    <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
-                                                                </button>
-                                                            </p>
-                                                        </div>
+                                                    <div class="modern-warning-box">
+                                                        <h4>Reset the Environments Configuration</h4>
+                                                        <p>
+                                                            Click <span class="fw-bold">Reset</span> to reset the Environments Configuration back to the default values at the time of installation.
+                                                        </p>
+                                                        <p class="modern-text-warning">
+                                                            <span class="fw-bold">NOTE:</span> This will reset the current Environments Configuration and cannot be undone!
+                                                        </p>
+                                                        <p>
+                                                            <button type="button" class="modern-btn-danger" @onclick=@(e => FormAction("ResourceEnvironment",0,"reset")) title="Reset">
+                                                                <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
+                                                            </button>
+                                                        </p>
                                                     </div>
                                                 </div>
                                             </div>
