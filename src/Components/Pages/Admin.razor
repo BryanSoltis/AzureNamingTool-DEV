@@ -306,110 +306,10 @@
         <div id="tab-settings" class="modern-tab-content">
             <h3 class="mb-3">Site Settings</h3>
             <p class="text-secondary mb-4">
-                Configure general site settings including storage provider, duplicate name handling, resource type editing, and webhooks for the Azure Naming Tool.
+                Configure general site settings including duplicate name handling, resource type editing, and webhooks for the Azure Naming Tool.
             </p>
 
-            <!-- Storage Provider -->
-                <div class="modern-setting-row">
-                    <div class="setting-label">Storage Provider</div>
-                    <div class="setting-description">
-                        Configure the storage provider for the Azure Naming Tool. Choose between JSON files or SQLite database for configuration data.
-                    </div>
-                    
-                    <div class="mt-3">
-                        <h6><i class="bi bi-info-circle"></i> Current Provider</h6>
-                        <div class="@(currentStorageProvider == "SQLite" ? "modern-notification-success" : "modern-notification-info")">
-                            <strong>@currentStorageProvider</strong>
-                            @if (currentStorageProvider == "SQLite")
-                            {
-                                <span class="ms-2"><i class="bi bi-check-circle"></i> Using SQLite database</span>
-                            }
-                            else
-                            {
-                                <span class="ms-2"><i class="bi bi-file-earmark-text"></i> Using JSON files</span>
-                            }
-                        </div>
-                    </div>
-
-                    @if (currentStorageProvider == "FileSystem")
-                    {
-                        <div class="mt-3">
-                            <h6><i class="bi bi-arrow-up-circle"></i> Upgrade to SQLite</h6>
-                            <p>
-                                Migrate your configuration data from JSON files to an embedded SQLite database for improved performance and reliability.
-                            </p>
-                            
-                            @if (!preMigrationBackupCompleted)
-                            {
-                                <div class="modern-notification-warning">
-                                    <i class="bi bi-exclamation-triangle"></i>
-                                    <strong>Step 1: Backup Required</strong><br />
-                                    Before migrating to SQLite, you must create a backup of your current configuration. This backup will allow you to restore your data if needed.
-                                </div>
-                                <button type="button" class="modern-btn-primary" @onclick="@(e => CreatePreMigrationBackup())" title="Create Backup">
-                                    <i class="bi bi-download"></i>
-                                    <span>Create Backup (Step 1)</span>
-                                </button>
-                            }
-                            else
-                            {
-                                <div class="modern-notification-success">
-                                    <i class="bi bi-check-circle"></i>
-                                    <strong>Backup Complete!</strong><br />
-                                    Backup file: <code>@preMigrationBackupFileName</code><br />
-                                    You can now proceed with the migration.
-                                </div>
-                                
-                                <div class="modern-notification-danger mt-3">
-                                    <i class="bi bi-exclamation-triangle-fill"></i>
-                                    <strong>IMPORTANT: Migration is one-way only!</strong>
-                                    <ul class="mb-0 mt-2">
-                                        <li>This migration cannot be automatically reversed</li>
-                                        <li>Your JSON files will be preserved for manual restoration if needed</li>
-                                        <li>After migration, use the Configuration page to create SQLite backups</li>
-                                        <li>The application will restart after migration</li>
-                                    </ul>
-                                </div>
-                                
-                                <button type="button" class="modern-btn-warning" @onclick="@(e => InitiateMigration())" disabled="@isMigrating" title="Migrate to SQLite">
-                                    @if (isMigrating)
-                                    {
-                                        <span class="modern-spinner-small me-2" role="status" aria-hidden="true"></span>
-                                        <span>Migrating...</span>
-                                    }
-                                    else
-                                    {
-                                        <i class="bi bi-database-gear"></i>
-                                        <span>Migrate to SQLite (Step 2)</span>
-                                    }
-                                </button>
-                            }
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="mt-3">
-                            <h6><i class="bi bi-check-circle text-success"></i> SQLite Storage Active</h6>
-                            <p>
-                                Your configuration is stored in an embedded SQLite database.
-                            </p>
-                            <div class="modern-info-box">
-                                <i class="bi bi-info-circle"></i>
-                                <strong>Backup & Restore:</strong> Use the <a href="/configuration" class="alert-link">Configuration page</a> to backup and restore your SQLite database or import/export JSON configurations.
-                            </div>
-                        </div>
-                    }
-
-                    @if (!String.IsNullOrEmpty(migrationErrorMessage))
-                    {
-                        <div class="modern-notification-danger mt-3">
-                            <i class="bi bi-exclamation-triangle-fill"></i>
-                            <strong>Error:</strong> @migrationErrorMessage
-                        </div>
-                    }
-                </div>
-
-                <!-- Allow Duplicate Names -->
+            <!-- Allow Duplicate Names -->
                 <div class="modern-toggle-row">
                     <div class="toggle-content">
                         <div class="toggle-label">Allow Duplicate Names</div>
@@ -655,8 +555,103 @@
             <div id="tab-configuration" class="modern-tab-content">
                 <h3 class="mb-3">Configuration Management</h3>
                 <p class="text-secondary mb-4">
-                    Backup, restore, and manage your Azure Naming Tool configuration data. Available options depend on your storage provider.
+                    Backup, restore, and manage your Azure Naming Tool configuration data. Configure storage provider and data management options.
                 </p>
+
+                <!-- Storage Provider -->
+                <div class="modern-setting-row">
+                    <div class="mt-3">
+                        <h6><i class="bi bi-info-circle"></i> Current Provider</h6>
+                        <div class="@(currentStorageProvider == "SQLite" ? "modern-notification-success" : "modern-notification-info")">
+                            <strong>@currentStorageProvider</strong>
+                            @if (currentStorageProvider == "SQLite")
+                            {
+                                <span class="ms-2"><i class="bi bi-check-circle"></i> Using SQLite database</span>
+                            }
+                            else
+                            {
+                                <span class="ms-2"><i class="bi bi-file-earmark-text"></i> Using JSON files</span>
+                            }
+                        </div>
+                    </div>
+
+                    @if (currentStorageProvider == "FileSystem")
+                    {
+                        <div class="mt-3">
+                            <h6><i class="bi bi-arrow-up-circle"></i> Upgrade to SQLite</h6>
+                            <p>
+                                Migrate your configuration data from JSON files to an embedded SQLite database for improved performance and reliability.
+                            </p>
+                            
+                            @if (!preMigrationBackupCompleted)
+                            {
+                                <div class="modern-notification-warning">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <strong>Step 1: Backup Required</strong><br />
+                                    Before migrating to SQLite, you must create a backup of your current configuration. This backup will allow you to restore your data if needed.
+                                </div>
+                                <button type="button" class="modern-btn-primary" @onclick="@(e => CreatePreMigrationBackup())" title="Create Backup">
+                                    <i class="bi bi-download"></i>
+                                    <span>Create Backup (Step 1)</span>
+                                </button>
+                            }
+                            else
+                            {
+                                <div class="modern-notification-success">
+                                    <i class="bi bi-check-circle"></i>
+                                    <strong>Backup Complete!</strong><br />
+                                    Backup file: <code>@preMigrationBackupFileName</code><br />
+                                    You can now proceed with the migration.
+                                </div>
+                                
+                                <div class="modern-notification-danger mt-3">
+                                    <i class="bi bi-exclamation-triangle-fill"></i>
+                                    <strong>IMPORTANT: Migration is one-way only!</strong>
+                                    <ul class="mb-0 mt-2">
+                                        <li>This migration cannot be automatically reversed</li>
+                                        <li>Your JSON files will be preserved for manual restoration if needed</li>
+                                        <li>After migration, use the Configuration page to create SQLite backups</li>
+                                        <li>The application will restart after migration</li>
+                                    </ul>
+                                </div>
+                                
+                                <button type="button" class="modern-btn-warning" @onclick="@(e => InitiateMigration())" disabled="@isMigrating" title="Migrate to SQLite">
+                                    @if (isMigrating)
+                                    {
+                                        <span class="modern-spinner-small me-2" role="status" aria-hidden="true"></span>
+                                        <span>Migrating...</span>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-database-gear"></i>
+                                        <span>Migrate to SQLite (Step 2)</span>
+                                    }
+                                </button>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="mt-3">
+                            <h6><i class="bi bi-check-circle text-success"></i> SQLite Storage Active</h6>
+                            <p>
+                                Your configuration is stored in an embedded SQLite database.
+                            </p>
+                            <div class="modern-info-box">
+                                <i class="bi bi-info-circle"></i>
+                                <strong>Backup & Restore:</strong> Use the backup options below to backup and restore your SQLite database or import/export JSON configurations.
+                            </div>
+                        </div>
+                    }
+
+                    @if (!String.IsNullOrEmpty(migrationErrorMessage))
+                    {
+                        <div class="modern-notification-danger mt-3">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <strong>Error:</strong> @migrationErrorMessage
+                        </div>
+                    }
+                </div>
 
                 @if (isUsingSQLite)
                 {
