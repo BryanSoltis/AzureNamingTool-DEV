@@ -72,8 +72,19 @@
                     </div>
                 </div>
             }
+
+            <!-- Expand/Collapse All Controls -->
+            <div class="mb-3 d-flex gap-2">
+                <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@ExpandAll" title="Expand all sections">
+                    <span class="oi oi-fullscreen-enter" aria-hidden="true"></span> Expand All
+                </button>
+                <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@CollapseAll" title="Collapse all sections">
+                    <span class="oi oi-fullscreen-exit" aria-hidden="true"></span> Collapse All
+                </button>
+            </div>
+
             <div class="modern-card mb-3">
-                <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("componentslegend"))">
+                <div class="modern-card-header collapsible @(GetCollapseClass("componentslegend"))" @onclick="@(() => ToggleCollapse("componentslegend"))">
                     <h3>
                         <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Actions Legend
                     </h3>
@@ -169,7 +180,7 @@
                 {
                     <!-- Components Card -->
                     <div class="modern-card mb-3">
-                        <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("components"))">
+                        <div class="modern-card-header collapsible @(GetCollapseClass("components"))" @onclick="@(() => ToggleCollapse("components"))">
                             <h3>
                                 <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Components
                             </h3>
@@ -177,9 +188,9 @@
                         <div class="modern-card-body @(GetCollapseClass("components"))">
                             <!-- Current Components -->
                             <div class="modern-sub-card mb-3">
-                                <div class="modern-sub-card-header">
+                                <h4 class="modern-subsection-title">
                                     Current Components
-                                </div>
+                                </h4>
                                 <div class="modern-sub-card-body">
                                     <p>The current Components.</p>
                                     @if (admin)
@@ -263,7 +274,7 @@
                             {
                                 <!-- Configuration Section -->
                                 <div class="modern-sub-card">
-                                    <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("componentsconfig"))">
+                                    <div class="modern-sub-card-header collapsible @(GetCollapseClass("componentsconfig"))" @onclick="@(() => ToggleCollapse("componentsconfig"))">
                                         <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                     </div>
                                     <div class="modern-sub-card-body @(GetCollapseClass("componentsconfig"))">
@@ -292,7 +303,7 @@
                 {
                     <!-- Delimiters Card -->
                     <div class="modern-card mb-3">
-                        <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("delimiters"))">
+                        <div class="modern-card-header collapsible @(GetCollapseClass("delimiters"))" @onclick="@(() => ToggleCollapse("delimiters"))">
                             <h3>
                                 <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Delimiters
                             </h3>
@@ -347,7 +358,7 @@
                             {
                                 <!-- Configuration Section -->
                                 <div class="modern-sub-card">
-                                    <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("delimitersconfig"))">
+                                    <div class="modern-sub-card-header collapsible @(GetCollapseClass("delimitersconfig"))" @onclick="@(() => ToggleCollapse("delimitersconfig"))">
                                         <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                     </div>
                                     <div class="modern-sub-card-body @(GetCollapseClass("delimitersconfig"))">
@@ -383,7 +394,7 @@
                 {
                     <!-- Custom Components Card -->
                     <div class="modern-card mb-3">
-                        <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("customcomponents"))">
+                        <div class="modern-card-header collapsible @(GetCollapseClass("customcomponents"))" @onclick="@(() => ToggleCollapse("customcomponents"))">
                             <h3>
                                 <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Custom Components
                             </h3>
@@ -394,7 +405,7 @@
                                 @if ((GeneralHelper.IsNotNull(servicesData.CustomComponents!.Where(x => x.ParentComponent == GeneralHelper.NormalizeName(customComponent.Name, true)))) && (customComponent.Name != "ResourceInstance"))
                                 {
                                     <div class="modern-sub-card mb-3">
-                                        <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("custom" + customComponent.Id.ToString()))">
+                                        <div class="modern-sub-card-header collapsible @(GetCollapseClass("custom" + customComponent.Id.ToString()))" @onclick="@(() => ToggleCollapse("custom" + customComponent.Id.ToString()))">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @customComponent.Name
                                         </div>
                                         @if (!customComponent.IsFreeText)
@@ -501,7 +512,7 @@
                             @if (admin)
                             {
                                 <div class="modern-sub-card">
-                                    <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("customcomponentconfig"))">
+                                    <div class="modern-sub-card-header collapsible @(GetCollapseClass("customcomponentconfig"))" @onclick="@(() => ToggleCollapse("customcomponentconfig"))">
                                         <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                     </div>
                                     <div class="modern-sub-card-body @(GetCollapseClass("customcomponentconfig"))">
@@ -520,7 +531,7 @@
                             {
                                 <!-- Environments Card -->
                                 <div class="modern-card mb-3">
-                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("environments"))">
+                                    <div class="modern-card-header collapsible @(GetCollapseClass("environments"))" @onclick="@(() => ToggleCollapse("environments"))">
                                         <h3>
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
                                         </h3>
@@ -596,7 +607,7 @@
                                         {
                                             <!-- Configuration Section -->
                                             <div class="modern-sub-card">
-                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("environmentsconfig"))">
+                                                <div class="modern-sub-card-header collapsible @(GetCollapseClass("environmentsconfig"))" @onclick="@(() => ToggleCollapse("environmentsconfig"))">
                                                     <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
                                                 <div class="modern-sub-card-body @(GetCollapseClass("environmentsconfig"))">
@@ -644,7 +655,7 @@
                             {
                                 <!-- Functions Card -->
                                 <div class="modern-card mb-3">
-                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("functions"))">
+                                    <div class="modern-card-header collapsible @(GetCollapseClass("functions"))" @onclick="@(() => ToggleCollapse("functions"))">
                                         <h3>
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
                                         </h3>
@@ -720,7 +731,7 @@
                                         {
                                             <!-- Configuration Section -->
                                             <div class="modern-sub-card">
-                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("functionsconfig"))">
+                                                <div class="modern-sub-card-header collapsible @(GetCollapseClass("functionsconfig"))" @onclick="@(() => ToggleCollapse("functionsconfig"))">
                                                     <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
                                                 <div class="modern-sub-card-body @(GetCollapseClass("functionsconfig"))">
@@ -768,7 +779,7 @@
                             {
                                 <!-- Locations Card -->
                                 <div class="modern-card mb-3">
-                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("locations"))">
+                                    <div class="modern-card-header collapsible @(GetCollapseClass("locations"))" @onclick="@(() => ToggleCollapse("locations"))">
                                         <h3>
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
                                         </h3>
@@ -850,7 +861,7 @@
                                         {
                                             <!-- Configuration Section -->
                                             <div class="modern-sub-card">
-                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("locationsconfig"))">
+                                                <div class="modern-sub-card-header collapsible @(GetCollapseClass("locationsconfig"))" @onclick="@(() => ToggleCollapse("locationsconfig"))">
                                                     <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
                                                 <div class="modern-sub-card-body @(GetCollapseClass("locationsconfig"))">
@@ -940,7 +951,7 @@
                             {
                                 <!-- Orgs Card -->
                                 <div class="modern-card mb-3">
-                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("orgs"))">
+                                    <div class="modern-card-header collapsible @(GetCollapseClass("orgs"))" @onclick="@(() => ToggleCollapse("orgs"))">
                                         <h3>
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
                                         </h3>
@@ -1014,7 +1025,7 @@
                                         @if (admin)
                                         {
                                             <div class="modern-sub-card mb-3">
-                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("orgsconfig"))">
+                                                <div class="modern-sub-card-header collapsible @(GetCollapseClass("orgsconfig"))" @onclick="@(() => ToggleCollapse("orgsconfig"))">
                                                     <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
                                                 <div class="modern-sub-card-body @(GetCollapseClass("orgsconfig"))">
@@ -1065,7 +1076,7 @@
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceProjAppSvcs))
                             {
                                 <div class="modern-card mb-3">
-                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("projsappssvcs"))">
+                                    <div class="modern-card-header collapsible @(GetCollapseClass("projsappssvcs"))" @onclick="@(() => ToggleCollapse("projsappssvcs"))">
                                         <h3 id="@resourceComponent.Name" class="modern-card-title">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
                                         </h3>
@@ -1139,7 +1150,7 @@
                                         @if (admin)
                                         {
                                             <div class="modern-sub-card mb-3">
-                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("projappsvcsconfig"))">
+                                                <div class="modern-sub-card-header collapsible @(GetCollapseClass("projappsvcsconfig"))" @onclick="@(() => ToggleCollapse("projappsvcsconfig"))">
                                                     <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
                                                 <div class="modern-sub-card-body @(GetCollapseClass("projappsvcsconfig"))">
@@ -1190,7 +1201,7 @@
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceTypes))
                             {
                                 <div class="modern-card mb-3">
-                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("types"))">
+                                    <div class="modern-card-header collapsible @(GetCollapseClass("types"))" @onclick="@(() => ToggleCollapse("types"))">
                                         <h3 id="@resourceComponent.Name" class="modern-card-title">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
                                         </h3>
@@ -1350,7 +1361,7 @@
                                         @if (admin)
                                         {
                                             <div class="modern-sub-card mb-3">
-                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("typesconfig"))">
+                                                <div class="modern-sub-card-header collapsible @(GetCollapseClass("typesconfig"))" @onclick="@(() => ToggleCollapse("typesconfig"))">
                                                     <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
                                                 <div class="modern-sub-card-body @(GetCollapseClass("typesconfig"))">
@@ -1446,7 +1457,7 @@
                             @if (GeneralHelper.IsNotNull(servicesData.ResourceUnitDepts))
                             {
                                 <div class="modern-card mb-3">
-                                    <div class="modern-card-header collapsible" @onclick="@(() => ToggleCollapse("unitsdepts"))">
+                                    <div class="modern-card-header collapsible @(GetCollapseClass("unitsdepts"))" @onclick="@(() => ToggleCollapse("unitsdepts"))">
                                         <h3 id="@resourceComponent.Name" class="modern-card-title">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourceComponent.DisplayName
                                         </h3>
@@ -1520,7 +1531,7 @@
                                         @if (admin)
                                         {
                                             <div class="modern-sub-card mb-3">
-                                                <div class="modern-sub-card-header collapsible" @onclick="@(() => ToggleCollapse("unitdeptsconfig"))">
+                                                <div class="modern-sub-card-header collapsible @(GetCollapseClass("unitdeptsconfig"))" @onclick="@(() => ToggleCollapse("unitdeptsconfig"))">
                                                     <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                                 </div>
                                                 <div class="modern-sub-card-body @(GetCollapseClass("unitdeptsconfig"))">
@@ -1678,6 +1689,49 @@
     private string GetCollapseClass(string sectionId)
     {
         return collapsedSections.Contains(sectionId) ? "collapsed" : "";
+    }
+
+    private void ExpandAll()
+    {
+        collapsedSections.Clear();
+    }
+
+    private void CollapseAll()
+    {
+        // Add all section IDs to the collapsed set
+        collapsedSections = new HashSet<string>
+        {
+            "componentslegend",
+            "components",
+            "componentsconfig",
+            "delimiters",
+            "delimitersconfig",
+            "customcomponents",
+            "customcomponentconfig",
+            "environments",
+            "environmentsconfig",
+            "functions",
+            "functionsconfig",
+            "locations",
+            "locationsconfig",
+            "orgs",
+            "orgsconfig",
+            "projsappssvcs",
+            "projappsvcsconfig",
+            "types",
+            "typesconfig",
+            "unitsdepts",
+            "unitdeptsconfig"
+        };
+        
+        // Add dynamic custom component sections
+        if (servicesData?.CustomComponents != null)
+        {
+            foreach (var customComponent in servicesData.CustomComponents)
+            {
+                collapsedSections.Add($"custom{customComponent.Id}");
+            }
+        }
     }
 
     private ResponseMessage message = new();
