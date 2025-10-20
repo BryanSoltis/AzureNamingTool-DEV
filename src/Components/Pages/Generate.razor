@@ -15,21 +15,25 @@
 @inject ServicesHelper ServicesHelper
 
 <PageTitle>Azure Naming Tool - Generate</PageTitle>
-<div class="modern-card">
-    <div class="modern-card-header">
-        <div class="modern-page-header">
-            <h1 class="modern-page-title">
-                <span class="oi oi-loop-circular" aria-hidden="true"></span>
-                Generate
-            </h1>
-            <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Generate", String.Empty, "generateinstructions", false))">
-                <span class="oi oi-document" aria-hidden="true"></span> Documentation
-            </button>
-        </div>
+
+<div class="modern-page-container">
+    <div class="modern-page-title">
+        <h1>Generate</h1>
     </div>
+    
+    <div class="modern-page-description">
+        <p>Generate a name for the selected resource type</p>
+    </div>
+    
+    <div class="modern-page-actions">
+        <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Generate", String.Empty, "generateinstructions", false))">
+            <span class="oi oi-document" aria-hidden="true"></span> Documentation
+        </button>
+    </div>
+</div>
+
+<div class="modern-card">
     <div class="modern-card-body">
-        <div class="mb-3">This page generates a name for the selected resource type.</div>
-        
         <div class="modern-card mb-4">
             <div class="modern-card-header modern-card-header-collapsible" data-bs-toggle="collapse" data-bs-target="#instructions" aria-expanded="true">
                 <span class="oi oi-chevron-bottom modern-collapse-icon" aria-hidden="true"></span>

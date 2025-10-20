@@ -13,21 +13,24 @@
 
 <PageTitle>Azure Naming Tool - Reference</PageTitle>
 
-<div class="modern-card">
-    <div class="modern-card-header">
-        <div class="modern-page-header">
-            <h1 class="modern-page-title">
-                <span class="oi oi-list-rich" aria-hidden="true"></span>
-                Reference
-            </h1>
-            <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Reference", String.Empty, "referenceinstructions", false))">
-                <span class="oi oi-document" aria-hidden="true"></span> Documentation
-            </button>
-        </div>
+<div class="modern-page-container">
+    <div class="modern-page-title">
+        <h1>Reference</h1>
     </div>
-    <div class="modern-card-body">
-        <div class="mb-4">This page provides an example name for each resource type using the defined configuration.</div>
+    
+    <div class="modern-page-description">
+        <p>View example names for each resource type using the defined configuration</p>
+    </div>
+    
+    <div class="modern-page-actions">
+        <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Reference", String.Empty, "referenceinstructions", false))">
+            <span class="oi oi-document" aria-hidden="true"></span> Documentation
+        </button>
+    </div>
+</div>
 
+<div class="modern-card">
+    <div class="modern-card-body">
         @if (servicesData.ResourceTypes == null)
         {
             <div class="modern-spinner-container">

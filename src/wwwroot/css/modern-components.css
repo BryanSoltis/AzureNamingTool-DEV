@@ -1166,19 +1166,42 @@ pre code {
    DASHBOARD COMPONENTS
    =================================================================== */
 
-/* Modern Page Header */
-.modern-page-header {
+/* Modern Page Container - New Consistent Structure */
+.modern-page-container {
     margin-bottom: var(--spacing-xl);
-    padding-bottom: var(--spacing-md);
-    border-bottom: 2px solid var(--color-border);
 }
 
 .modern-page-title h1 {
     font-size: var(--font-size-3xl);
     font-weight: var(--font-weight-bold);
     color: var(--color-text-primary);
+    margin: 0 0 var(--spacing-md) 0;
+}
+
+.modern-page-description {
+    margin-bottom: var(--spacing-lg);
+}
+
+.modern-page-description p {
+    font-size: var(--font-size-md);
+    color: var(--color-text-secondary);
     margin: 0;
-    margin-bottom: var(--spacing-xs);
+    line-height: 1.6;
+}
+
+.modern-page-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    align-items: center;
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-xl);
+}
+
+/* Legacy Modern Page Header - Keep for backward compatibility */
+.modern-page-header {
+    margin-bottom: var(--spacing-xl);
+    padding-bottom: var(--spacing-md);
+    border-bottom: 2px solid var(--color-border);
 }
 
 .modern-page-subtitle {

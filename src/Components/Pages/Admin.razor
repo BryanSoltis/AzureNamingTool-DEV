@@ -25,11 +25,15 @@
 
 <PageTitle>Azure Naming Tool - Admin</PageTitle>
 
-<div class="modern-page-header">
+<div class="modern-page-container">
     <div class="modern-page-title">
         <h1>Admin</h1>
-        <p class="modern-page-subtitle">Manage security, configuration, and customization settings</p>
     </div>
+    
+    <div class="modern-page-description">
+        <p>Manage security, configuration, and customization settings</p>
+    </div>
+    
     @if (admin)
     {
         <div class="modern-page-actions">
@@ -66,15 +70,6 @@
     }
     else
     {
-        <!-- Admin Welcome Message -->
-        <div class="modern-card mb-3">
-            <div class="modern-card-body">
-                <p class="mb-0 text-secondary">
-                    Manage security settings, site configurations, customizations, and system details for the Azure Naming Tool.
-                </p>
-            </div>
-        </div>
-
         <!-- Modern Tab Navigation -->
         <div class="modern-tabs-container">
             <div class="modern-tabs">

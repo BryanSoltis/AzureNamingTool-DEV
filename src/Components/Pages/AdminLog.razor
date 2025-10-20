@@ -19,21 +19,25 @@
 @inject NavigationManager NavigationManager
 
 <PageTitle>Azure Naming Tool - Admin Log</PageTitle>
-<div class="modern-card">
-    <div class="modern-card-header">
-        <div class="modern-page-header">
-            <h1 class="modern-page-title">
-                <span class="oi oi-task" aria-hidden="true"></span>
-                Admin Log
-            </h1>
-            <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme!, "bg-navcolor", "Admin Log", String.Empty, "adminloginstructions", admin))">
-                <span class="oi oi-document" aria-hidden="true"></span> Documentation
-            </button>
-        </div>
-    </div>
-    <div class="modern-card-body">
-        <div class="mb-3">This page displays a log of Admin/Configuration changes.</div>
 
+<div class="modern-page-container">
+    <div class="modern-page-title">
+        <h1>Admin Log</h1>
+    </div>
+    
+    <div class="modern-page-description">
+        <p>View a log of Admin and Configuration changes</p>
+    </div>
+    
+    <div class="modern-page-actions">
+        <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme!, "bg-navcolor", "Admin Log", String.Empty, "adminloginstructions", admin))">
+            <span class="oi oi-document" aria-hidden="true"></span> Documentation
+        </button>
+    </div>
+</div>
+
+<div class="modern-card">
+    <div class="modern-card-body">
         @if (!dataLoaded)
         {
             <div class="modern-spinner-container">
