@@ -9,12 +9,22 @@ namespace AzureNamingTool.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger<CorrelationIdMiddleware> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CorrelationIdMiddleware"/> class.
+        /// </summary>
+        /// <param name="next">The next middleware in the pipeline.</param>
+        /// <param name="logger">The logger instance.</param>
         public CorrelationIdMiddleware(RequestDelegate next, ILogger<CorrelationIdMiddleware> logger)
         {
             _next = next;
             _logger = logger;
         }
 
+        /// <summary>
+        /// Processes the HTTP request and adds a correlation ID to the response.
+        /// </summary>
+        /// <param name="context">The HTTP context.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task InvokeAsync(HttpContext context)
         {
             // Check if correlation ID already exists in request headers

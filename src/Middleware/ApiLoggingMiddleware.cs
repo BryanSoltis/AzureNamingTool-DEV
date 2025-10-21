@@ -11,12 +11,22 @@ namespace AzureNamingTool.Middleware
         private readonly RequestDelegate _next;
         private readonly ILogger<ApiLoggingMiddleware> _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApiLoggingMiddleware"/> class.
+        /// </summary>
+        /// <param name="next">The next middleware in the pipeline.</param>
+        /// <param name="logger">The logger instance.</param>
         public ApiLoggingMiddleware(RequestDelegate next, ILogger<ApiLoggingMiddleware> logger)
         {
             _next = next;
             _logger = logger;
         }
 
+        /// <summary>
+        /// Processes the HTTP request and logs request/response information for API endpoints.
+        /// </summary>
+        /// <param name="context">The HTTP context.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task InvokeAsync(HttpContext context)
         {
             // Only log API requests (not static files, health checks, etc.)
