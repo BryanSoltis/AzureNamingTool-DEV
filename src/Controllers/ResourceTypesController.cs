@@ -80,7 +80,6 @@ namespace AzureNamingTool.Controllers
         [ProducesResponseType(typeof(Models.ResourceType), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id)
         {
             try
@@ -89,10 +88,6 @@ namespace AzureNamingTool.Controllers
                 serviceResponse = await _resourceTypeService.GetItemAsync(id);
                 if (serviceResponse.Success)
                 {
-                    if (serviceResponse.ResponseObject == null)
-                    {
-                        return NotFound($"Resource type with ID {id} not found.");
-                    }
                     return Ok(serviceResponse.ResponseObject);
                 }
                 else
