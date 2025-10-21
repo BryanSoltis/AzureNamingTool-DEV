@@ -22,6 +22,18 @@
 <BlazoredToasts Position="ToastPosition.BottomRight" ShowProgressBar="true" />
 
 <div class="modern-layout">
+    <!-- Mobile Menu Button (outside sidebar) -->
+    <button type="button" 
+            class="mobile-menu-toggle" 
+            onclick="window.toggleMobileMenu()"
+            title="Toggle Menu"
+            aria-label="Toggle Menu">
+        <span class="oi oi-menu"></span>
+    </button>
+    
+    <!-- Mobile Sidebar Backdrop -->
+    <div class="modern-sidebar-backdrop" onclick="window.closeMobileMenu()"></div>
+    
     <!-- Sidebar -->
     <aside class="modern-sidebar @(sidebarCollapsed ? "collapsed" : "")">
         <NavMenu PageType="@PageType" />

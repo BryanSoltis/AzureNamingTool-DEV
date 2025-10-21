@@ -18,22 +18,25 @@
             <span class="brand-title">@toolname</span>
         </div>
     </div>
-    <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
+    <button type="button" 
+            title="Navigation menu" 
+            class="navbar-toggler" 
+            @onclick="ToggleNavMenu">
         <span class="navbar-toggler-icon"></span>
     </button>
 </div>
 
-<div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass">
     <nav class="flex-column">
         <div class="nav-item px-2">
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="nav-icon oi oi-home" aria-hidden="true"></span>
+                <span class="nav-icon oi oi-home" aria-hidden="true" title="Home"></span>
                 <span class="nav-text">Home</span>
             </NavLink>
         </div>
         <div class="nav-item px-2">
             <NavLink class="nav-link" href="admin">
-                <span class="nav-icon oi oi-wrench" aria-hidden="true"></span>
+                <span class="nav-icon oi oi-wrench" aria-hidden="true" title="Admin"></span>
                 <span class="nav-text">Admin</span>
             </NavLink>
         </div>
@@ -41,7 +44,7 @@
         {
             <div class="nav-item px-2">
                 <NavLink class="nav-link" href="adminlog">
-                    <span class="nav-icon oi oi-box" aria-hidden="true"></span>
+                    <span class="nav-icon oi oi-box" aria-hidden="true" title="Admin Log"></span>
                     <span class="nav-text">Admin Log</span>
                 </NavLink>
             </div>
@@ -50,7 +53,7 @@
         {
             <div class="nav-item px-2">
                 <NavLink class="nav-link" href="instructions">
-                    <span class="nav-icon oi oi-book" aria-hidden="true"></span>
+                    <span class="nav-icon oi oi-book" aria-hidden="true" title="Instructions"></span>
                     <span class="nav-text">Instructions</span>
                 </NavLink>
             </div>
@@ -59,7 +62,7 @@
         {
             <div class="nav-item px-2">
                 <NavLink class="nav-link" href="configuration">
-                    <span class="nav-icon oi oi-cog" aria-hidden="true"></span>
+                    <span class="nav-icon oi oi-cog" aria-hidden="true" title="Configuration"></span>
                     <span class="nav-text">Configuration</span>
                 </NavLink>
             </div>
@@ -68,14 +71,14 @@
         {
             <div class="nav-item px-2">
                 <NavLink class="nav-link" href="reference">
-                    <span class="nav-icon oi oi-book" aria-hidden="true"></span>
+                    <span class="nav-icon oi oi-book" aria-hidden="true" title="Reference"></span>
                     <span class="nav-text">Reference</span>
                 </NavLink>
             </div>
         }
         <div class="nav-item px-2">
             <NavLink class="nav-link" href="generate">
-                <span class="nav-icon oi oi-target" aria-hidden="true"></span>
+                <span class="nav-icon oi oi-target" aria-hidden="true" title="Generate"></span>
                 <span class="nav-text">Generate</span>
             </NavLink>
         </div>
@@ -83,7 +86,7 @@
         {
             <div class="nav-item px-2">
                 <NavLink class="nav-link" href="generatednameslog">
-                    <span class="nav-icon oi oi-spreadsheet" aria-hidden="true"></span>
+                    <span class="nav-icon oi oi-spreadsheet" aria-hidden="true" title="Generated Names Log"></span>
                     <span class="nav-text">Generated Names Log</span>
                 </NavLink>
             </div>
@@ -163,6 +166,7 @@
 @code {
     [Parameter]
     public Type? PageType { get; set; }
+    
     private bool collapseNavMenu = true;
     private ServicesData servicesData = new();
     private SiteConfiguration config = ConfigurationHelper.GetConfigurationData();
@@ -218,6 +222,35 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task HandleMobileMenuToggle()
+    {
+        Logger.LogInformation("HandleMobileMenuToggle called from C#");
+        
+        try
+        {
+            await JsRuntime.InvokeVoidAsync("eval", @"
+                console.log('*** BUTTON CLICKED - Blazor invoking toggleMobileMenu ***');
+                console.log('Window object:', window);
+                console.log('toggleMobileMenu function:', window.toggleMobileMenu);
+                
+                if (typeof window.toggleMobileMenu === 'function') {
+                    console.log('Calling toggleMobileMenu...');
+                    window.toggleMobileMenu();
+                } else {
+                    console.error('toggleMobileMenu function not found!');
+                    console.log('Available window properties:', Object.keys(window).filter(k => k.includes('toggle')));
+                }
+            ");
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Error toggling mobile menu: {Message}", ex.Message);
+            
+            // Try console.log to see if JS interop works at all
+            await JsRuntime.InvokeVoidAsync("eval", "console.error('Exception in HandleMobileMenuToggle: " + ex.Message + "')");
+        }
     }
 
     private async void OnConfigNavClick(string e)

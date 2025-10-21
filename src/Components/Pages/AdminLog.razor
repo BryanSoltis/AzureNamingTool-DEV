@@ -64,13 +64,11 @@
                     </div>
                     
                     <div class="modern-card mb-4">
-                        <div class="modern-card-header">
-                            <h3 class="modern-card-title">
-                                <span class="oi oi-magnifying-glass" aria-hidden="true"></span>
-                                Filter Data
-                            </h3>
+                        <div class="modern-card-header modern-card-header-collapsible" data-bs-toggle="collapse" data-bs-target="#adminlogfilter" aria-expanded="false">
+                            <span class="oi oi-chevron-bottom modern-collapse-icon" aria-hidden="true"></span>
+                            <span class="modern-card-title">Filter Data</span>
                         </div>
-                        <div class="modern-card-body">
+                        <div class="collapse modern-card-body" id="adminlogfilter">
                             <div class="row mb-3">
                                 <div class="col-auto">
                                     <label class="modern-form-label">Start Date</label>
@@ -88,8 +86,8 @@
                                 <div class="col-md-6">
                                     <label class="modern-form-label">Search</label>
                                     <div class="modern-input-group">
-                                        <span class="modern-input-icon">
-                                            <span class="oi oi-magnifying-glass"></span>
+                                        <span class="modern-input-group-icon">
+                                            <span class="oi oi-magnifying-glass" aria-hidden="true" title="Search"></span>
                                         </span>
                                         <input class="modern-form-input modern-input-with-icon" 
                                                type="search" 

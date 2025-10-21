@@ -23,15 +23,22 @@ var storageOptions = new StorageOptions();
 builder.Configuration.GetSection("StorageOptions").Bind(storageOptions);
 builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection("StorageOptions"));
 
+// Add Response Compression for better performance
+builder.Services.AddResponseCompression(options =>
+{
+    options.EnableForHttps = true;
+});
+
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents().AddHubOptions(options =>
     {
-        options.ClientTimeoutInterval = TimeSpan.FromSeconds(30);
+        // Optimize for better responsiveness in Azure App Service
+        options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);  // Increased for slower networks
         options.EnableDetailedErrors = false;
         options.HandshakeTimeout = TimeSpan.FromSeconds(15);
-        options.KeepAliveInterval = TimeSpan.FromSeconds(15);
-        options.MaximumParallelInvocationsPerClient = 1;
+        options.KeepAliveInterval = TimeSpan.FromSeconds(10);      // More frequent keep-alive
+        options.MaximumParallelInvocationsPerClient = 2;           // Allow parallel operations
         options.MaximumReceiveMessageSize = 102400000;
         options.StreamBufferCapacity = 10;
     });
@@ -282,6 +289,9 @@ app.UseSwagger();
 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AzureNamingToolAPI"));
 
 app.UseHttpsRedirection();
+
+// Enable Response Compression
+app.UseResponseCompression();
 
 app.UseStaticFiles();
 app.UseAntiforgery();

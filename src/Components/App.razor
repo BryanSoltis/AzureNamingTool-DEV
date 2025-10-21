@@ -64,6 +64,11 @@
 </head>
 
 <body>
+    <!-- Global Loading Indicator -->
+    <div id="blazor-loading-indicator" style="display: none; position: fixed; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #0072C6 0%, #00BCF2 100%); z-index: 999999; animation: loadingProgress 1.5s ease-in-out infinite;">
+        <div style="position: absolute; right: 0; top: 0; bottom: 0; width: 100px; background: linear-gradient(90deg, transparent, white); opacity: 0.3;"></div>
+    </div>
+    
     <Routes @rendermode="InteractiveServer" identityProviderDetails="identityProviderDetails" />
     <script src="_framework/blazor.web.js"></script>
     <script src="js/jquery-3.7.0.min.js"></script>
@@ -76,6 +81,113 @@
 
 </html>
 <script>
+    // Define mobile menu functions immediately
+    (function() {
+    // Mobile menu toggle
+    window.toggleMobileMenu = function() {
+        const sidebar = document.querySelector('.modern-sidebar');
+        const backdrop = document.querySelector('.modern-sidebar-backdrop');
+        const menuButton = document.querySelector('.mobile-menu-toggle');
+        
+        console.log('toggleMobileMenu called');
+        console.log('Sidebar element:', sidebar);
+        console.log('Backdrop element:', backdrop);
+        
+        if (sidebar) {
+            const isOpen = sidebar.classList.toggle('show');
+            console.log('Sidebar classes after toggle:', sidebar.className);
+            
+            // Move button when menu is open
+            if (menuButton) {
+                if (isOpen) {
+                    menuButton.classList.add('menu-open');
+                } else {
+                    menuButton.classList.remove('menu-open');
+                }
+            }
+        } else {
+            console.error('Sidebar element not found!');
+        }
+        
+        if (backdrop) {
+            backdrop.classList.toggle('show');
+            console.log('Backdrop classes after toggle:', backdrop.className);
+        } else {
+            console.error('Backdrop element not found!');
+        }
+    };        // Close mobile menu
+        window.closeMobileMenu = function() {
+            const sidebar = document.querySelector('.modern-sidebar');
+            const backdrop = document.querySelector('.modern-sidebar-backdrop');
+            const menuButton = document.querySelector('.mobile-menu-toggle');
+            
+            if (sidebar) {
+                sidebar.classList.remove('show');
+            }
+            if (backdrop) {
+                backdrop.classList.remove('show');
+            }
+            if (menuButton) {
+                menuButton.classList.remove('menu-open');
+            }
+        };
+        
+        console.log('Mobile menu functions defined');
+    })();
+    
+    // Setup mobile menu after DOM is ready
+    function setupMobileMenu() {
+        console.log('Setting up mobile menu handlers');
+        
+        // Add backdrop click handler
+        const backdrop = document.querySelector('.modern-sidebar-backdrop');
+        if (backdrop) {
+            backdrop.onclick = window.closeMobileMenu;
+            console.log('Backdrop click handler added');
+        } else {
+            console.warn('Backdrop not found during setup');
+        }
+        
+        // Add nav link click handlers for mobile
+        const navLinks = document.querySelectorAll('.modern-sidebar .nav-link');
+        console.log('Found', navLinks.length, 'nav links');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    console.log('Nav link clicked on mobile, closing menu');
+                    window.closeMobileMenu();
+                }
+            });
+        });
+    }
+    
+    // Run setup when DOM is ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', setupMobileMenu);
+    } else {
+        setupMobileMenu();
+    }
+    
+    // Re-setup after Blazor enhanced navigation
+    if (typeof Blazor !== 'undefined') {
+        Blazor.addEventListener('enhancedload', setupMobileMenu);
+    }
+    
+    // Use event delegation ONLY on sidebar for nav link clicks (much more efficient)
+    const sidebar = document.querySelector('.modern-sidebar');
+    if (sidebar) {
+        sidebar.addEventListener('click', function(e) {
+            // Check if click is on or inside a nav-link
+            const navLink = e.target.closest('.nav-link');
+            if (navLink && window.innerWidth <= 768) {
+                console.log('Nav link clicked on mobile via event delegation, closing menu');
+                // Small delay to allow navigation to start
+                setTimeout(function() {
+                    window.closeMobileMenu();
+                }, 100);
+            }
+        });
+    }
 
     // Scroll into view helper function
     function scrollIntoView(id) {
@@ -237,4 +349,44 @@
                 .css("top", dropdownMenuTopLocation);
         });
     }
+
+    // Loading Indicator Management
+    (function() {
+        const loadingIndicator = document.getElementById('blazor-loading-indicator');
+        let navigationTimeout;
+        
+        // Show loading indicator during navigation
+        Blazor.addEventListener('enhancednavigationstart', () => {
+            if (loadingIndicator) {
+                // Small delay to avoid flashing for fast navigations
+                navigationTimeout = setTimeout(() => {
+                    loadingIndicator.style.display = 'block';
+                }, 100);
+            }
+        });
+        
+        // Hide loading indicator when navigation completes
+        Blazor.addEventListener('enhancednavigationend', () => {
+            if (navigationTimeout) {
+                clearTimeout(navigationTimeout);
+            }
+            if (loadingIndicator) {
+                loadingIndicator.style.display = 'none';
+            }
+        });
+    })();
 </script>
+
+<style>
+    @@keyframes loadingProgress {
+        0% {
+            transform: translateX(-100%);
+        }
+        50% {
+            transform: translateX(0%);
+        }
+        100% {
+            transform: translateX(100%);
+        }
+    }
+</style>

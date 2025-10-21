@@ -1902,6 +1902,26 @@ pre code {
     margin-bottom: var(--spacing-md);
 }
 
+/* Empty State */
+.modern-empty-state {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg);
+    text-align: left;
+    color: var(--color-text-secondary);
+}
+
+.modern-empty-state .oi {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.modern-empty-state p {
+    margin: 0;
+    font-size: 1rem;
+}
+
 .modern-warning-box {
     background-color: rgba(245, 158, 11, 0.05);
     border-left: 3px solid #f59e0b;
@@ -3263,10 +3283,27 @@ pre code {
     
     .modern-modal {
         width: 95%;
+        max-height: 95vh;
     }
     
     .modern-modal-body {
         padding: 16px;
+    }
+    
+    .modern-modal-content {
+        max-height: calc(95vh - 120px);
+        padding: 16px;
+    }
+    
+    .modern-modal-footer {
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 16px;
+    }
+    
+    .modern-modal-footer button {
+        flex: 1 1 auto;
+        min-width: 120px;
     }
     
     .modern-tabs {
@@ -3276,6 +3313,16 @@ pre code {
     .modern-tab {
         padding: 10px 16px;
         font-size: 13px;
+    }
+}
+
+@media (max-width: 480px) {
+    .modern-modal-footer {
+        flex-direction: column;
+    }
+    
+    .modern-modal-footer button {
+        width: 100%;
     }
 }
 

@@ -582,7 +582,51 @@
     }
 }
 
+/* Mobile menu toggle button (always visible on mobile) */
+.mobile-menu-toggle {
+    display: none !important;
+}
+
 @media (max-width: 768px) {
+    .mobile-menu-toggle {
+        display: flex !important;
+        position: fixed;
+        top: 8px;
+        left: 16px;
+        z-index: 10000;
+        background-color: var(--color-azure-blue);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-menu-toggle:hover {
+        background-color: #0066cc;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    .mobile-menu-toggle:active {
+        transform: scale(0.95);
+    }
+    
+    /* Move button when sidebar is open */
+    .mobile-menu-toggle.menu-open {
+        left: 276px;
+        background-color: rgba(0, 0, 0, 0.6);
+    }
+    
+    .mobile-menu-toggle.menu-open:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+    }
+    
     .modern-header {
         height: 56px;
         padding: 0 var(--spacing-md);
@@ -606,6 +650,72 @@
     
     .header-right .btn {
         padding: var(--spacing-xs) var(--spacing-sm);
+    }
+    
+    /* Mobile sidebar behavior */
+    .modern-sidebar {
+        position: fixed !important;
+        left: -260px !important;
+        top: 0;
+        bottom: 0;
+        width: 260px !important;
+        min-width: 260px !important;
+        z-index: 1050 !important;
+        transition: left 0.3s ease-in-out !important;
+        overflow-y: auto !important;
+        overflow-x: hidden !important;
+    }
+    
+    .modern-sidebar.show {
+        left: 0 !important;
+    }
+    
+    .modern-sidebar.collapsed {
+        left: -260px !important;
+        width: 260px !important;
+    }
+    
+    /* Ensure sidebar content is visible on mobile */
+    .modern-sidebar .modern-sidebar-header,
+    .modern-sidebar nav,
+    .modern-sidebar .nav-item,
+    .modern-sidebar .nav-link {
+        display: flex !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+    }
+    
+    /* Force nav items to always show on mobile (override collapse) */
+    .modern-sidebar .collapse {
+        display: block !important;
+        height: auto !important;
+        visibility: visible !important;
+    }
+    
+    /* Hide the hamburger button inside the sidebar on mobile */
+    .modern-sidebar .navbar-toggler {
+        display: none !important;
+    }
+    
+    .modern-main {
+        width: 100%;
+        margin-left: 0;
+    }
+    
+    /* Mobile sidebar backdrop */
+    .modern-sidebar-backdrop {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1040;
+    }
+    
+    .modern-sidebar-backdrop.show {
+        display: block;
     }
 }
 
