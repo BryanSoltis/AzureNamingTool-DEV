@@ -40,4 +40,11 @@ public interface IResourceEnvironmentService
     /// <param name="items">The list of resource environments to configure.</param>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
     Task<ServiceResponse> PostConfigAsync(List<ResourceEnvironment> items);
+
+    /// <summary>
+    /// Updates the sort order of resource environments without normalization.
+    /// </summary>
+    /// <param name="items">The list of resource environments with updated sort orders.</param>
+    /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+    Task<ServiceResponse> UpdateSortOrderAsync(List<ResourceEnvironment> items);
 }

@@ -299,6 +299,30 @@ namespace AzureNamingTool.Services
             }
             return serviceResponse;
         }
+
+        /// <summary>
+        /// Updates the sort order of resource environments without normalization.
+        /// This method directly saves the provided items without re-sequencing IDs or sort orders.
+        /// </summary>
+        /// <param name="items">The list of resource environments with updated sort orders.</param>
+        /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+        public async Task<ServiceResponse> UpdateSortOrderAsync(List<ResourceEnvironment> items)
+        {
+            ServiceResponse serviceResponse = new();
+            try
+            {
+                // Simply save the items as-is without any normalization
+                await _repository.SaveAllAsync(items);
+                serviceResponse.Success = true;
+            }
+            catch (Exception ex)
+            {
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                serviceResponse.Success = false;
+                serviceResponse.ResponseObject = ex;
+            }
+            return serviceResponse;
+        }
     }
 }
 

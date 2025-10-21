@@ -3716,5 +3716,104 @@ pre code {
     margin-bottom: 12px;
 }
 
+/* ===================================================================
+   DRAG AND DROP STYLES
+   =================================================================== */
+
+/* Draggable items */
+[draggable="true"] {
+    cursor: move;
+    cursor: grab;
+    user-select: none;
+    transition: all var(--transition-fast);
+}
+
+[draggable="true"]:active {
+    cursor: grabbing;
+}
+
+/* Drag handle icon */
+.drag-handle {
+    opacity: 0.3;
+    transition: opacity var(--transition-fast);
+    cursor: grab;
+    padding: 4px;
+    margin-right: 8px;
+    display: inline-block;
+}
+
+[draggable="true"]:hover .drag-handle {
+    opacity: 0.8;
+}
+
+[draggable="true"]:active .drag-handle {
+    cursor: grabbing;
+}
+
+/* Item being dragged */
+.dragging {
+    opacity: 0.5;
+    background-color: var(--color-azure-blue) !important;
+    color: white !important;
+    transform: scale(1.02);
+    box-shadow: var(--shadow-lg) !important;
+    cursor: grabbing !important;
+}
+
+.dragging * {
+    color: white !important;
+}
+
+/* Item being dragged over */
+.drag-over {
+    border-top: 3px solid var(--color-azure-blue) !important;
+    background-color: var(--color-hover-bg) !important;
+}
+
+/* Placeholder for drop position */
+.drag-placeholder {
+    background: repeating-linear-gradient(
+        45deg,
+        var(--color-azure-blue),
+        var(--color-azure-blue) 10px,
+        var(--color-azure-teal) 10px,
+        var(--color-azure-teal) 20px
+    );
+    opacity: 0.3;
+    border: 2px dashed var(--color-azure-blue);
+    height: 50px;
+}
+
+.drag-placeholder td {
+    padding: 0 !important;
+}
+
+/* Drag hint text */
+.drag-hint {
+    font-size: var(--font-size-xs);
+    color: var(--color-text-secondary);
+    font-style: italic;
+    margin-top: 4px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.drag-hint .oi {
+    font-size: 10px;
+}
+
+/* Dark theme adjustments */
+[data-theme="dark"] .dragging {
+    background-color: var(--color-azure-blue) !important;
+}
+
+[data-theme="dark"] .drag-over {
+    background-color: rgba(0, 120, 212, 0.1) !important;
+}
+
+[data-theme="dark"] .drag-placeholder {
+    opacity: 0.4;
+}
 
 

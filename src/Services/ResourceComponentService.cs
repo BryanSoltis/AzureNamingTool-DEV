@@ -47,7 +47,8 @@ namespace AzureNamingTool.Services
                     }
                     else
                     {
-                        serviceResponse.ResponseObject = items.OrderBy(y => y.SortOrder).OrderByDescending(y => y.Enabled).ToList();
+                        // Admin view: show all items in their exact SortOrder
+                        serviceResponse.ResponseObject = items.OrderBy(y => y.SortOrder).ToList();
                     }
                     serviceResponse.Success = true;
                 }
@@ -150,7 +151,7 @@ namespace AzureNamingTool.Services
                             }
 
                             // Reset the sort order of the list
-                            foreach (ResourceComponent thisitem in items.OrderBy(x => x.SortOrder).OrderByDescending(x => x.Enabled).ToList())
+                            foreach (ResourceComponent thisitem in items.OrderBy(x => x.SortOrder).ToList())
                             {
                                 thisitem.SortOrder = position;
                                 position += 1;
@@ -176,10 +177,11 @@ namespace AzureNamingTool.Services
                         }
 
                         position = 1;
-                        foreach (ResourceComponent thisitem in items.OrderBy(x => x.SortOrder).OrderByDescending(x => x.Enabled).ToList())
+                        foreach (ResourceComponent thisitem in items.OrderBy(x => x.SortOrder).ToList())
                         {
                             thisitem.SortOrder = position;
-                            thisitem.Id = position;
+                            // DO NOT reassign Id - it should remain stable!
+                            // thisitem.Id = position;
                             position += 1;
                         }
 
@@ -233,7 +235,8 @@ namespace AzureNamingTool.Services
                         foreach (ResourceComponent thisitem in items.OrderBy(x => x.SortOrder).ToList())
                         {
                             thisitem.SortOrder = position;
-                            thisitem.Id = position;
+                            // DO NOT reassign Id - it should remain stable!
+                            // thisitem.Id = position;
                             position += 1;
                         }
 
@@ -300,18 +303,47 @@ namespace AzureNamingTool.Services
                     }
                 }
 
-                // Determine new item ids
-                int i = 1;
+                // Determine new item ids (keep existing IDs, only assign to new items)
+                long maxId = newitems.Any() ? newitems.Max(x => x.Id) : 0;
 
-                foreach (ResourceComponent item in newitems.OrderByDescending(x => x.Enabled).OrderBy(x => x.SortOrder))
+                foreach (ResourceComponent item in newitems)
                 {
-                    item.Id = i;
-                    item.SortOrder = i;
-                    i += 1;
+                    // Only assign new IDs to items that don't have one
+                    if (item.Id == 0)
+                    {
+                        maxId++;
+                        item.Id = maxId;
+                    }
+                    
+                    // Keep the existing SortOrder - don't modify it!
                 }
 
                 // Write items to file
                 await _repository.SaveAllAsync(newitems);
+                serviceResponse.Success = true;
+            }
+            catch (Exception ex)
+            {
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                serviceResponse.Success = false;
+                serviceResponse.ResponseObject = ex;
+            }
+            return serviceResponse;
+        }
+
+        /// <summary>
+        /// Updates the sort order of resource components without normalization.
+        /// This method directly saves the provided items without re-sequencing IDs or sort orders.
+        /// </summary>
+        /// <param name="items">The list of resource components with updated sort orders.</param>
+        /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+        public async Task<ServiceResponse> UpdateSortOrderAsync(List<ResourceComponent> items)
+        {
+            ServiceResponse serviceResponse = new();
+            try
+            {
+                // Simply save the items as-is without any normalization
+                await _repository.SaveAllAsync(items);
                 serviceResponse.Success = true;
             }
             catch (Exception ex)

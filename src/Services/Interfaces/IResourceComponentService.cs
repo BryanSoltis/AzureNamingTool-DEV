@@ -41,4 +41,11 @@ public interface IResourceComponentService
     /// <param name="items">The list of resource components to configure.</param>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
     Task<ServiceResponse> PostConfigAsync(List<ResourceComponent> items);
+
+    /// <summary>
+    /// Updates the sort order of resource components without normalization.
+    /// </summary>
+    /// <param name="items">The list of resource components with updated sort orders.</param>
+    /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+    Task<ServiceResponse> UpdateSortOrderAsync(List<ResourceComponent> items);
 }

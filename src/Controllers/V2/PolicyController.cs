@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace AzureNamingTool.Controllers.V2
 {
+    /// <summary>
+    /// API controller for managing Azure Policy definitions (V2).
+    /// </summary>
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("2.0")]
     [ApiController]
@@ -19,12 +22,23 @@ namespace AzureNamingTool.Controllers.V2
         private readonly IPolicyService _policyService;
         private readonly IAdminLogService _adminLogService;
 
+        /// <summary>
+        /// Initializes a new instance of the PolicyController.
+        /// </summary>
+        /// <param name="policyService">Service for policy operations</param>
+        /// <param name="adminLogService">Service for admin logging</param>
         public PolicyController(IPolicyService policyService, IAdminLogService adminLogService)
         {
             _policyService = policyService;
             _adminLogService = adminLogService;
         }
 
+        /// <summary>
+        /// Gets the Azure Policy definition for resource naming validation.
+        /// </summary>
+        /// <returns>ApiResponse containing the policy definition</returns>
+        /// <response code="200">Returns the policy definition wrapped in ApiResponse</response>
+        /// <response code="500">Internal server error occurred</response>
         [HttpGet]
         [Route("[action]")]
         public async Task<IActionResult> GetPolicyDefinition()
