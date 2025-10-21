@@ -4,6 +4,7 @@ using AzureNamingTool.Models;
 using AzureNamingTool.Services;
 using AzureNamingTool.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace AzureNamingTool.Controllers
     /// Controller for managing resource delimiters.
     /// </summary>
     [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     [ApiKey]
     [Produces("application/json")]

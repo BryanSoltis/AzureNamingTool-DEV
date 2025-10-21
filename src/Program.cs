@@ -54,14 +54,39 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddSingleton<StateContainer>();
 
 builder.Services.AddEndpointsApiExplorer();
+
+// Configure API Versioning
+builder.Services.AddApiVersioning(options =>
+{
+    options.DefaultApiVersion = new Asp.Versioning.ApiVersion(1, 0);
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.ReportApiVersions = true;
+    options.ApiVersionReader = Asp.Versioning.ApiVersionReader.Combine(
+        new Asp.Versioning.UrlSegmentApiVersionReader(),
+        new Asp.Versioning.HeaderApiVersionReader("X-Api-Version")
+    );
+})
+.AddMvc()
+.AddApiExplorer(options =>
+{
+    options.GroupNameFormat = "'v'VVV";
+    options.SubstituteApiVersionInUrl = true;
+});
+
 builder.Services.AddSwaggerGen(c =>
 {
     c.OperationFilter<CustomHeaderSwaggerAttribute>();
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Version = "v" + ConfigurationHelper.GetAssemblyVersion(),
-        Title = "Azure Naming Tool API",
-        Description = "An ASP.NET Core Web API for managing the Azure Naming tool configuration. All API requests require the configured API Keys (found in the site Admin configuration). You can find more details in the <a href=\"https://github.com/mspnp/AzureNamingTool/wiki/Using-the-API\" target=\"_new\">Azure Naming Tool API documentation</a>."
+        Version = "v1.0",
+        Title = "Azure Naming Tool API v1",
+        Description = "An ASP.NET Core Web API for managing the Azure Naming tool configuration. All API requests require the configured API Keys (found in the site Admin configuration). You can find more details in the <a href=\"https://github.com/mspnp/AzureNamingTool/wiki/Using-the-API\" target=\"_new\">Azure Naming Tool API documentation</a>.<br/><br/><strong>Version 1.0:</strong> Current stable API with backward compatibility."
+    });
+    c.SwaggerDoc("v2", new OpenApiInfo
+    {
+        Version = "v2.0",
+        Title = "Azure Naming Tool API v2",
+        Description = "An ASP.NET Core Web API for managing the Azure Naming tool configuration. All API requests require the configured API Keys (found in the site Admin configuration). You can find more details in the <a href=\"https://github.com/mspnp/AzureNamingTool/wiki/Using-the-API\" target=\"_new\">Azure Naming Tool API documentation</a>.<br/><br/><strong>Version 2.0:</strong> Enhanced API with standardized responses, improved error handling, and additional features."
     });
 
     var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
@@ -287,7 +312,13 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseSwagger();
-app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "AzureNamingToolAPI"));
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Azure Naming Tool API v1");
+    c.SwaggerEndpoint("/swagger/v2/swagger.json", "Azure Naming Tool API v2");
+    c.DisplayRequestDuration();
+    c.EnableTryItOutByDefault();
+});
 
 app.UseHttpsRedirection();
 

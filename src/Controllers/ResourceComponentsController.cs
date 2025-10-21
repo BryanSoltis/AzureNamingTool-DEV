@@ -5,6 +5,7 @@ using AzureNamingTool.Models;
 using AzureNamingTool.Services;
 using AzureNamingTool.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 using PSC.Blazor.Components.MarkdownEditor;
 using System;
 using System.Collections.Generic;
@@ -17,6 +18,7 @@ namespace AzureNamingTool.Controllers
     /// Controller for managing resource components.
     /// </summary>
     [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     [ApiKey]
     [Produces("application/json")]

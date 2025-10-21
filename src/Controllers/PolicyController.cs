@@ -1,5 +1,6 @@
 using AzureNamingTool.Models;
 using Microsoft.AspNetCore.Mvc;
+using Asp.Versioning;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -15,6 +16,7 @@ namespace AzureNamingTool.Controllers
     /// Controller for managing policies.
     /// </summary>
     [Route("api/[controller]")]
+    [ApiVersion("1.0")]
     [ApiController]
     [ApiKey]
     [Produces("application/json")]
