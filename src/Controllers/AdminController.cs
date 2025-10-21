@@ -50,6 +50,9 @@ namespace AzureNamingTool.Controllers
         /// <returns>string - Successful update</returns>
         [HttpPost]
         [Route("[action]")]
+        [ProducesResponseType(typeof(string), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> UpdatePassword([BindRequired][FromHeader(Name = "AdminPassword")] string adminpassword, [FromBody] string password)
         {
             try
@@ -59,17 +62,17 @@ namespace AzureNamingTool.Controllers
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
                         serviceResponse = await _adminService.UpdatePasswordAsync(password);
-                        return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem updating the password."));
+                        return (serviceResponse.Success ? Ok("SUCCESS") : BadRequest("There was a problem updating the password."));
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -97,17 +100,17 @@ namespace AzureNamingTool.Controllers
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
                         serviceResponse = await _adminService.UpdateAPIKeyAsync(apikey, "fullaccess");
-                        return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem updating the Full Access API Key."));
+                        return (serviceResponse.Success ? Ok("SUCCESS") : BadRequest(" - There was a problem updating the Full Access API Key."));
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -135,17 +138,17 @@ namespace AzureNamingTool.Controllers
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
                         serviceResponse = await _adminService.GenerateAPIKeyAsync("fullaccess");
-                        return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem generating the Full Access API Key."));
+                        return (serviceResponse.Success ? Ok("SUCCESS") : BadRequest(" - There was a problem generating the Full Access API Key."));
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -176,17 +179,17 @@ namespace AzureNamingTool.Controllers
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
                         serviceResponse = await _adminService.UpdateAPIKeyAsync(apikey, "namegeneration");
-                        return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem updating the Name Generation API Key."));
+                        return (serviceResponse.Success ? Ok("SUCCESS") : BadRequest(" - There was a problem updating the Name Generation API Key."));
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -213,17 +216,17 @@ namespace AzureNamingTool.Controllers
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
                         serviceResponse = await _adminService.GenerateAPIKeyAsync("namegeneration");
-                        return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem generating the Name Generation API Key."));
+                        return (serviceResponse.Success ? Ok("SUCCESS") : BadRequest(" - There was a problem generating the Name Generation API Key."));
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -251,17 +254,17 @@ namespace AzureNamingTool.Controllers
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
                         serviceResponse = await _adminService.UpdateAPIKeyAsync(apikey, "readonly");
-                        return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem updating the Read-Only API Key."));
+                        return (serviceResponse.Success ? Ok("SUCCESS") : BadRequest(" - There was a problem updating the Read-Only API Key."));
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -288,17 +291,17 @@ namespace AzureNamingTool.Controllers
                     if (adminpassword == GeneralHelper.DecryptString(config.AdminPassword!, config.SALTKey!))
                     {
                         serviceResponse = await _adminService.GenerateAPIKeyAsync("readonly");
-                        return (serviceResponse.Success ? Ok("SUCCESS") : Ok("FAILURE - There was a problem generating the Read-Only API Key."));
+                        return (serviceResponse.Success ? Ok("SUCCESS") : BadRequest(" - There was a problem generating the Read-Only API Key."));
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -334,13 +337,13 @@ namespace AzureNamingTool.Controllers
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -376,13 +379,13 @@ namespace AzureNamingTool.Controllers
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -489,13 +492,13 @@ namespace AzureNamingTool.Controllers
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -531,13 +534,13 @@ namespace AzureNamingTool.Controllers
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
 
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)
@@ -572,12 +575,12 @@ namespace AzureNamingTool.Controllers
                     }
                     else
                     {
-                        return Ok("FAILURE - Incorrect Global Admin Password.");
+                        return Unauthorized("Incorrect Global Admin Password.");
                     }
                 }
                 else
                 {
-                    return Ok("FAILURE - You must provide the Global Admin Password.");
+                    return BadRequest("You must provide the Global Admin Password.");
                 }
             }
             catch (Exception ex)

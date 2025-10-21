@@ -87,6 +87,10 @@ namespace AzureNamingTool.Controllers
                 serviceResponse = await _resourceTypeService.GetItemAsync(id);
                 if (serviceResponse.Success)
                 {
+                    if (serviceResponse.ResponseObject == null)
+                    {
+                        return NotFound($"Resource type with ID {id} not found.");
+                    }
                     return Ok(serviceResponse.ResponseObject);
                 }
                 else
