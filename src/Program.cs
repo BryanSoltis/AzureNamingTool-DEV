@@ -297,6 +297,9 @@ app.UseResponseCompression();
 // Add Correlation ID to all requests/responses
 app.UseCorrelationId();
 
+// Add API request/response logging
+app.UseApiLogging();
+
 app.UseStaticFiles();
 app.UseAntiforgery();
 
