@@ -20,6 +20,7 @@ namespace AzureNamingTool.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
+    [Produces("application/json")]
     public class ResourceTypesController : ControllerBase
     {
         private readonly IResourceTypeService _resourceTypeService;
@@ -42,6 +43,9 @@ namespace AzureNamingTool.Controllers
         /// <param name="admin">bool - Indicates if the user is an admin (optional)</param>
         /// <returns>json - Current resource types data</returns>
         [HttpGet]
+        [ProducesResponseType(typeof(List<Models.ResourceType>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Get(bool admin = false)
         {
             try
@@ -71,6 +75,10 @@ namespace AzureNamingTool.Controllers
         /// <param name="id">int - Resource Type id</param>
         /// <returns>json - Resource Type data</returns>
         [HttpGet("{id}")]
+        [ProducesResponseType(typeof(Models.ResourceType), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Get(int id)
         {
             try
@@ -101,6 +109,9 @@ namespace AzureNamingTool.Controllers
         /// <returns>bool - PASS/FAIL</returns>
         [HttpPost]
         [Route("[action]")]
+        [ProducesResponseType(typeof(bool), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> PostConfig([FromBody] List<ResourceType> items)
         {
             try

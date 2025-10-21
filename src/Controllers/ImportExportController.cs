@@ -19,6 +19,7 @@ namespace AzureNamingTool.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
+    [Produces("application/json")]
     public class ImportExportController : ControllerBase
     {
         private readonly IImportExportService _importExportService;

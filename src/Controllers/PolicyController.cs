@@ -1,4 +1,4 @@
-﻿using AzureNamingTool.Models;
+using AzureNamingTool.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -17,6 +17,7 @@ namespace AzureNamingTool.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
+    [Produces("application/json")]
     public class PolicyController : ControllerBase
     {
         //private ServiceResponse serviceResponse = new();

@@ -20,6 +20,7 @@ namespace AzureNamingTool.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
+    [Produces("application/json")]
     public class CustomComponentsController : ControllerBase
     {
         private readonly ICustomComponentService _customComponentService;

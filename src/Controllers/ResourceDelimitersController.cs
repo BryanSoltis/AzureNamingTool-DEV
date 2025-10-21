@@ -1,4 +1,4 @@
-﻿using AzureNamingTool.Attributes;
+using AzureNamingTool.Attributes;
 using AzureNamingTool.Helpers;
 using AzureNamingTool.Models;
 using AzureNamingTool.Services;
@@ -18,6 +18,7 @@ namespace AzureNamingTool.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
+    [Produces("application/json")]
     public class ResourceDelimitersController : ControllerBase
     {
         private readonly IResourceDelimiterService _resourceDelimiterService;

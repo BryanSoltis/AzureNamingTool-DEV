@@ -19,6 +19,7 @@ namespace AzureNamingTool.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
+    [Produces("application/json")]
     public class ResourceProjAppSvcsController : ControllerBase
     {
         private readonly IResourceProjAppSvcService _resourceprojappsvcService;

@@ -2,6 +2,7 @@ using AzureNamingTool.Attributes;
 using AzureNamingTool.Components;
 using AzureNamingTool.Data;
 using AzureNamingTool.Helpers;
+using AzureNamingTool.Middleware;
 using AzureNamingTool.Models;
 using AzureNamingTool.Repositories;
 using AzureNamingTool.Repositories.Implementation.FileSystem;
@@ -292,6 +293,9 @@ app.UseHttpsRedirection();
 
 // Enable Response Compression
 app.UseResponseCompression();
+
+// Add Correlation ID to all requests/responses
+app.UseCorrelationId();
 
 app.UseStaticFiles();
 app.UseAntiforgery();

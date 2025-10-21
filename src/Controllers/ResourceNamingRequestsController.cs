@@ -23,6 +23,7 @@ namespace AzureNamingTool.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [ApiKey]
+    [Produces("application/json")]
     public class ResourceNamingRequestsController : ControllerBase
     {
         private readonly IResourceNamingRequestService _resourceNamingRequestService;
@@ -48,6 +49,10 @@ namespace AzureNamingTool.Controllers
         /// <returns>string - Name generation response</returns>
         [HttpPost]
         [Route("[action]")]
+        [ProducesResponseType(typeof(ResourceNameResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResourceNameResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RequestNameWithComponents([FromBody] ResourceNameRequestWithComponents request)
         {
             try
@@ -77,6 +82,10 @@ namespace AzureNamingTool.Controllers
         /// <returns>string - Name generation response</returns>
         [HttpPost]
         [Route("[action]")]
+        [ProducesResponseType(typeof(ResourceNameResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ResourceNameResponse), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> RequestName([FromBody] ResourceNameRequest request)
         {
             try
@@ -107,6 +116,10 @@ namespace AzureNamingTool.Controllers
         /// <returns>ValidateNameResponse - Name validation response</returns>
         [HttpPost]
         [Route("[action]")]
+        [ProducesResponseType(typeof(ValidateNameResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(string), StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> ValidateName([FromBody] ValidateNameRequest validateNameRequest)
         {
             try
