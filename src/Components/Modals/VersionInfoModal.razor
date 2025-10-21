@@ -12,8 +12,11 @@
         </p>
         @if (!String.IsNullOrEmpty(VersionAlert))
         {
-            <div class="modern-info-box mt-3">
-                @((MarkupString)VersionAlert)
+            <div class="modern-notification-info mt-3">
+                <i class="bi bi-info-circle"></i>
+                <div>
+                    @((MarkupString)VersionAlert)
+                </div>
             </div>
         }
     </div>

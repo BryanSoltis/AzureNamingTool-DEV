@@ -50,7 +50,8 @@
             {
                 <div class="modern-alert modern-alert-danger mb-3">
                     <div class="modern-alert-header">
-                        <h4>⚠️ ATTENTION</h4>
+                        <i class="bi bi-exclamation-triangle-fill"></i>
+                        <h4>ATTENTION</h4>
                     </div>
                     <div class="modern-alert-body">
                         <p>The Azure Naming Tool cannot verify internet connectivity, so some features have been disabled. This includes the ability to <span class="fw-bold">Refresh</span> resource types and locations.</p>
@@ -65,8 +66,11 @@
             @if ((!versionalertshown) && (!String.IsNullOrEmpty(versionalert)))
             {
                 <div class="modern-alert modern-alert-warning mb-3">
-                    <div class="modern-alert-body">
-                        @((MarkupString)versionalert)
+                    <div class="modern-alert-content-wrapper">
+                        <i class="bi bi-info-circle"></i>
+                        <div class="modern-alert-content-text">
+                            @((MarkupString)versionalert)
+                        </div>
                     </div>
                     <div class="modern-alert-footer">
                         <label class="modern-form-check">
@@ -208,19 +212,22 @@
                                         <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                     </div>
                                     <div class="modern-sub-card-body @(GetCollapseClass("componentsconfig"))">
-                                        <div class="modern-warning-box">
-                                            <h4>Reset the Components Configuration</h4>
-                                            <p>
-                                                Click <span class="fw-bold">Reset</span> to reset the Components Configuration back to the default values at the time of installation.
-                                            </p>
-                                            <p class="modern-text-warning">
-                                                <span class="fw-bold">NOTE:</span> This will reset the current Components Configuration and cannot be undone!
-                                            </p>
-                                            <p>
-                                                <button type="button" class="modern-btn-danger" @onclick=@(e => FormAction("ResourceComponent",0,"reset")) title="Reset">
+                                        <div class="modern-notification-warning">
+                                            <i class="bi bi-exclamation-triangle"></i>
+                                            <div>
+                                                <h4>Reset the Components Configuration</h4>
+                                                <p>
+                                                    Click <span class="fw-bold">Reset</span> to reset the Components Configuration back to the default values at the time of installation.
+                                                </p>
+                                                <p class="modern-text-warning">
+                                                    <span class="fw-bold">NOTE:</span> This will reset the current Components Configuration and cannot be undone!
+                                                </p>
+                                                <p>
+                                                    <button type="button" class="modern-btn-danger" @onclick=@(e => FormAction("ResourceComponent",0,"reset")) title="Reset">
                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
                                                 </button>
                                             </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -292,19 +299,22 @@
                                         <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Configuration
                                     </div>
                                     <div class="modern-sub-card-body @(GetCollapseClass("delimitersconfig"))">
-                                        <div class="modern-warning-box">
-                                            <h4>Reset the Delimiters Configuration</h4>
-                                            <p>
-                                                Click <span class="fw-bold">Reset</span> to reset the Delimiters Configuration back to the default values at the time of installation.
-                                            </p>
-                                            <p class="modern-text-warning">
-                                                <span class="fw-bold">NOTE:</span> This will reset the current Delimiters Configuration and cannot be undone!
-                                            </p>
+                                        <div class="modern-notification-warning">
+                                            <i class="bi bi-exclamation-triangle"></i>
+                                            <div>
+                                                <h4>Reset the Delimiters Configuration</h4>
+                                                <p>
+                                                    Click <span class="fw-bold">Reset</span> to reset the Delimiters Configuration back to the default values at the time of installation.
+                                                </p>
+                                                <p class="modern-text-warning">
+                                                    <span class="fw-bold">NOTE:</span> This will reset the current Delimiters Configuration and cannot be undone!
+                                                </p>
                                             <p>
                                                 <button type="button" class="modern-btn-danger" @onclick=@(e => FormAction("ResourceDelimiter",0,"reset")) title="Reset">
                                                     <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
                                                 </button>
                                             </p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -559,19 +569,22 @@
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div class="modern-warning-box">
-                                                        <h4>Reset the Environments Configuration</h4>
-                                                        <p>
-                                                            Click <span class="fw-bold">Reset</span> to reset the Environments Configuration back to the default values at the time of installation.
-                                                        </p>
-                                                        <p class="modern-text-warning">
-                                                            <span class="fw-bold">NOTE:</span> This will reset the current Environments Configuration and cannot be undone!
-                                                        </p>
+                                                    <div class="modern-notification-warning">
+                                                        <i class="bi bi-exclamation-triangle"></i>
+                                                        <div>
+                                                            <h4>Reset the Environments Configuration</h4>
+                                                            <p>
+                                                                Click <span class="fw-bold">Reset</span> to reset the Environments Configuration back to the default values at the time of installation.
+                                                            </p>
+                                                            <p class="modern-text-warning">
+                                                                <span class="fw-bold">NOTE:</span> This will reset the current Environments Configuration and cannot be undone!
+                                                            </p>
                                                         <p>
                                                             <button type="button" class="modern-btn-danger" @onclick=@(e => FormAction("ResourceEnvironment",0,"reset")) title="Reset">
                                                                 <span class="oi oi-loop-circular" aria-hidden="true"></span> Reset
                                                             </button>
                                                         </p>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>

@@ -3471,32 +3471,65 @@ pre code {
 
 /* Modern Alert Styles */
 .modern-alert {
+    display: block;
     padding: 16px;
-    border-radius: 8px;
-    border: 1px solid;
+    border-radius: 6px;
     margin-bottom: 16px;
+    border-left: 4px solid;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .modern-alert-danger {
-    background: #fee2e2;
-    border-color: #f87171;
+    background: #fef2f2;
+    border-left-color: #dc2626;
     color: #7f1d1d;
 }
 
 .modern-alert-warning {
-    background: #fef3c7;
-    border-color: #fbbf24;
+    background: #fffbeb;
+    border-left-color: #f59e0b;
     color: #78350f;
 }
 
+.modern-alert-content-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.modern-alert-content-wrapper i {
+    flex-shrink: 0;
+    font-size: 20px;
+}
+
+.modern-alert-content-text {
+    flex: 1;
+}
+
+.modern-alert-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
 .modern-alert-header h4 {
-    margin: 0 0 12px 0;
+    margin: 0;
     font-size: 18px;
     font-weight: 600;
 }
 
+.modern-alert-header i {
+    flex-shrink: 0;
+    font-size: 20px;
+}
+
 .modern-alert-body {
     margin-bottom: 12px;
+    padding-left: 0;
 }
 
 .modern-alert-body p:last-child {
@@ -3505,9 +3538,35 @@ pre code {
 
 .modern-alert-footer {
     display: flex;
-    justify-content: space-between;
+    flex-direction: row;
     align-items: center;
+    justify-content: space-between;
     gap: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Dark Theme Alert Styles */
+[data-theme="dark"] .modern-alert {
+    border-top-color: rgba(255, 255, 255, 0.1);
+    border-right-color: rgba(255, 255, 255, 0.1);
+    border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .modern-alert-footer {
+    border-top-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-theme="dark"] .modern-alert-danger {
+    background: rgba(239, 68, 68, 0.15);
+    border-left-color: #ef4444;
+    color: #fca5a5;
+}
+
+[data-theme="dark"] .modern-alert-warning {
+    background: rgba(251, 191, 36, 0.15);
+    border-left-color: #fbbf24;
+    color: #fde047;
 }
 
 .modern-form-check {
@@ -3515,14 +3574,19 @@ pre code {
     align-items: center;
     gap: 8px;
     cursor: pointer;
+    font-size: 14px;
 }
 
 .modern-form-check input[type="checkbox"] {
     cursor: pointer;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-azure-blue);
 }
 
 .modern-form-check span {
     user-select: none;
+    color: inherit;
 }
 
 /* Modern Section Title */

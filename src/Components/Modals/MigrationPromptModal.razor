@@ -33,19 +33,23 @@
         </div>
     </div>
 
-    <div class="modern-info-box mb-3">
+    <div class="modern-notification-info mb-3">
         <i class="bi bi-info-circle"></i>
-        <strong>Safe Migration:</strong> Your JSON files will be backed up before migration.
-        You can rollback if needed from the Admin page.
+        <div>
+            <strong>Safe Migration:</strong> Your JSON files will be backed up before migration.
+            You can rollback if needed from the Admin page.
+        </div>
     </div>
 
     @if (showMigrationStatus)
     {
-        <div class="modern-warning-box">
+        <div class="modern-notification-warning">
             <i class="bi bi-hourglass-split"></i>
-            <strong>Migration in progress...</strong>
-            <div class="modern-progress-bar mt-2">
-                <div class="modern-progress-fill animated"></div>
+            <div>
+                <strong>Migration in progress...</strong>
+                <div class="modern-progress-bar mt-2">
+                    <div class="modern-progress-fill animated"></div>
+                </div>
             </div>
         </div>
     }
