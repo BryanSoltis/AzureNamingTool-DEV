@@ -2587,17 +2587,32 @@ pre code {
 }
 
 /* Modal Header */
-.blazored-modal-header {
+/* Blazored Modal Header - Force nav color styling with maximum specificity */
+.blazored-modal-container .blazored-modal .blazored-modal-header,
+.blazored-modal-container > .blazored-modal > .blazored-modal-header,
+div[class*="blazored-modal-container"] div[class*="blazored-modal-header"],
+.blazored-modal-header,
+div.blazored-modal-header,
+.blazored-modal > .blazored-modal-header,
+.blazored-modal-container .blazored-modal-header {
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
     padding: 20px 24px !important;
     border-bottom: 1px solid var(--color-border) !important;
-    background: linear-gradient(135deg, var(--color-azure-blue) 0%, #005a9e 100%) !important;
+    background: #004494 !important; /* Match nav header color */
+    background-color: #004494 !important; /* Backup for background */
+    background-image: none !important; /* Override any gradient */
     color: white !important;
 }
 
-.blazored-modal-title {
+.blazored-modal-container .blazored-modal .blazored-modal-header .blazored-modal-title,
+.blazored-modal-container > .blazored-modal > .blazored-modal-header > .blazored-modal-title,
+div[class*="blazored-modal-header"] h3[class*="blazored-modal-title"],
+.blazored-modal-title,
+h3.blazored-modal-title,
+.blazored-modal-header .blazored-modal-title,
+.blazored-modal-header h3 {
     font-size: 20px !important;
     font-weight: 600 !important;
     margin: 0 !important;
@@ -2645,6 +2660,17 @@ pre code {
     background-color: var(--color-bg-secondary) !important;
 }
 
+.modern-modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 24px;
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-bg-secondary);
+    margin-top: auto; /* Push footer to bottom when content is short */
+}
+
 /* Modal Animations */
 @keyframes fadeIn {
     from {
@@ -2673,6 +2699,18 @@ pre code {
     flex-direction: column;
     max-height: 85vh;
     overflow-y: auto; /* Enable scrolling on the modal content */
+    line-height: 1.6; /* Consistent line height for readability */
+    font-size: 14px; /* Consistent font size */
+}
+
+.modern-modal-content p,
+.modern-modal-content div {
+    margin-bottom: 0.75rem; /* Consistent spacing */
+}
+
+.modern-modal-content p:last-child,
+.modern-modal-content div:last-child {
+    margin-bottom: 0; /* Remove bottom margin from last element */
 }
 
 .modern-modal-body {
@@ -2680,6 +2718,8 @@ pre code {
     overflow-y: auto;
     padding: 1.5rem;
     max-height: calc(85vh - 120px); /* Account for header and footer */
+    line-height: 1.6; /* Consistent line height for readability */
+    font-size: 14px; /* Consistent font size */
 }
 
 .modern-modal-content h4,

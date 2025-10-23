@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeDismissibles();
     initializeTabs();
     initializeScrollToTop();
+    forceBlazoredModalStyling();
 });
 
 /* ===================================================================
@@ -492,6 +493,88 @@ function initializeScrollToTop() {
     }
     
     scrollToTopInitialized = true;
+}
+
+/* ===================================================================
+   BLAZORED MODAL STYLING FORCE
+   Forces the modal header to use nav color (#004494) with white text
+   =================================================================== */
+
+function forceBlazoredModalStyling() {
+    function applyModalFixes() {
+        console.log('=== applyModalFixes running ===');
+        
+        // Remove padding and border from blazored-modal to let header extend to edges
+        const modals = document.querySelectorAll('.blazored-modal');
+        console.log('Found', modals.length, 'blazored-modal elements');
+        modals.forEach(modal => {
+            modal.style.padding = '0';
+            modal.style.border = 'none';
+        });
+        
+        // Force header to use nav color - using setProperty with !important to override CSS isolation
+        const headers = document.querySelectorAll('.bm-header');
+        console.log('Found', headers.length, 'bm-header elements');
+        headers.forEach(header => {
+            const beforeColor = window.getComputedStyle(header).backgroundColor;
+            console.log('Header background BEFORE:', beforeColor);
+            
+            // Completely clear all background properties
+            header.style.removeProperty('background');
+            header.style.removeProperty('background-color');
+            header.style.removeProperty('background-image');
+            header.style.removeProperty('background-size');
+            header.style.removeProperty('background-position');
+            header.style.removeProperty('background-repeat');
+            
+            // Apply same gradient as sidebar for visual consistency
+            header.style.setProperty('background', 'linear-gradient(180deg, #2d3748 0%, #1a202c 100%)', 'important');
+            header.style.setProperty('color', '#ffffff', 'important');
+            
+            // Check what was applied
+            setTimeout(() => {
+                const computed = window.getComputedStyle(header);
+                console.log('Header background AFTER:', computed.backgroundColor);
+                console.log('Header background-image AFTER:', computed.backgroundImage);
+                console.log('Header element:', header);
+            }, 50);
+        });
+    }
+    
+    // Apply immediately
+    applyModalFixes();
+    
+    // Apply repeatedly to catch any late-loading modals
+    setTimeout(applyModalFixes, 100);
+    setTimeout(applyModalFixes, 250);
+    setTimeout(applyModalFixes, 500);
+    setTimeout(applyModalFixes, 1000);
+    
+    // Watch for new modals
+    const observer = new MutationObserver(function(mutations) {
+        let hasNewModal = false;
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(node => {
+                if (node.nodeType === 1 && (node.classList?.contains('blazored-modal') || node.querySelector?.('.blazored-modal'))) {
+                    hasNewModal = true;
+                }
+            });
+        });
+        
+        if (hasNewModal) {
+            console.log('NEW MODAL DETECTED - applying fixes');
+            setTimeout(applyModalFixes, 10);
+            setTimeout(applyModalFixes, 100);
+            setTimeout(applyModalFixes, 250);
+        }
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+    
+    console.log('Blazored Modal styling watcher initialized');
 }
 
 console.log('Modern Components JavaScript initialized successfully');
