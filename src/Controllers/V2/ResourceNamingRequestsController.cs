@@ -330,6 +330,220 @@ namespace AzureNamingTool.Controllers.V2
                 return StatusCode(500, response);
             }
         }
+
+        /// <summary>
+        /// Generate resource names for multiple resource types in a single request.
+        /// Processes each resource type independently and returns detailed success/failure information.
+        /// </summary>
+        /// <param name="request">BulkResourceNameRequest (json) - Bulk name generation request with shared components and resource types</param>
+        /// <returns>Standardized API response with bulk name generation results</returns>
+        [HttpPost]
+        [Route("[action]")]
+        [ProducesResponseType(typeof(ApiResponse<BulkResourceNameResponse>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<BulkResourceNameResponse>), StatusCodes.Status207MultiStatus)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GenerateBulk([FromBody] BulkResourceNameRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    var response = ApiResponse<object>.ErrorResponse(
+                        "INVALID_REQUEST",
+                        "Request body cannot be null",
+                        "BulkResourceNameRequest"
+                    );
+                    response.Metadata.CorrelationId = GetCorrelationId();
+                    return BadRequest(response);
+                }
+
+                // Validate resource types list
+                if (request.ResourceTypes == null || request.ResourceTypes.Count == 0)
+                {
+                    var response = ApiResponse<object>.ErrorResponse(
+                        "INVALID_REQUEST",
+                        "ResourceTypes list cannot be null or empty",
+                        "BulkResourceNameRequest.ResourceTypes"
+                    );
+                    response.Metadata.CorrelationId = GetCorrelationId();
+                    return BadRequest(response);
+                }
+
+                var bulkResponse = new BulkResourceNameResponse
+                {
+                    TotalRequested = request.ResourceTypes.Count,
+                    ProcessedAt = DateTime.UtcNow
+                };
+
+                // Process each resource type
+                foreach (var resourceTypeShortName in request.ResourceTypes)
+                {
+                    var result = new BulkResourceNameResult
+                    {
+                        ResourceType = resourceTypeShortName
+                    };
+
+                    try
+                    {
+                        // Build individual request for this resource type
+                        var individualRequest = new ResourceNameRequest
+                        {
+                            ResourceType = resourceTypeShortName,
+                            ResourceEnvironment = request.ResourceEnvironment,
+                            ResourceFunction = request.ResourceFunction,
+                            ResourceInstance = request.ResourceInstance,
+                            ResourceLocation = request.ResourceLocation,
+                            ResourceOrg = request.ResourceOrg,
+                            ResourceProjAppSvc = request.ResourceProjAppSvc,
+                            ResourceUnitDept = request.ResourceUnitDept,
+                            CustomComponents = request.CustomComponents,
+                            CreatedBy = request.CreatedBy
+                        };
+
+                        // Apply resource type overrides if specified
+                        if (request.ResourceTypeOverrides != null && 
+                            request.ResourceTypeOverrides.TryGetValue(resourceTypeShortName, out var overrides))
+                        {
+                            if (!string.IsNullOrEmpty(overrides.ResourceEnvironment))
+                                individualRequest.ResourceEnvironment = overrides.ResourceEnvironment;
+                            if (!string.IsNullOrEmpty(overrides.ResourceFunction))
+                                individualRequest.ResourceFunction = overrides.ResourceFunction;
+                            if (!string.IsNullOrEmpty(overrides.ResourceInstance))
+                                individualRequest.ResourceInstance = overrides.ResourceInstance;
+                            if (!string.IsNullOrEmpty(overrides.ResourceLocation))
+                                individualRequest.ResourceLocation = overrides.ResourceLocation;
+                            if (!string.IsNullOrEmpty(overrides.ResourceOrg))
+                                individualRequest.ResourceOrg = overrides.ResourceOrg;
+                            if (!string.IsNullOrEmpty(overrides.ResourceProjAppSvc))
+                                individualRequest.ResourceProjAppSvc = overrides.ResourceProjAppSvc;
+                            if (!string.IsNullOrEmpty(overrides.ResourceUnitDept))
+                                individualRequest.ResourceUnitDept = overrides.ResourceUnitDept;
+                            if (overrides.CustomComponents != null && overrides.CustomComponents.Count > 0)
+                                individualRequest.CustomComponents = overrides.CustomComponents;
+                        }
+
+                        // Generate the name
+                        var nameResponse = await _resourceNamingRequestService.RequestNameAsync(individualRequest);
+
+                        if (nameResponse.Success)
+                        {
+                            result.Success = true;
+                            result.ResourceName = nameResponse.ResourceName;
+                            
+                            if (!request.ValidateOnly)
+                            {
+                                result.ResourceNameDetails = nameResponse.ResourceNameDetails;
+                            }
+
+                            bulkResponse.SuccessCount++;
+                        }
+                        else
+                        {
+                            result.Success = false;
+                            result.ErrorMessage = nameResponse.Message;
+                            bulkResponse.FailureCount++;
+
+                            // If not continue on error, stop processing
+                            if (!request.ContinueOnError)
+                            {
+                                bulkResponse.Results.Add(result);
+                                break;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        result.Success = false;
+                        result.ErrorMessage = $"Exception occurred: {ex.Message}";
+                        bulkResponse.FailureCount++;
+
+                        await _adminLogService.PostItemAsync(new AdminLogMessage()
+                        {
+                            Title = "ERROR",
+                            Message = $"V2 API - GenerateBulk failed for resource type '{resourceTypeShortName}': {ex.Message}"
+                        });
+
+                        // If not continue on error, stop processing
+                        if (!request.ContinueOnError)
+                        {
+                            bulkResponse.Results.Add(result);
+                            break;
+                        }
+                    }
+
+                    bulkResponse.Results.Add(result);
+                }
+
+                // Set overall success and message
+                bulkResponse.Success = bulkResponse.FailureCount == 0;
+                
+                if (bulkResponse.Success)
+                {
+                    bulkResponse.Message = $"Successfully generated {bulkResponse.SuccessCount} resource name(s)";
+                }
+                else if (bulkResponse.SuccessCount > 0)
+                {
+                    bulkResponse.Message = $"Partially successful: {bulkResponse.SuccessCount} succeeded, {bulkResponse.FailureCount} failed";
+                }
+                else
+                {
+                    bulkResponse.Message = $"All {bulkResponse.FailureCount} resource name generation(s) failed";
+                }
+
+                // Return appropriate status code
+                if (bulkResponse.Success)
+                {
+                    var response = ApiResponse<BulkResourceNameResponse>.SuccessResponse(
+                        bulkResponse,
+                        bulkResponse.Message
+                    );
+                    response.Metadata.CorrelationId = GetCorrelationId();
+                    return Ok(response);
+                }
+                else if (bulkResponse.SuccessCount > 0)
+                {
+                    // Partial success - return 207 Multi-Status
+                    var response = ApiResponse<BulkResourceNameResponse>.SuccessResponse(
+                        bulkResponse,
+                        bulkResponse.Message
+                    );
+                    response.Metadata.CorrelationId = GetCorrelationId();
+                    return StatusCode(207, response);
+                }
+                else
+                {
+                    // Complete failure - return 400
+                    var response = ApiResponse<BulkResourceNameResponse>.SuccessResponse(
+                        bulkResponse,
+                        bulkResponse.Message
+                    );
+                    response.Metadata.CorrelationId = GetCorrelationId();
+                    return BadRequest(response);
+                }
+            }
+            catch (Exception ex)
+            {
+                await _adminLogService.PostItemAsync(new AdminLogMessage()
+                {
+                    Title = "ERROR",
+                    Message = $"V2 API - GenerateBulk failed: {ex.Message}"
+                });
+
+                var response = ApiResponse<object>.ErrorResponse(
+                    "INTERNAL_SERVER_ERROR",
+                    $"An unexpected error occurred during bulk name generation: {ex.Message}",
+                    "ResourceNamingRequestsController.GenerateBulk"
+                );
+                response.Error!.InnerError = new ApiInnerError
+                {
+                    Code = ex.GetType().Name
+                };
+                response.Metadata.CorrelationId = GetCorrelationId();
+                return StatusCode(500, response);
+            }
+        }
     }
 }
 
