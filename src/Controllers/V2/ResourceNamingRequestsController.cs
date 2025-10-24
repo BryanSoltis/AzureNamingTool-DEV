@@ -337,6 +337,68 @@ namespace AzureNamingTool.Controllers.V2
         /// </summary>
         /// <param name="request">BulkResourceNameRequest (json) - Bulk name generation request with shared components and resource types</param>
         /// <returns>Standardized API response with bulk name generation results</returns>
+        /// <remarks>
+        /// This endpoint allows you to generate names for multiple resource types in a single API call.
+        /// 
+        /// **Key Features:**
+        /// - Process multiple resource types with shared component values
+        /// - Continue processing on errors (default: true)
+        /// - Per-resource-type component overrides
+        /// - Validate-only mode (test names without persisting)
+        /// - Detailed success/failure reporting for each resource
+        /// 
+        /// **Response Status Codes:**
+        /// - 200 OK: All resource names generated successfully
+        /// - 207 Multi-Status: Partial success (some succeeded, some failed)
+        /// - 400 Bad Request: Validation error or all failed
+        /// 
+        /// **Sample Request:**
+        /// 
+        ///     POST /api/v2/ResourceNamingRequests/GenerateBulk
+        ///     {
+        ///       "resourceTypes": ["rg", "vnet", "nsg"],
+        ///       "resourceLocation": "use",
+        ///       "resourceInstance": "001",
+        ///       "resourceTypeOverrides": {
+        ///         "vnet": {
+        ///           "resourceInstance": "002"
+        ///         }
+        ///       },
+        ///       "continueOnError": true,
+        ///       "validateOnly": false,
+        ///       "createdBy": "MyApp"
+        ///     }
+        /// 
+        /// **Sample Response (200 OK):**
+        /// 
+        ///     {
+        ///       "success": true,
+        ///       "data": {
+        ///         "results": [
+        ///           {
+        ///             "resourceType": "rg",
+        ///             "success": true,
+        ///             "resourceName": "rg-use-001"
+        ///           },
+        ///           {
+        ///             "resourceType": "vnet",
+        ///             "success": true,
+        ///             "resourceName": "vnet-use-002"
+        ///           },
+        ///           {
+        ///             "resourceType": "nsg",
+        ///             "success": true,
+        ///             "resourceName": "nsg-use-001"
+        ///           }
+        ///         ],
+        ///         "success": true,
+        ///         "message": "Successfully generated 3 resource name(s)",
+        ///         "totalRequested": 3,
+        ///         "successCount": 3,
+        ///         "failureCount": 0
+        ///       }
+        ///     }
+        /// </remarks>
         [HttpPost]
         [Route("[action]")]
         [ProducesResponseType(typeof(ApiResponse<BulkResourceNameResponse>), StatusCodes.Status200OK)]
