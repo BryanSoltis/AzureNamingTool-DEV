@@ -100,6 +100,9 @@ builder.Services.AddBlazoredModal();
 builder.Services.AddMemoryCache();
 builder.Services.AddMvcCore().AddApiExplorer();
 
+// Register HttpClient for Azure validation services
+builder.Services.AddHttpClient();
+
 // Register Cache Service (Singleton since it wraps IMemoryCache)
 builder.Services.AddSingleton<ICacheService, CacheService>();
 
