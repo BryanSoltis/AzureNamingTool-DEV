@@ -100,6 +100,10 @@
                     <span class="oi oi-cog tab-icon" aria-hidden="true"></span>
                     Site Settings
                 </button>
+                <button class="modern-tab" data-tab="tab-azure-validation">
+                    <span class="oi oi-cloud tab-icon" aria-hidden="true"></span>
+                    Azure Validation
+                </button>
             </div>
 
             <!-- System Details Tab Content -->
@@ -1154,6 +1158,252 @@
                 }
             </div>
             <!-- End of tab-identity -->
+
+            <!-- Azure Validation Tab Content -->
+            <div id="tab-azure-validation" class="modern-tab-content">
+                <h3 class="mb-3">Azure Validation Settings</h3>
+                <p class="text-secondary mb-4">
+                    Configure Azure tenant name validation to check if generated resource names already exist in your Azure environment. This feature requires Azure authentication and appropriate permissions.
+                </p>
+
+                @if (!azuretenantamevalidationenabled)
+                {
+                    <div class="modern-notification-warning mb-4">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <div>
+                            <strong>Azure Validation is Disabled</strong><br />
+                            Enable <strong>Azure Tenant Name Validation</strong> in the <strong>Site Settings</strong> tab to configure these settings.
+                        </div>
+                    </div>
+                }
+
+                <!-- Connection Status Section -->
+                <div class="modern-setting-row">
+                    <div class="setting-label">Connection Status</div>
+                    <div class="setting-description">
+                        View the current Azure connection status and test connectivity to your Azure tenant.
+                    </div>
+                    <div class="mt-3">
+                        @if (azureConnectionTested)
+                        {
+                            @if (azureConnectionSuccess)
+                            {
+                                <div class="modern-notification-success">
+                                    <i class="bi bi-check-circle"></i>
+                                    <div>
+                                        <strong>✓ Connected to Azure</strong><br />
+                                        Authentication: @azureConnectionDetails<br />
+                                        @if (!string.IsNullOrEmpty(azureTenantInfo))
+                                        {
+                                            <span>Tenant: @azureTenantInfo</span><br />
+                                        }
+                                        @if (azureSubscriptionCount > 0)
+                                        {
+                                            <span>Accessible Subscriptions: @azureSubscriptionCount</span>
+                                        }
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="modern-notification-danger">
+                                    <i class="bi bi-x-circle"></i>
+                                    <div>
+                                        <strong>✗ Connection Failed</strong><br />
+                                        @azureConnectionError
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="modern-notification-info">
+                                <i class="bi bi-info-circle"></i>
+                                <div>
+                                    Click <strong>Test Connection</strong> to verify Azure authentication and permissions.
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    <div class="setting-actions mt-3">
+                        <button type="button" class="modern-btn-primary" @onclick="TestAzureConnection" disabled="@(!azuretenantamevalidationenabled || testingConnection)" title="Test Azure Connection">
+                            @if (testingConnection)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                                <span>Testing...</span>
+                            }
+                            else
+                            {
+                                <span class="oi oi-wifi" aria-hidden="true"></span>
+                                <span>Test Connection</span>
+                            }
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Authentication Mode Section -->
+                <div class="modern-setting-row">
+                    <div class="setting-label">Authentication Mode</div>
+                    <div class="setting-description">
+                        Select how the Azure Naming Tool authenticates with Azure for name validation.
+                    </div>
+                    <div class="modern-notification-info mt-3">
+                        <i class="bi bi-info-circle"></i>
+                        <div>
+                            <strong>Managed Identity</strong> - Recommended for Azure-hosted deployments (App Service, Container Apps, AKS)<br />
+                            <strong>Service Principal</strong> - Use when Managed Identity is not available or for testing
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="radio" name="authMode" id="authModeManagedIdentity" value="ManagedIdentity" checked="@(azureAuthMode == "ManagedIdentity")" @onchange="@(() => azureAuthMode = "ManagedIdentity")" disabled="@(!azuretenantamevalidationenabled)">
+                            <label class="form-check-label" for="authModeManagedIdentity">
+                                <strong>Managed Identity</strong> (Recommended)
+                            </label>
+                        </div>
+                        <div class="form-check mt-2">
+                            <input class="form-check-input" type="radio" name="authMode" id="authModeServicePrincipal" value="ServicePrincipal" checked="@(azureAuthMode == "ServicePrincipal")" @onchange="@(() => azureAuthMode = "ServicePrincipal")" disabled="@(!azuretenantamevalidationenabled)">
+                            <label class="form-check-label" for="authModeServicePrincipal">
+                                <strong>Service Principal</strong>
+                            </label>
+                        </div>
+                    </div>
+
+                    @if (azureAuthMode == "ServicePrincipal")
+                    {
+                        <div class="mt-4">
+                            <div class="modern-notification-warning">
+                                <i class="bi bi-exclamation-triangle"></i>
+                                <div>
+                                    <strong>Service Principal Configuration Required</strong><br />
+                                    Configure Service Principal credentials in the <code>settings/azurevalidationsettings.json</code> file or use Azure Key Vault for secure storage.
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <label class="modern-form-label">Tenant ID</label>
+                                <input type="text" class="modern-form-input mb-3" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" value="@azureTenantId" @oninput="@((e) => azureTenantId = e.Value?.ToString() ?? "")" disabled="@(!azuretenantamevalidationenabled)" />
+                                
+                                <label class="modern-form-label">Client ID</label>
+                                <input type="text" class="modern-form-input mb-3" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" value="@azureClientId" @oninput="@((e) => azureClientId = e.Value?.ToString() ?? "")" disabled="@(!azuretenantamevalidationenabled)" />
+                                
+                                <div class="modern-notification-info mt-3">
+                                    <i class="bi bi-shield-lock"></i>
+                                    <div>
+                                        <strong>Security Note:</strong> Client Secret should be stored in Azure Key Vault or the configuration file, not entered here for security reasons.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    
+                    <div class="setting-actions mt-3">
+                        <button type="button" class="modern-btn-success" @onclick="SaveAzureValidationSettings" disabled="@(!azuretenantamevalidationenabled)" title="Save Authentication Settings">
+                            <span class="oi oi-check" aria-hidden="true"></span> Save Settings
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Conflict Resolution Strategy Section -->
+                <div class="modern-setting-row">
+                    <div class="setting-label">Conflict Resolution Strategy</div>
+                    <div class="setting-description">
+                        Choose how the tool should handle naming conflicts when a generated name already exists in Azure.
+                    </div>
+                    <div class="mt-3">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="conflictStrategy" id="strategyAutoIncrement" value="AutoIncrement" checked="@(azureConflictStrategy == "AutoIncrement")" @onchange="@(() => azureConflictStrategy = "AutoIncrement")" disabled="@(!azuretenantamevalidationenabled)">
+                            <label class="form-check-label" for="strategyAutoIncrement">
+                                <strong>Auto-Increment</strong> - Automatically increment the instance number until a unique name is found<br />
+                                <small class="text-muted">Example: vnet-001 → vnet-002 → vnet-003</small>
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="conflictStrategy" id="strategyNotifyOnly" value="NotifyOnly" checked="@(azureConflictStrategy == "NotifyOnly")" @onchange="@(() => azureConflictStrategy = "NotifyOnly")" disabled="@(!azuretenantamevalidationenabled)">
+                            <label class="form-check-label" for="strategyNotifyOnly">
+                                <strong>Notify Only</strong> - Keep the original name but show a warning<br />
+                                <small class="text-muted">User receives notification that name exists in Azure</small>
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="conflictStrategy" id="strategyFail" value="Fail" checked="@(azureConflictStrategy == "Fail")" @onchange="@(() => azureConflictStrategy = "Fail")" disabled="@(!azuretenantamevalidationenabled)">
+                            <label class="form-check-label" for="strategyFail">
+                                <strong>Fail</strong> - Reject the name generation with an error<br />
+                                <small class="text-muted">Forces manual resolution of naming conflicts</small>
+                            </label>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="radio" name="conflictStrategy" id="strategySuffixRandom" value="SuffixRandom" checked="@(azureConflictStrategy == "SuffixRandom")" @onchange="@(() => azureConflictStrategy = "SuffixRandom")" disabled="@(!azuretenantamevalidationenabled)">
+                            <label class="form-check-label" for="strategySuffixRandom">
+                                <strong>Suffix Random</strong> - Add a random suffix to make the name unique<br />
+                                <small class="text-muted">Example: vnet-001-a1b2c3</small>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="setting-actions mt-3">
+                        <button type="button" class="modern-btn-success" @onclick="SaveAzureValidationSettings" disabled="@(!azuretenantamevalidationenabled)" title="Save Conflict Strategy">
+                            <span class="oi oi-check" aria-hidden="true"></span> Save Strategy
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Cache Settings Section -->
+                <div class="modern-setting-row">
+                    <div class="setting-label">Cache Settings</div>
+                    <div class="setting-description">
+                        Configure caching for Azure validation results to improve performance and reduce API calls.
+                    </div>
+                    <div class="modern-toggle-row mt-3">
+                        <div class="toggle-content">
+                            <div class="toggle-label">Enable Validation Cache</div>
+                            <div class="toggle-description">
+                                Cache validation results to reduce Azure API calls and improve performance.
+                            </div>
+                        </div>
+                        <div class="toggle-switch-wrapper">
+                            <label class="modern-toggle-switch" title="Enable Validation Cache">
+                                <input type="checkbox" checked="@azureCacheEnabled" @onchange="@((e) => azureCacheEnabled = (bool)(e.Value ?? false))" disabled="@(!azuretenantamevalidationenabled)">
+                                <span class="modern-toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="modern-form-label">Cache Duration (minutes)</label>
+                        <input type="number" class="modern-form-input" min="1" max="60" value="@azureCacheDuration" @oninput="@((e) => azureCacheDuration = int.TryParse(e.Value?.ToString(), out int val) ? val : 5)" disabled="@(!azuretenantamevalidationenabled || !azureCacheEnabled)" />
+                        <small class="text-muted">Validation results will be cached for this duration. Default: 5 minutes</small>
+                    </div>
+                    <div class="setting-actions mt-3">
+                        <button type="button" class="modern-btn-success" @onclick="SaveAzureValidationSettings" disabled="@(!azuretenantamevalidationenabled)" title="Save Cache Settings">
+                            <span class="oi oi-check" aria-hidden="true"></span> Save Cache Settings
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Documentation Section -->
+                <div class="modern-setting-row">
+                    <div class="setting-label">Documentation & Setup Guide</div>
+                    <div class="setting-description">
+                        Learn how to configure Azure validation, set up authentication, and troubleshoot common issues.
+                    </div>
+                    <div class="mt-3">
+                        <div class="modern-notification-info">
+                            <i class="bi bi-book"></i>
+                            <div>
+                                <strong>Required Azure Permissions:</strong><br />
+                                • <strong>Reader</strong> role on subscriptions to validate names<br />
+                                • <strong>Resource Graph</strong> access for scoped resource validation<br />
+                                • <strong>CheckNameAvailability</strong> API access for globally unique resources<br /><br />
+                                <strong>For Service Principal Setup:</strong><br />
+                                1. Create an App Registration in Azure AD<br />
+                                2. Assign <strong>Reader</strong> role on target subscriptions<br />
+                                3. Generate a client secret<br />
+                                4. Store credentials securely in Key Vault or configuration<br /><br />
+                                <a href="https://github.com/mspnp/AzureNamingTool/wiki/Azure-Validation" target="_blank" class="text-primary"><strong>View Full Documentation →</strong></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- End of tab-azure-validation -->
         </div>
         <!-- End of modern-tabs-container -->
     }
@@ -1217,7 +1467,11 @@
     [Inject]
     public ICustomComponentService? CustomComponentService { get; set; }
     
+    [Inject]
+    public IAzureValidationService? AzureValidationService { get; set; }
+    
     private ServicesData servicesData = new();
+
     private string currentpassword = String.Empty;
     private string newpassword = String.Empty;
     private string currentapikey = String.Empty;
@@ -1272,6 +1526,21 @@
     // Individual component import/export variables
     private string selectedComponentType = String.Empty;
     private string componentImportJson = String.Empty;
+
+    // Azure Validation variables
+    private bool testingConnection = false;
+    private bool azureConnectionTested = false;
+    private bool azureConnectionSuccess = false;
+    private string azureConnectionError = String.Empty;
+    private string azureConnectionDetails = String.Empty;
+    private string azureTenantInfo = String.Empty;
+    private int azureSubscriptionCount = 0;
+    private string azureAuthMode = "ManagedIdentity";
+    private string azureTenantId = String.Empty;
+    private string azureClientId = String.Empty;
+    private string azureConflictStrategy = "AutoIncrement";
+    private bool azureCacheEnabled = true;
+    private int azureCacheDuration = 5;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -3282,6 +3551,154 @@
             { 
                 Title = "ERROR", 
                 Message = $"Component import failed: {ex.Message}"
+            });
+        }
+    }
+
+    // Azure Validation Methods
+    private async Task TestAzureConnection()
+    {
+        testingConnection = true;
+        azureConnectionTested = false;
+        StateHasChanged();
+
+        try
+        {
+            if (AzureValidationService == null)
+            {
+                azureConnectionSuccess = false;
+                azureConnectionError = "Azure Validation Service is not available. Ensure Azure SDK packages are installed.";
+                azureConnectionTested = true;
+                return;
+            }
+
+            // Test the connection
+            var testResult = await AzureValidationService.TestConnectionAsync();
+
+            azureConnectionSuccess = testResult.Authenticated;
+            azureConnectionTested = true;
+
+            if (testResult.Authenticated)
+            {
+                // Get settings to show connection details
+                var settings = await AzureValidationService.GetSettingsAsync();
+                if (settings != null)
+                {
+                    azureConnectionDetails = settings.AuthMode.ToString();
+                    azureTenantInfo = settings.TenantId ?? "Default";
+                    azureSubscriptionCount = testResult.AccessibleSubscriptions.Count;
+                }
+
+                toastService.ShowSuccess("Successfully connected to Azure!");
+                
+                await AdminLogService!.PostItemAsync(new AdminLogMessage()
+                {
+                    Title = "INFORMATION",
+                    Message = $"Azure connection test successful. Auth: {azureConnectionDetails}, Subscriptions: {azureSubscriptionCount}"
+                });
+            }
+            else
+            {
+                azureConnectionError = testResult.ErrorMessage ?? "Unknown error occurred during connection test.";
+                toastService.ShowError("Azure connection test failed: " + azureConnectionError);
+                
+                await AdminLogService!.PostItemAsync(new AdminLogMessage()
+                {
+                    Title = "WARNING",
+                    Message = $"Azure connection test failed: {azureConnectionError}"
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            azureConnectionSuccess = false;
+            azureConnectionTested = true;
+            azureConnectionError = $"Exception during connection test: {ex.Message}";
+            
+            toastService.ShowError("Connection test failed: " + ex.Message);
+            
+            await AdminLogService!.PostItemAsync(new AdminLogMessage()
+            {
+                Title = "ERROR",
+                Message = $"Azure connection test exception: {ex.Message}"
+            });
+        }
+        finally
+        {
+            testingConnection = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task SaveAzureValidationSettings()
+    {
+        try
+        {
+            if (AzureValidationService == null)
+            {
+                toastService.ShowError("Azure Validation Service is not available.");
+                return;
+            }
+
+            // Get current settings
+            var settings = await AzureValidationService.GetSettingsAsync();
+            if (settings == null)
+            {
+                settings = new AzureValidationSettings
+                {
+                    Enabled = azuretenantamevalidationenabled
+                };
+            }
+
+            // Update settings from UI
+            settings.Enabled = azuretenantamevalidationenabled;
+            settings.AuthMode = Enum.Parse<AuthenticationMode>(azureAuthMode);
+            settings.ConflictResolution.Strategy = Enum.Parse<ConflictStrategy>(azureConflictStrategy);
+            settings.Cache.Enabled = azureCacheEnabled;
+            settings.Cache.DurationMinutes = azureCacheDuration;
+
+            // Update Service Principal settings if applicable
+            if (azureAuthMode == "ServicePrincipal")
+            {
+                if (!string.IsNullOrEmpty(azureTenantId))
+                {
+                    settings.TenantId = azureTenantId;
+                }
+                
+                if (settings.ServicePrincipal == null)
+                {
+                    settings.ServicePrincipal = new ServicePrincipalSettings();
+                }
+                
+                if (!string.IsNullOrEmpty(azureClientId))
+                {
+                    settings.ServicePrincipal.ClientId = azureClientId;
+                }
+            }
+
+            // Save settings
+            await AzureValidationService.UpdateSettingsAsync(settings);
+
+            toastService.ShowSuccess("Azure validation settings saved successfully!");
+            
+            await AdminLogService!.PostItemAsync(new AdminLogMessage()
+            {
+                Title = "INFORMATION",
+                Message = $"Azure validation settings updated. Auth: {azureAuthMode}, Strategy: {azureConflictStrategy}"
+            });
+
+            // Reset connection test status to prompt re-test
+            azureConnectionTested = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            toastService.ShowError("Failed to save settings: " + ex.Message);
+            
+            await AdminLogService!.PostItemAsync(new AdminLogMessage()
+            {
+                Title = "ERROR",
+                Message = $"Failed to save Azure validation settings: {ex.Message}"
             });
         }
     }
