@@ -290,6 +290,7 @@ builder.Services.AddScoped<IResourceOrgService, ResourceOrgService>();
 builder.Services.AddScoped<IResourceProjAppSvcService, ResourceProjAppSvcService>();
 builder.Services.AddScoped<IResourceTypeService, ResourceTypeService>();
 builder.Services.AddScoped<IResourceUnitDeptService, ResourceUnitDeptService>();
+builder.Services.AddScoped<IAzureValidationService, AzureValidationService>();
 
 // Register coordinator to break circular dependencies between ResourceComponent and ResourceType
 builder.Services.AddScoped<IResourceConfigurationCoordinator, ResourceConfigurationCoordinator>();
