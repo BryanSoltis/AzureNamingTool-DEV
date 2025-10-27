@@ -1,6 +1,7 @@
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 using AzureNamingTool.Models;
 using AzureNamingTool.Helpers;
+using AzureNamingTool.Services;
 using Microsoft.AspNetCore.Mvc;
 using Asp.Versioning;
 using System;
@@ -25,22 +26,88 @@ namespace AzureNamingTool.Controllers.V2
         private readonly IResourceTypeService _resourceTypeService;
         private readonly IAdminLogService _adminLogService;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IAzureValidationService _azureValidationService;
+        private readonly ConflictResolutionService _conflictResolutionService;
 
         public ResourceNamingRequestsController(
             IResourceNamingRequestService resourceNamingRequestService,
             IResourceTypeService resourceTypeService,
             IAdminLogService adminLogService,
-            IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            IAzureValidationService azureValidationService,
+            ConflictResolutionService conflictResolutionService)
         {
             _resourceNamingRequestService = resourceNamingRequestService;
             _resourceTypeService = resourceTypeService;
             _adminLogService = adminLogService;
             _httpContextAccessor = httpContextAccessor;
+            _azureValidationService = azureValidationService;
+            _conflictResolutionService = conflictResolutionService;
         }
 
         private string? GetCorrelationId()
         {
             return _httpContextAccessor.HttpContext?.Items["CorrelationId"]?.ToString();
+        }
+
+        /// <summary>
+        /// Performs Azure tenant validation and conflict resolution on a generated name
+        /// </summary>
+        private async Task<(string finalName, AzureValidationMetadata? validationMetadata)> ValidateAndResolveConflictAsync(
+            string generatedName,
+            string resourceType,
+            bool skipValidation = false)
+        {
+            // Check if validation is enabled and not skipped
+            if (skipValidation || !await _azureValidationService.IsValidationEnabledAsync())
+            {
+                return (generatedName, null);
+            }
+
+            try
+            {
+                // Get Azure validation settings
+                var settings = await _azureValidationService.GetSettingsAsync();
+
+                // Validate the generated name
+                var validation = await _azureValidationService.ValidateNameAsync(generatedName, resourceType);
+                validation.ValidationPerformed = true;
+
+                // If name doesn't exist in Azure, we're done
+                if (!validation.ExistsInAzure)
+                {
+                    return (generatedName, validation);
+                }
+
+                // Name exists - apply conflict resolution strategy
+                var resolution = await _conflictResolutionService.ResolveConflictAsync(
+                    generatedName,
+                    resourceType,
+                    settings);
+
+                // Update validation metadata with resolution details
+                validation.OriginalName = resolution.OriginalName;
+                validation.IncrementAttempts = resolution.Attempts;
+                validation.ValidationWarning = resolution.Warning ?? resolution.ErrorMessage;
+
+                // Return the resolved name (or original if resolution failed)
+                return (resolution.FinalName, validation);
+            }
+            catch (Exception ex)
+            {
+                _adminLogService.PostItemAsync(new AdminLogMessage()
+                {
+                    Title = "WARNING",
+                    Message = $"Azure validation failed: {ex.Message}. Continuing with original name."
+                }).GetAwaiter().GetResult();
+
+                // On error, return original name with error metadata
+                return (generatedName, new AzureValidationMetadata
+                {
+                    ValidationPerformed = true,
+                    ValidationWarning = $"Validation error: {ex.Message}"
+                });
+            }
         }
 
         /// <summary>
@@ -161,10 +228,21 @@ namespace AzureNamingTool.Controllers.V2
                 
                 if (resourceNameRequestResponse.Success)
                 {
+                    // Perform Azure tenant validation and conflict resolution
+                    var (finalName, validationMetadata) = await ValidateAndResolveConflictAsync(
+                        resourceNameRequestResponse.ResourceName,
+                        request.ResourceType,
+                        skipValidation: false);
+
+                    // Update the response with the final name and validation metadata
+                    resourceNameRequestResponse.ResourceName = finalName;
+                    resourceNameRequestResponse.ValidationMetadata = validationMetadata;
+
                     await _adminLogService.PostItemAsync(new AdminLogMessage() 
                     { 
                         Title = "INFORMATION", 
-                        Message = $"V2 API - Generated name: {resourceNameRequestResponse.ResourceName}" 
+                        Message = $"V2 API - Generated name: {finalName}" +
+                                  (validationMetadata?.ValidationPerformed == true ? " (Azure validated)" : "")
                     });
                     
                     var response = ApiResponse<ResourceNameResponse>.SuccessResponse(
@@ -491,8 +569,15 @@ namespace AzureNamingTool.Controllers.V2
 
                         if (nameResponse.Success)
                         {
+                            // Perform Azure validation and conflict resolution
+                            var (finalName, validationMetadata) = await ValidateAndResolveConflictAsync(
+                                nameResponse.ResourceName,
+                                resourceTypeShortName,
+                                skipValidation: false);
+
                             result.Success = true;
-                            result.ResourceName = nameResponse.ResourceName;
+                            result.ResourceName = finalName;
+                            result.ValidationMetadata = validationMetadata;
                             
                             if (!request.ValidateOnly)
                             {

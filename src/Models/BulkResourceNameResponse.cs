@@ -88,5 +88,10 @@ namespace AzureNamingTool.Models
         /// Gets or sets validation errors if any.
         /// </summary>
         public List<string>? ValidationErrors { get; set; }
+
+        /// <summary>
+        /// Gets or sets the Azure tenant validation metadata (if validation was performed).
+        /// </summary>
+        public AzureValidationMetadata? ValidationMetadata { get; set; }
     }
 }
