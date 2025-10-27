@@ -691,9 +691,10 @@
                 sbNames.Append("<table class=\"table text-light generatednames\">");
                 sbNames.Append("<thead>");
                 sbNames.Append("<tr>");
-                sbNames.Append("<th class\"w25\">Reource Type</th>");
-                sbNames.Append("<th class\"w25\">Generated Name</th>");
-                sbNames.Append("<th class\"w50\">Notes</th>");
+                sbNames.Append("<th class\"w20\">Resource Type</th>");
+                sbNames.Append("<th class\"w20\">Generated Name</th>");
+                sbNames.Append("<th class\"w40\">Notes</th>");
+                sbNames.Append("<th class\"w20\">Azure Validation</th>");
                 sbNames.Append("</tr>");
                 sbNames.Append("</thead>");
                 sbNames.Append("<tbody>");
@@ -764,6 +765,46 @@
                             sbNames.Append(resourceNameRequestResponse.Message);
                         }
                         sbNames.Append("</td>");
+                        sbNames.Append("<td class=\"col-3\">");
+                        // Add Azure validation status
+                        if (resourceNameRequestResponse.ValidationMetadata != null)
+                        {
+                            var vm = resourceNameRequestResponse.ValidationMetadata;
+                            if (vm.ValidationPerformed)
+                            {
+                                if (vm.ExistsInAzure)
+                                {
+                                    sbNames.Append("<span class=\"badge bg-warning text-dark\">Existed in Azure</span><br/>");
+                                    if (!String.IsNullOrEmpty(vm.OriginalName))
+                                    {
+                                        sbNames.Append($"<small>Original: {vm.OriginalName}</small><br/>");
+                                        sbNames.Append($"<small>Resolved: {resourceNameRequestResponse.ResourceName}</small><br/>");
+                                        if (vm.IncrementAttempts.HasValue)
+                                        {
+                                            sbNames.Append($"<small>({vm.IncrementAttempts.Value} attempts)</small><br/>");
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    sbNames.Append("<span class=\"badge bg-success\">✓ Available</span><br/>");
+                                }
+                                
+                                if (!String.IsNullOrEmpty(vm.ValidationWarning))
+                                {
+                                    sbNames.Append($"<small class=\"text-warning\">⚠️ {vm.ValidationWarning}</small>");
+                                }
+                            }
+                            else
+                            {
+                                sbNames.Append("<span class=\"badge bg-secondary\">Not Validated</span>");
+                            }
+                        }
+                        else
+                        {
+                            sbNames.Append("<span class=\"badge bg-secondary\">Disabled</span>");
+                        }
+                        sbNames.Append("</td>");
                         sbNames.Append("</tr>");
 
                         // Set the result container
@@ -808,6 +849,46 @@
                             if (!String.IsNullOrEmpty(resourceNameRequestResponse.Message))
                             {
                                 sbNames.Append(resourceNameRequestResponse.Message);
+                            }
+                            sbNames.Append("</td>");
+                            sbNames.Append("<td class=\"col-3\">");
+                            // Add Azure validation status
+                            if (resourceNameRequestResponse.ValidationMetadata != null)
+                            {
+                                var vm = resourceNameRequestResponse.ValidationMetadata;
+                                if (vm.ValidationPerformed)
+                                {
+                                    if (vm.ExistsInAzure)
+                                    {
+                                        sbNames.Append("<span class=\"badge bg-warning text-dark\">Existed in Azure</span><br/>");
+                                        if (!String.IsNullOrEmpty(vm.OriginalName))
+                                        {
+                                            sbNames.Append($"<small>Original: {vm.OriginalName}</small><br/>");
+                                            sbNames.Append($"<small>Resolved: {resourceNameRequestResponse.ResourceName}</small><br/>");
+                                            if (vm.IncrementAttempts.HasValue)
+                                            {
+                                                sbNames.Append($"<small>({vm.IncrementAttempts.Value} attempts)</small><br/>");
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        sbNames.Append("<span class=\"badge bg-success\">✓ Available</span><br/>");
+                                    }
+                                    
+                                    if (!String.IsNullOrEmpty(vm.ValidationWarning))
+                                    {
+                                        sbNames.Append($"<small class=\"text-warning\">⚠️ {vm.ValidationWarning}</small>");
+                                    }
+                                }
+                                else
+                                {
+                                    sbNames.Append("<span class=\"badge bg-secondary\">Not Validated</span>");
+                                }
+                            }
+                            else
+                            {
+                                sbNames.Append("<span class=\"badge bg-secondary\">Disabled</span>");
                             }
                             sbNames.Append("</td>");
                             sbNames.Append("</tr>");

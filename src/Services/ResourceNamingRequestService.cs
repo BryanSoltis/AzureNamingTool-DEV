@@ -32,6 +32,8 @@ namespace AzureNamingTool.Services
         private readonly ICustomComponentService _customComponentService;
         private readonly IGeneratedNamesService _generatedNamesService;
         private readonly IAdminLogService _adminLogService;
+        private readonly IAzureValidationService? _azureValidationService;
+        private readonly ConflictResolutionService? _conflictResolutionService;
 
         public ResourceNamingRequestService(
             IResourceComponentService resourceComponentService,
@@ -45,7 +47,9 @@ namespace AzureNamingTool.Services
             IResourceFunctionService resourceFunctionService,
             ICustomComponentService customComponentService,
             IGeneratedNamesService generatedNamesService,
-            IAdminLogService adminLogService)
+            IAdminLogService adminLogService,
+            IAzureValidationService? azureValidationService = null,
+            ConflictResolutionService? conflictResolutionService = null)
         {
             _resourceComponentService = resourceComponentService;
             _resourceDelimiterService = resourceDelimiterService;
@@ -59,6 +63,8 @@ namespace AzureNamingTool.Services
             _customComponentService = customComponentService;
             _generatedNamesService = generatedNamesService;
             _adminLogService = adminLogService;
+            _azureValidationService = azureValidationService;
+            _conflictResolutionService = conflictResolutionService;
         }
 
         /// <summary>
@@ -951,6 +957,92 @@ namespace AzureNamingTool.Services
                             generatedName.ResourceTypeName += " - " + resourceType.Property;
                         }
 
+                        // Azure Validation and Conflict Resolution
+                        AzureValidationMetadata? validationMetadata = null;
+                        if (_azureValidationService != null && _conflictResolutionService != null)
+                        {
+                            try
+                            {
+                                // Check if Azure validation is enabled
+                                var siteConfig = ConfigurationHelper.GetConfigurationData();
+                                if (siteConfig != null && siteConfig.AzureTenantNameValidationEnabled?.Equals("True", StringComparison.OrdinalIgnoreCase) == true)
+                                {
+                                    // Get Azure validation settings
+                                    var validationSettings = await _azureValidationService.GetSettingsAsync();
+                                    if (validationSettings != null && validationSettings.Enabled)
+                                    {
+                                        // Validate the name against Azure
+                                        validationMetadata = await _azureValidationService.ValidateNameAsync(
+                                            name,
+                                            resourceType.ShortName ?? resourceType.Resource
+                                        );
+
+                                        // If name exists in Azure, apply conflict resolution
+                                        if (validationMetadata.ExistsInAzure)
+                                        {
+                                            var resolutionResult = await _conflictResolutionService.ResolveConflictAsync(
+                                                name,
+                                                resourceType.ShortName ?? resourceType.Resource,
+                                                validationSettings
+                                            );
+
+                                            if (resolutionResult.Success)
+                                            {
+                                                // Update the name with the resolved name
+                                                name = resolutionResult.FinalName;
+                                                generatedName.ResourceName = name;
+
+                                                // Update validation metadata with resolution info
+                                                validationMetadata.OriginalName = resolutionResult.OriginalName;
+                                                validationMetadata.IncrementAttempts = resolutionResult.Attempts;
+                                                
+                                                // Add resolution info to message
+                                                string resolutionMessage = $"Name conflict resolved using {resolutionResult.Strategy} strategy. Original: {resolutionResult.OriginalName}, Final: {resolutionResult.FinalName}";
+                                                if (!string.IsNullOrEmpty(resolutionResult.Warning))
+                                                {
+                                                    validationMetadata.ValidationWarning = resolutionResult.Warning;
+                                                    resolutionMessage += $" Warning: {resolutionResult.Warning}";
+                                                }
+                                                
+                                                if (sbMessage.Length > 0)
+                                                    sbMessage.Append(" ");
+                                                sbMessage.Append(resolutionMessage);
+                                            }
+                                            else
+                                            {
+                                                // Conflict resolution failed - return error
+                                                resourceNameResponse.Success = false;
+                                                resourceNameResponse.ResourceName = "***RESOURCE NAME NOT GENERATED***";
+                                                resourceNameResponse.Message = resolutionResult.ErrorMessage ?? "Failed to resolve naming conflict with Azure tenant.";
+                                                resourceNameResponse.ValidationMetadata = validationMetadata;
+                                                return resourceNameResponse;
+                                            }
+                                        }
+                                        
+                                        // Set validation timestamp
+                                        validationMetadata.ValidationTimestamp = DateTime.UtcNow;
+                                    }
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                // Log but don't fail name generation if Azure validation fails
+                                await _adminLogService.PostItemAsync(new AdminLogMessage() 
+                                { 
+                                    Title = "WARNING", 
+                                    Message = $"Azure validation failed: {ex.Message}" 
+                                });
+                                
+                                // Create validation metadata indicating the error
+                                validationMetadata = new AzureValidationMetadata
+                                {
+                                    ValidationPerformed = true,
+                                    ValidationWarning = $"Azure validation could not be performed: {ex.Message}",
+                                    ValidationTimestamp = DateTime.UtcNow
+                                };
+                            }
+                        }
+
                         ServiceResponse responseGenerateName = await _generatedNamesService.PostItemAsync(generatedName);
                         if (responseGenerateName.Success)
                         {
@@ -958,6 +1050,8 @@ namespace AzureNamingTool.Services
                             resourceNameResponse.ResourceName = name;
                             resourceNameResponse.Message = sbMessage.ToString();
                             resourceNameResponse.ResourceNameDetails = generatedName;
+                            resourceNameResponse.ValidationMetadata = validationMetadata;
+
 
                             // Check if the GenerationWebhook is configured
                             String webhook = ConfigurationHelper.GetAppSetting("GenerationWebhook", true);
