@@ -211,13 +211,19 @@ namespace AzureNamingTool.Services
 
             try
             {
-                var settings = await GetSettingsAsync();
-
-                if (!settings.Enabled)
+                // Check global toggle first
+                var globalEnabled = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("AzureTenantNameValidationEnabled"));
+                if (!globalEnabled)
                 {
-                    result.ErrorMessage = "Azure validation is not enabled";
+                    result.ErrorMessage = "Azure tenant name validation is not enabled in Site Settings";
                     return result;
                 }
+
+                var settings = await GetSettingsAsync();
+
+                // For test connection, we don't require settings.Enabled to be true
+                // The global site setting being enabled is sufficient for testing
+                // This allows users to test before saving settings
 
                 result.AuthenticationMode = settings.AuthMode.ToString();
                 result.TenantId = settings.TenantId;

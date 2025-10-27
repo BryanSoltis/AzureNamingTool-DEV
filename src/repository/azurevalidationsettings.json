@@ -14,7 +14,7 @@
     "ClientSecretName": ""
   },
   "ConflictResolution": {
-    "Strategy": "AutoIncrement",
+    "Strategy": "NotifyOnly",
     "MaxAttempts": 100,
     "IncrementPadding": 3,
     "IncludeWarnings": true

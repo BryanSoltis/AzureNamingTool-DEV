@@ -100,10 +100,13 @@
                     <span class="oi oi-cog tab-icon" aria-hidden="true"></span>
                     Site Settings
                 </button>
-                <button class="modern-tab" data-tab="tab-azure-validation">
-                    <span class="oi oi-cloud tab-icon" aria-hidden="true"></span>
-                    Azure Validation
-                </button>
+                @if (azuretenantamevalidationenabled)
+                {
+                    <button class="modern-tab" data-tab="tab-azure-validation">
+                        <span class="oi oi-cloud tab-icon" aria-hidden="true"></span>
+                        Azure Validation
+                    </button>
+                }
             </div>
 
             <!-- System Details Tab Content -->
@@ -415,7 +418,7 @@
                     <div class="toggle-content">
                         <div class="toggle-label">Azure Tenant Name Validation</div>
                         <div class="toggle-description">
-                            Enable validation of generated names against your Azure tenant to check if a resource name already exists. When enabled, additional Azure connection settings will appear in the <strong>Azure Validation</strong> tab.
+                            Enable validation of generated names against your Azure tenant to check if a resource name already exists. When enabled, the <strong>Azure Validation</strong> tab will appear where you can configure authentication and connection settings.
                         </div>
                     </div>
                     <div class="toggle-switch-wrapper">
@@ -1160,24 +1163,15 @@
             <!-- End of tab-identity -->
 
             <!-- Azure Validation Tab Content -->
-            <div id="tab-azure-validation" class="modern-tab-content">
-                <h3 class="mb-3">Azure Validation Settings</h3>
-                <p class="text-secondary mb-4">
-                    Configure Azure tenant name validation to check if generated resource names already exist in your Azure environment. This feature requires Azure authentication and appropriate permissions.
-                </p>
+            @if (azuretenantamevalidationenabled)
+            {
+                <div id="tab-azure-validation" class="modern-tab-content">
+                    <h3 class="mb-3">Azure Validation Settings</h3>
+                    <p class="text-secondary mb-4">
+                        Configure Azure tenant name validation to check if generated resource names already exist in your Azure environment. This feature requires Azure authentication and appropriate permissions.
+                    </p>
 
-                @if (!azuretenantamevalidationenabled)
-                {
-                    <div class="modern-notification-warning mb-4">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        <div>
-                            <strong>Azure Validation is Disabled</strong><br />
-                            Enable <strong>Azure Tenant Name Validation</strong> in the <strong>Site Settings</strong> tab to configure these settings.
-                        </div>
-                    </div>
-                }
-
-                <!-- Connection Status Section -->
+                    <!-- Connection Status Section -->
                 <div class="modern-setting-row">
                     <div class="setting-label">Connection Status</div>
                     <div class="setting-description">
@@ -1314,14 +1308,15 @@
                             <input class="form-check-input" type="radio" name="conflictStrategy" id="strategyAutoIncrement" value="AutoIncrement" checked="@(azureConflictStrategy == "AutoIncrement")" @onchange="@(() => azureConflictStrategy = "AutoIncrement")" disabled="@(!azuretenantamevalidationenabled)">
                             <label class="form-check-label" for="strategyAutoIncrement">
                                 <strong>Auto-Increment</strong> - Automatically increment the instance number until a unique name is found<br />
-                                <small class="text-muted">Example: vnet-001 → vnet-002 → vnet-003</small>
+                                <small class="text-muted">Example: vnet-001 → vnet-002 → vnet-003</small><br />
+                                <small class="text-warning"><strong>⚠️ Requires instance component (e.g., -001) in your naming convention</strong></small>
                             </label>
                         </div>
                         <div class="form-check mb-3">
                             <input class="form-check-input" type="radio" name="conflictStrategy" id="strategyNotifyOnly" value="NotifyOnly" checked="@(azureConflictStrategy == "NotifyOnly")" @onchange="@(() => azureConflictStrategy = "NotifyOnly")" disabled="@(!azuretenantamevalidationenabled)">
                             <label class="form-check-label" for="strategyNotifyOnly">
-                                <strong>Notify Only</strong> - Keep the original name but show a warning<br />
-                                <small class="text-muted">User receives notification that name exists in Azure</small>
+                                <strong>Notify Only</strong> (Recommended) - Keep the original name but show a warning<br />
+                                <small class="text-muted">User receives notification that name exists in Azure. Works with all naming conventions.</small>
                             </label>
                         </div>
                         <div class="form-check mb-3">
@@ -1402,8 +1397,9 @@
                         </div>
                     </div>
                 </div>
-            </div>
-            <!-- End of tab-azure-validation -->
+                </div>
+                <!-- End of tab-azure-validation -->
+            }
         </div>
         <!-- End of modern-tabs-container -->
     }
@@ -1538,7 +1534,7 @@
     private string azureAuthMode = "ManagedIdentity";
     private string azureTenantId = String.Empty;
     private string azureClientId = String.Empty;
-    private string azureConflictStrategy = "AutoIncrement";
+    private string azureConflictStrategy = "NotifyOnly";
     private bool azureCacheEnabled = true;
     private int azureCacheDuration = 5;
 

@@ -95,8 +95,9 @@ namespace AzureNamingTool.Models
     {
         /// <summary>
         /// Gets or sets the conflict resolution strategy
+        /// Default is NotifyOnly for maximum compatibility with all naming conventions
         /// </summary>
-        public ConflictStrategy Strategy { get; set; } = ConflictStrategy.AutoIncrement;
+        public ConflictStrategy Strategy { get; set; } = ConflictStrategy.NotifyOnly;
 
         /// <summary>
         /// Gets or sets the maximum number of auto-increment attempts
