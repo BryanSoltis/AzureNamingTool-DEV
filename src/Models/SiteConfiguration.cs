@@ -134,5 +134,10 @@
         /// Gets or sets a value indicating whether the user has dismissed the SQLite migration prompt.
         /// </summary>
         public string? MigrationPromptDismissed { get; set; } = "False";
+
+        /// <summary>
+        /// Gets or sets a value indicating whether Azure tenant name validation is enabled.
+        /// </summary>
+        public string? AzureTenantNameValidationEnabled { get; set; } = "False";
     }
 }

@@ -406,6 +406,22 @@
                     </div>
                 </div>
 
+                <!-- Azure Tenant Name Validation -->
+                <div class="modern-toggle-row">
+                    <div class="toggle-content">
+                        <div class="toggle-label">Azure Tenant Name Validation</div>
+                        <div class="toggle-description">
+                            Enable validation of generated names against your Azure tenant to check if a resource name already exists. When enabled, additional Azure connection settings will appear in the <strong>Azure Validation</strong> tab.
+                        </div>
+                    </div>
+                    <div class="toggle-switch-wrapper">
+                        <label class="modern-toggle-switch" title="Azure Tenant Name Validation Enabled">
+                            <input type="checkbox" checked="@azuretenantamevalidationenabled" @oninput='args => SettingChanged(args, "azuretenantamevalidationenabled")'>
+                            <span class="modern-toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
                 <!-- Generation Webhook -->
                 <div class="modern-setting-row">
                     <div class="setting-label">Generation Webhook</div>
@@ -1225,6 +1241,7 @@
     private bool latestnewsenabled = false;
     private bool retaingenerateselections = false;
     private bool showadmindetailstoallusers = false;
+    private bool azuretenantamevalidationenabled = false;
     private string customhomecontent = String.Empty;
     MarkdownEditor mdCustomHomeContent = new();
     private string customlogopath = String.Empty;
@@ -1287,6 +1304,7 @@
                 latestnewsenabled = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("LatestNewsEnabled"));
                 retaingenerateselections = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("RetainGenerateSelections"));
                 showadmindetailstoallusers = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("ShowAdminDetailsToAllUsers"));
+                azuretenantamevalidationenabled = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("AzureTenantNameValidationEnabled"));
                 customhomecontent = ConfigurationHelper.GetAppSetting("CustomHomeContent", false);
                 //await mdCustomHomeContent.SetValueAsync(customhomecontent);
                 customlogopath = ConfigurationHelper.GetAppSetting("CustomLogoPath", false);
@@ -2144,6 +2162,17 @@
                         {
                             ConfigurationHelper.SetAppSetting("ShowAdminDetailsToAllUsers", e.Value!.ToString() ?? "");
                             message.Message = "Show Admin Details To All Users setting updated to " + e.Value?.ToString()!.ToUpper() ?? "" + "!";
+                        }
+                        break;
+                    case "azuretenantamevalidationenabled":
+                        if (GeneralHelper.IsNotNull(e.Value))
+                        {
+                            ConfigurationHelper.SetAppSetting("AzureTenantNameValidationEnabled", e.Value!.ToString() ?? "");
+                            message.Message = "Azure Tenant Name Validation setting updated to " + e.Value?.ToString()!.ToUpper() ?? "" + "!";
+                            if ((bool)e.Value!)
+                            {
+                                ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Azure Tenant Validation Enabled", "<p>Azure tenant name validation is now enabled.</p><p>You can configure Azure connection settings in the <strong>Azure Validation</strong> tab.</p><p>Note: Azure validation requires proper authentication and permissions to query your Azure tenant.</p>", "", admin);
+                            }
                         }
                         break;
                 }
