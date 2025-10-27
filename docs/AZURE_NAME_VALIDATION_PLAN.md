@@ -161,6 +161,64 @@ AZURE_CLIENT_SECRET=secret
 
 ### 3. Name Validation Logic
 
+#### Understanding Resource Name Scopes
+
+Azure resources have different scopes of uniqueness based on the Microsoft documentation:
+
+| Scope | Description | Example Resources |
+|-------|-------------|-------------------|
+| **Global** | Unique across ALL of Azure (all customers worldwide) | Storage Accounts, App Services, Key Vault, Container Registry, Cosmos DB, Redis Cache, Service Bus, Event Hub |
+| **Resource Group** | Unique within a resource group only | Virtual Networks, VMs, NSGs, Public IPs |
+| **Subscription** | Unique within a subscription | Resource Groups |
+| **Region** | Unique within an Azure region | Batch Accounts |
+| **Parent Resource** | Unique within a parent resource | Subnets (within VNet), Disks |
+
+**CRITICAL LIMITATION**: Azure Resource Graph can only query resources **you have access to** (your subscriptions). It **CANNOT** check if a globally unique name is already taken by another Azure customer.
+
+#### Validation Approaches by Scope
+
+**For GLOBALLY UNIQUE resources** (Storage, App Service, Key Vault, etc.):
+- **Option 1 - Check Name Availability API** (Recommended): Use Azure's `CheckNameAvailability` API which checks true global uniqueness
+  ```csharp
+  // Example for Storage Account
+  POST https://management.azure.com/subscriptions/{subscriptionId}/providers/Microsoft.Storage/checkNameAvailability?api-version=2023-01-01
+  {
+    "name": "mystorageaccount",
+    "type": "Microsoft.Storage/storageAccounts"
+  }
+  // Returns: { "nameAvailable": false, "reason": "AlreadyExists", "message": "..." }
+  ```
+- **Option 2 - Resource Graph** (Limited): Only checks within your tenant - won't catch conflicts from other customers
+- **Recommended**: Use CheckNameAvailability API for global resources, Resource Graph for scoped resources
+
+**For RESOURCE GROUP/SUBSCRIPTION scoped resources** (VNets, VMs, etc.):
+- Resource Graph queries work perfectly
+- These resources don't need global uniqueness checks
+
+#### Implementation Strategy
+
+The existing `resourcetypes.json` contains a `scope` field with values:
+- `"global"` - Requires CheckNameAvailability API
+- `"resource group"` - Use Resource Graph
+- `"subscription"` - Use Resource Graph
+- `"region"` - Use Resource Graph (with region filter)
+- `"parent resource"` - Not applicable for name generation
+
+**Validation Flow:**
+```
+1. Generate resource name using existing logic
+2. IF Azure validation enabled:
+   a. Load ResourceType from resourcetypes.json
+   b. Check ResourceType.Scope property
+   c. IF Scope == "global":
+      - Call CheckNameAvailability API (true global check)
+   d. ELSE:
+      - Query Resource Graph (tenant-scoped check)
+   e. IF name exists:
+      - Apply conflict resolution strategy
+   f. Return final name with validation metadata
+```
+
 #### Azure Resource Graph Query
 ```kusto
 Resources

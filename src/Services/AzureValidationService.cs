@@ -10,16 +10,20 @@ using AzureNamingTool.Helpers;
 using AzureNamingTool.Models;
 using AzureNamingTool.Services.Interfaces;
 using System.Text.Json;
+using System.Net.Http.Headers;
 
 namespace AzureNamingTool.Services
 {
     /// <summary>
     /// Service for validating resource names against Azure tenant using Azure Resource Graph
+    /// and CheckNameAvailability API for globally unique resources
     /// </summary>
     public class AzureValidationService : IAzureValidationService
     {
         private readonly ILogger<AzureValidationService> _logger;
         private readonly IConfiguration _config;
+        private readonly IResourceTypeService _resourceTypeService;
+        private readonly IHttpClientFactory _httpClientFactory;
         private ArmClient? _armClient;
         private TokenCredential? _credential;
         private const string SETTINGS_FILE = "azurevalidationsettings.json";
@@ -30,10 +34,18 @@ namespace AzureNamingTool.Services
         /// </summary>
         /// <param name="logger">Logger instance</param>
         /// <param name="config">Configuration instance</param>
-        public AzureValidationService(ILogger<AzureValidationService> logger, IConfiguration config)
+        /// <param name="resourceTypeService">Resource type service for accessing resource metadata</param>
+        /// <param name="httpClientFactory">HTTP client factory for API calls</param>
+        public AzureValidationService(
+            ILogger<AzureValidationService> logger, 
+            IConfiguration config,
+            IResourceTypeService resourceTypeService,
+            IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _config = config;
+            _resourceTypeService = resourceTypeService;
+            _httpClientFactory = httpClientFactory;
         }
 
         /// <summary>
@@ -73,12 +85,27 @@ namespace AzureNamingTool.Services
                 // Ensure authenticated
                 await EnsureAuthenticatedAsync(settings);
 
-                // Query Azure Resource Graph
-                var exists = await CheckResourceExistsAsync(resourceName, resourceType, settings);
+                // Get resource type metadata to determine validation approach
+                var resourceTypeInfo = await GetResourceTypeInfoAsync(resourceType);
+                bool isGlobalScope = resourceTypeInfo?.Scope?.Equals("global", StringComparison.OrdinalIgnoreCase) ?? false;
+
+                (bool exists, List<string> resourceIds) validationResult;
+
+                // Use appropriate validation method based on scope
+                if (isGlobalScope)
+                {
+                    _logger.LogInformation("Using CheckNameAvailability API for globally unique resource: {ResourceType}", resourceType);
+                    validationResult = await CheckNameAvailabilityAsync(resourceName, resourceType, settings);
+                }
+                else
+                {
+                    _logger.LogInformation("Using Resource Graph query for scoped resource: {ResourceType}", resourceType);
+                    validationResult = await CheckResourceExistsAsync(resourceName, resourceType, settings);
+                }
 
                 metadata.ValidationPerformed = true;
-                metadata.ExistsInAzure = exists.Exists;
-                metadata.ConflictingResources = exists.ResourceIds;
+                metadata.ExistsInAzure = validationResult.exists;
+                metadata.ConflictingResources = validationResult.resourceIds;
 
                 // Cache the result
                 if (settings.Cache.Enabled)
@@ -87,8 +114,8 @@ namespace AzureNamingTool.Services
                     CacheHelper.SetCacheObject(cacheKey, metadata);
                 }
 
-                _logger.LogInformation("Azure validation completed for {ResourceName}: exists={Exists}", 
-                    resourceName, exists.Exists);
+                _logger.LogInformation("Azure validation completed for {ResourceName}: exists={Exists}, scope={Scope}", 
+                    resourceName, validationResult.exists, isGlobalScope ? "global" : "scoped");
 
                 return metadata;
             }
@@ -502,6 +529,219 @@ namespace AzureNamingTool.Services
                 _logger.LogError(ex, "Error querying Azure Resource Graph for {ResourceName}", resourceName);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Gets resource type information from the repository
+        /// </summary>
+        private async Task<Models.ResourceType?> GetResourceTypeInfoAsync(string resourceTypeShortName)
+        {
+            try
+            {
+                var response = await _resourceTypeService.GetItemsAsync();
+                if (!response.Success || response.ResponseObject == null)
+                {
+                    return null;
+                }
+
+                if (response.ResponseObject is not List<Models.ResourceType> resourceTypes)
+                {
+                    return null;
+                }
+                
+                // Try to match by ShortName first (e.g., "st" for storage)
+                var match = resourceTypes.FirstOrDefault(rt => 
+                    rt.ShortName.Equals(resourceTypeShortName, StringComparison.OrdinalIgnoreCase));
+
+                // If not found, try matching by Resource field (e.g., "Storage/storageAccounts")
+                if (match == null)
+                {
+                    match = resourceTypes.FirstOrDefault(rt => 
+                        rt.Resource.Equals(resourceTypeShortName, StringComparison.OrdinalIgnoreCase));
+                }
+
+                // If still not found, try partial match on Resource field
+                if (match == null)
+                {
+                    match = resourceTypes.FirstOrDefault(rt => 
+                        rt.Resource.Contains(resourceTypeShortName, StringComparison.OrdinalIgnoreCase));
+                }
+
+                return match;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error getting resource type info for {ResourceType}", resourceTypeShortName);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Checks name availability using Azure Resource Manager CheckNameAvailability API
+        /// </summary>
+        private async Task<(bool Exists, List<string> ResourceIds)> CheckNameAvailabilityAsync(
+            string resourceName,
+            string resourceType,
+            AzureValidationSettings settings)
+        {
+            try
+            {
+                // Get resource type info to build proper API request
+                var resourceTypeInfo = await GetResourceTypeInfoAsync(resourceType);
+                if (resourceTypeInfo == null)
+                {
+                    _logger.LogWarning("Could not find resource type info for {ResourceType}, falling back to Resource Graph", resourceType);
+                    return await CheckResourceExistsAsync(resourceName, resourceType, settings);
+                }
+
+                // Map the resource type to provider namespace and type
+                var (providerNamespace, resourceTypeName) = ParseResourceType(resourceTypeInfo.Resource);
+                
+                // Get subscription ID (required for CheckNameAvailability API)
+                var subscriptionId = settings.SubscriptionIds.FirstOrDefault();
+                if (string.IsNullOrEmpty(subscriptionId))
+                {
+                    // Try to get default subscription from ARM client
+                    await foreach (var sub in _armClient!.GetSubscriptions().GetAllAsync())
+                    {
+                        subscriptionId = sub.Data.SubscriptionId;
+                        break;
+                    }
+                }
+
+                if (string.IsNullOrEmpty(subscriptionId))
+                {
+                    _logger.LogWarning("No subscription ID available for CheckNameAvailability API, falling back to Resource Graph");
+                    return await CheckResourceExistsAsync(resourceName, resourceType, settings);
+                }
+
+                // Build CheckNameAvailability API endpoint
+                var apiVersion = GetCheckNameAvailabilityApiVersion(providerNamespace);
+                var endpoint = $"https://management.azure.com/subscriptions/{subscriptionId}/providers/{providerNamespace}/checkNameAvailability?api-version={apiVersion}";
+
+                // Build request body
+                var requestBody = new
+                {
+                    name = resourceName,
+                    type = $"{providerNamespace}/{resourceTypeName}"
+                };
+
+                // Get access token
+                var token = await GetAccessTokenAsync();
+
+                // Create HTTP client
+                var httpClient = _httpClientFactory.CreateClient();
+                httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                // Send POST request
+                var response = await httpClient.PostAsJsonAsync(endpoint, requestBody);
+                response.EnsureSuccessStatusCode();
+
+                // Parse response
+                var result = await response.Content.ReadFromJsonAsync<CheckNameAvailabilityResponse>();
+
+                if (result == null)
+                {
+                    _logger.LogWarning("CheckNameAvailability API returned null response");
+                    return (false, new List<string>());
+                }
+
+                // nameAvailable = true means name is NOT taken (available for use)
+                // nameAvailable = false means name IS taken (already exists)
+                bool exists = !result.NameAvailable;
+
+                _logger.LogInformation(
+                    "CheckNameAvailability result for {ResourceName}: available={Available}, reason={Reason}, message={Message}",
+                    resourceName, result.NameAvailable, result.Reason, result.Message);
+
+                return (exists, exists ? new List<string> { result.Message ?? "Name already exists globally" } : new List<string>());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error calling CheckNameAvailability API for {ResourceName}, falling back to Resource Graph", resourceName);
+                // Fall back to Resource Graph if CheckNameAvailability fails
+                return await CheckResourceExistsAsync(resourceName, resourceType, settings);
+            }
+        }
+
+        /// <summary>
+        /// Parses a resource type string into provider namespace and resource type name
+        /// </summary>
+        private (string providerNamespace, string resourceTypeName) ParseResourceType(string resourceType)
+        {
+            // Handle formats like "Storage/storageAccounts" or "Microsoft.Storage/storageAccounts"
+            var parts = resourceType.Split('/', StringSplitOptions.RemoveEmptyEntries);
+            
+            if (parts.Length >= 2)
+            {
+                // If first part doesn't start with "Microsoft.", add it
+                var providerNamespace = parts[0].StartsWith("Microsoft.") 
+                    ? parts[0] 
+                    : $"Microsoft.{parts[0]}";
+                
+                var resourceTypeName = parts[1];
+                
+                return (providerNamespace, resourceTypeName);
+            }
+
+            // Default fallback
+            return ("Microsoft.Resources", resourceType);
+        }
+
+        /// <summary>
+        /// Gets the appropriate API version for CheckNameAvailability based on provider namespace
+        /// </summary>
+        private string GetCheckNameAvailabilityApiVersion(string providerNamespace)
+        {
+            // Map of provider namespaces to their CheckNameAvailability API versions
+            return providerNamespace switch
+            {
+                "Microsoft.Storage" => "2023-01-01",
+                "Microsoft.Web" => "2023-01-01",
+                "Microsoft.KeyVault" => "2023-07-01",
+                "Microsoft.ContainerRegistry" => "2023-07-01",
+                "Microsoft.CognitiveServices" => "2023-05-01",
+                "Microsoft.Cache" => "2023-08-01",
+                "Microsoft.DocumentDB" => "2023-11-15",
+                "Microsoft.ServiceBus" => "2022-10-01-preview",
+                "Microsoft.EventHub" => "2022-10-01-preview",
+                "Microsoft.Devices" => "2023-06-30",
+                "Microsoft.ApiManagement" => "2023-05-01-preview",
+                "Microsoft.DataFactory" => "2018-06-01",
+                "Microsoft.Search" => "2023-11-01",
+                "Microsoft.Communication" => "2023-04-01",
+                "Microsoft.SignalRService" => "2023-02-01",
+                "Microsoft.Sql" => "2023-08-01-preview",
+                "Microsoft.DBforMySQL" => "2023-12-30",
+                "Microsoft.DBforPostgreSQL" => "2023-12-01-preview",
+                "Microsoft.DBforMariaDB" => "2020-01-01",
+                _ => "2021-04-01" // Default fallback version
+            };
+        }
+
+        /// <summary>
+        /// Gets an access token for Azure Resource Manager API calls
+        /// </summary>
+        private async Task<string> GetAccessTokenAsync()
+        {
+            if (_credential == null)
+            {
+                throw new InvalidOperationException("Azure credential is not initialized");
+            }
+
+            var tokenContext = new TokenRequestContext(new[] { "https://management.azure.com/.default" });
+            var token = await _credential.GetTokenAsync(tokenContext, CancellationToken.None);
+            return token.Token;
+        }
+
+        /// <summary>
+        /// Response model for CheckNameAvailability API
+        /// </summary>
+        private class CheckNameAvailabilityResponse
+        {
+            public bool NameAvailable { get; set; }
+            public string? Reason { get; set; }
+            public string? Message { get; set; }
         }
 
         /// <summary>
