@@ -1,69 +1,86 @@
-Azure Naming Tool - Release Notes v5.0.0
+# Azure Naming Tool - Release Notes v5.0.0
 
-Overview
---------
-v5.0.0 is a major UX and stability release focused on modernizing the Configuration experience and preparing the codebase for future API enhancements (v2). Highlights include a complete drag-and-drop rework for configuration lists, API versioning groundwork (v1/v2), and several data integrity fixes to prevent prior ordering issues.
+## Overview
+Version 5.0.0 is a major release featuring Azure Tenant Name Validation, modernized UI/UX, improved configuration management, and API versioning support.
 
-Highlights (High-level)
------------------------
-- Modern drag-and-drop sorting across all Configuration sections (Components, Environments, Functions, Locations, Orgs, Projects/Apps/Services, Units/Depts, Custom Components)
-  - Replaces up/down arrow controls with intuitive drag handles and visual feedback
-  - Immediate persistence to configured storage (JSON or SQLite)
-  - Robust client/server sync to prevent data corruption
-- Data integrity fixes
-  - Removed improper ID reassignment during list reorders
-  - Fixed sort-order regression where Enabled flag previously affected ordering
-  - Added dedicated UpdateSortOrder APIs to perform direct, normalization-free saves
-- Blazor rendering stability improvements
-  - Forced container render-key strategy to ensure UI reflects data changes instantly
-  - Re-initialization of JavaScript handlers after DOM refresh to allow repeated drag operations
-- API Versioning groundwork
-  - Added support for API versioning (v1 and v2) with separate Swagger docs
-  - Introduced v2 controller examples and structured response models to enable future breaking improvements while keeping v1 stable
-- Developer & QA improvements
-  - Better logging for reorder and persistence operations
-  - Transactional SQLite saves and JSON write operations with cache invalidation
-  - Unit tests and UI tests scaffolded for drag-and-drop behaviors (where applicable)
+## 🎯 Major Features
 
-Upgrade Notes
--------------
-- If you use the FileSystem/JSON storage provider, updated JSON files will be written directly when items are reordered. Ensure your deployment user has write permissions to the `settings/` folder.
-- If you use SQLite, saves are transactional. Backups are recommended before upgrading production environments.
-- No breaking changes are expected for existing APIs under the default v1 endpoints. v2 endpoints are opt-in.
+### Azure Tenant Name Validation (NEW)
+- **Validate generated names against your Azure tenant** before deployment
+- Prevent naming conflicts by checking if resource names already exist
+- Support for both **Managed Identity** (recommended) and **Service Principal** authentication
+- Flexible conflict resolution strategies:
+  - **NotifyOnly** - Warn about conflicts but allow generation (default)
+  - **AutoIncrement** - Automatically append incremented suffix (e.g., -001, -002)
+  - **Fail** - Block generation if name exists
+  - **SuffixRandom** - Add random suffix to resolve conflicts
+- **Performance caching** to minimize Azure API calls
+- **Scoped validation** - configure specific subscription(s) to check
+- Integrated into Site Settings for easy configuration
 
-How to test the key scenarios
-----------------------------
-1. Start the application and sign in as an admin.
-2. Open Configuration → Components (or any sortable section).
-3. Drag an item to a new position; observe visual feedback during drag and a success toast after drop.
-4. Confirm the new order is persisted by refreshing the page and verifying items remain in the new order.
-5. Confirm same behavior for Environments, Functions, Locations, Orgs, Projects/Apps/Services, Units/Depts, and Custom Components.
+### Modern UI/UX Improvements
+- **Consistent card-based design** across all Admin tabs
+- Boxed styling with hover effects for all settings
+- Improved visual hierarchy and spacing
+- Optimized grouped settings (e.g., Site Navigation toggles)
+- Modern, clean interface throughout the application
 
-Files/Areas Changed (developer-focused)
---------------------------------------
-- UI/JS/CSS
-  - `src/wwwroot/js/drag-drop-sort.js` (new)
-  - `src/wwwroot/css/modern-components.css` (updated)
-  - `src/Components/Pages/Configuration.razor` (major changes)
-- Services
-  - `src/Services/ResourceComponentService.cs` (new UpdateSortOrderAsync + bug fixes)
-  - `src/Services/ResourceEnvironmentService.cs` (new UpdateSortOrderAsync)
-  - Service interfaces updated to expose UpdateSortOrderAsync
-- Repositories
-  - `src/Repositories/Implementation/FileSystem/JsonFileConfigurationRepository.cs` (SaveAllAsync updates)
-  - `src/Repositories/SQLiteConfigurationRepository.cs` (SaveAllAsync transactional behavior)
-- API
-  - V2 controller examples added under `src/Controllers/V2/` with updated response models
+### Drag-and-Drop Configuration
+- **Intuitive drag-and-drop sorting** for all configuration lists
+- Replaces up/down arrow controls with drag handles
+- Visual feedback during drag operations
+- Immediate persistence to storage (JSON or SQLite)
+- Supports: Components, Environments, Functions, Locations, Orgs, Projects/Apps/Services, Units/Depts, Custom Components
 
-Notes & Known Issues
---------------------
-- The render-key re-render strategy is intentionally aggressive to guarantee deterministic UI updates; this may be revisited for optimization in future minor releases.
-- Custom components use their own per-parent table; drag-and-drop initialization is applied per custom-component container.
+### API Versioning
+- Support for API versioning (v1 and v2)
+- Separate Swagger documentation for each version
+- v1 endpoints remain stable; v2 enables future enhancements
+- No breaking changes to existing v1 APIs
 
-Acknowledgements
-----------------
-Thanks to the contributors and QA engineers who helped reproduce ordering bugs, validate persistence across storage providers, and polish the UX.
+## 🔧 Improvements
 
-Contact
--------
-For issues, open a GitHub issue under the repository and tag with `area/configuration` and `severity:high` if the problem involves data corruption or persistence.
+### Data Integrity
+- Fixed ID reassignment issues during list reorders
+- Corrected sort-order behavior when Enabled flag changes
+- Added dedicated UpdateSortOrder APIs for reliable persistence
+- Transactional SQLite saves with proper cache invalidation
+
+### Rendering Stability
+- Improved Blazor component rendering with render-key strategy
+- Better JavaScript handler initialization after DOM updates
+- More reliable UI updates across all configuration sections
+
+## 📋 Upgrade Notes
+
+### Storage Permissions
+- **FileSystem/JSON**: Ensure write permissions to `settings/` folder
+- **SQLite**: Backups recommended before upgrading production environments
+
+### Azure Validation (Optional)
+- Enable in Admin → Site Settings → "Azure Tenant Name Validation"
+- Configure authentication (Managed Identity recommended for Azure deployments)
+- Set conflict resolution strategy based on your naming convention
+- Test connection before saving configuration
+
+### API Compatibility
+- No breaking changes to v1 endpoints
+- v2 endpoints are opt-in and experimental
+
+## 🐛 Bug Fixes
+- Fixed configuration list ordering persistence issues
+- Resolved Enabled flag affecting sort order
+- Improved client/server data synchronization
+- Fixed spacing inconsistencies in grouped UI elements
+
+## 📚 Documentation
+For detailed feature guides, see:
+- [Azure Validation Admin Guide](AZURE_VALIDATION_ADMIN_GUIDE.md)
+- [Azure Validation API Guide](AZURE_VALIDATION_API_GUIDE.md)
+- [Azure Validation Security Guide](AZURE_VALIDATION_SECURITY_GUIDE.md)
+
+## 🙏 Acknowledgements
+Thanks to all contributors and testers who helped validate features, identify bugs, and improve the user experience.
+
+---
+**For issues or questions**, please open a GitHub issue in the repository.
