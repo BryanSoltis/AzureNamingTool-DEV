@@ -345,29 +345,25 @@
                 </div>
 
                 <!-- Resource Type Editing -->
-                <div class="modern-setting-row">
-                    <div class="setting-label">Resource Type Editing</div>
-                    <div class="setting-description">
-                        By default, <strong>Resource Type Validation</strong> is configured to match the Azure portal. These values can be overridden by enabling the following setting.
-                    </div>
-                    <div class="modern-notification-warning mt-3">
-                        <i class="bi bi-exclamation-triangle"></i>
-                        <div>
-                            <strong>ATTENTION</strong><br />
-                            Please see the <a href="https://github.com/mspnp/AzureNamingTool/wiki/Resource-Type-Editing" target="_blank" class="alert-link">Resource Type Editing documentation</a> for guidance on metadata editing.
+                <div class="modern-toggle-row">
+                    <div class="toggle-content">
+                        <div class="toggle-label">Resource Type Editing</div>
+                        <div class="toggle-description">
+                            By default, <strong>Resource Type Validation</strong> is configured to match the Azure portal. These values can be overridden by enabling this setting.
+                        </div>
+                        <div class="modern-notification-warning mt-2">
+                            <i class="bi bi-exclamation-triangle"></i>
+                            <div>
+                                <strong>ATTENTION</strong><br />
+                                Please see the <a href="https://github.com/mspnp/AzureNamingTool/wiki/Resource-Type-Editing" target="_blank" class="alert-link">Resource Type Editing documentation</a> for guidance on metadata editing.
+                            </div>
                         </div>
                     </div>
-                    <div class="modern-toggle-row mt-3">
-                        <div class="toggle-content">
-                            <div class="toggle-label">Enable Resource Type Editing</div>
-                            <div class="toggle-description">Allow editing of resource type validation rules</div>
-                        </div>
-                        <div class="toggle-switch-wrapper">
-                            <label class="modern-toggle-switch" title="Resource Type Editing Enabled">
-                                <input type="checkbox" checked="@resourcetypeeditingallowed" @oninput='args => SettingChanged(args, "resourcetypeeditingallowed")'>
-                                <span class="modern-toggle-slider"></span>
-                            </label>
-                        </div>
+                    <div class="toggle-switch-wrapper">
+                        <label class="modern-toggle-switch" title="Resource Type Editing Enabled">
+                            <input type="checkbox" checked="@resourcetypeeditingallowed" @oninput='args => SettingChanged(args, "resourcetypeeditingallowed")'>
+                            <span class="modern-toggle-slider"></span>
+                        </label>
                     </div>
                 </div>
 
@@ -526,6 +522,21 @@
                                     <small class="text-muted"><i class="bi bi-shield-lock"></i> Client Secret should be stored in Azure Key Vault or configuration file.</small>
                                 </div>
                             }
+                        </div>
+
+                        <!-- Subscription Configuration -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold">Subscription Scope</h6>
+                            <p class="text-muted small">Configure which Azure subscriptions to check for existing resources. Leave empty to check all accessible subscriptions.</p>
+                            
+                            <label class="modern-form-label">Subscription IDs (one per line)</label>
+                            <textarea class="modern-form-input" rows="4" 
+                                      placeholder="01760e96-666d-43f8-9c2f-e066323c6465&#10;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" 
+                                      @bind="azureSubscriptionIds"></textarea>
+                            <small class="text-muted">
+                                <i class="bi bi-info-circle"></i> Enter subscription IDs (GUIDs) separated by new lines. 
+                                If empty, all subscriptions accessible by the authentication principal will be queried.
+                            </small>
                         </div>
 
                         <!-- Conflict Resolution Strategy -->
@@ -1468,6 +1479,7 @@
     private string azureAuthMode = "ManagedIdentity";
     private string azureTenantId = String.Empty;
     private string azureClientId = String.Empty;
+    private string azureSubscriptionIds = String.Empty;
     private string azureConflictStrategy = "NotifyOnly";
     private bool azureCacheEnabled = true;
     private int azureCacheDuration = 5;
@@ -1504,6 +1516,45 @@
                 retaingenerateselections = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("RetainGenerateSelections"));
                 showadmindetailstoallusers = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("ShowAdminDetailsToAllUsers"));
                 azuretenantamevalidationenabled = Convert.ToBoolean(ConfigurationHelper.GetAppSetting("AzureTenantNameValidationEnabled"));
+                
+                // Load Azure validation settings
+                if (AzureValidationService != null)
+                {
+                    try
+                    {
+                        var azureSettings = await AzureValidationService.GetSettingsAsync();
+                        if (azureSettings != null)
+                        {
+                            azureAuthMode = azureSettings.AuthMode.ToString();
+                            azureTenantId = azureSettings.TenantId ?? String.Empty;
+                            azureConflictStrategy = azureSettings.ConflictResolution.Strategy.ToString();
+                            azureCacheEnabled = azureSettings.Cache.Enabled;
+                            azureCacheDuration = azureSettings.Cache.DurationMinutes;
+                            
+                            // Load subscription IDs
+                            if (azureSettings.SubscriptionIds != null && azureSettings.SubscriptionIds.Any())
+                            {
+                                azureSubscriptionIds = string.Join(Environment.NewLine, azureSettings.SubscriptionIds);
+                            }
+                            
+                            // Load Service Principal settings if available
+                            if (azureSettings.ServicePrincipal != null)
+                            {
+                                azureClientId = azureSettings.ServicePrincipal.ClientId ?? String.Empty;
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        // Silently fail - settings will use defaults
+                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                        { 
+                            Title = "WARNING", 
+                            Message = $"Failed to load Azure validation settings: {ex.Message}" 
+                        });
+                    }
+                }
+                
                 customhomecontent = ConfigurationHelper.GetAppSetting("CustomHomeContent", false);
                 //await mdCustomHomeContent.SetValueAsync(customhomecontent);
                 customlogopath = ConfigurationHelper.GetAppSetting("CustomLogoPath", false);
@@ -3586,6 +3637,21 @@
             settings.ConflictResolution.Strategy = Enum.Parse<ConflictStrategy>(azureConflictStrategy);
             settings.Cache.Enabled = azureCacheEnabled;
             settings.Cache.DurationMinutes = azureCacheDuration;
+
+            // Parse and update subscription IDs
+            settings.SubscriptionIds.Clear();
+            if (!string.IsNullOrWhiteSpace(azureSubscriptionIds))
+            {
+                var subscriptionLines = azureSubscriptionIds.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (var line in subscriptionLines)
+                {
+                    var subId = line.Trim();
+                    if (!string.IsNullOrWhiteSpace(subId) && Guid.TryParse(subId, out _))
+                    {
+                        settings.SubscriptionIds.Add(subId);
+                    }
+                }
+            }
 
             // Update Service Principal settings if applicable
             if (azureAuthMode == "ServicePrincipal")
