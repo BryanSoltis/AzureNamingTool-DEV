@@ -2459,19 +2459,37 @@
                                     if (GeneralHelper.IsNotNull(resourceComponent))
                                     {
                                         resourceComponent.Enabled = true;
-                                        resourceComponent.SortOrder = servicesData.ResourceComponents.Count + 1;
-                                        serviceResponse = await ResourceComponentService!.PostItemAsync(resourceComponent);
-                                        if (serviceResponse.Success)
+                                        
+                                        // Reorganize all items: enabled first (ordered by current sort), then disabled
+                                        var enabledItems = servicesData.ResourceComponents
+                                            .Where(x => x.Enabled && x.Id != resourceComponent.Id)
+                                            .OrderBy(x => x.SortOrder)
+                                            .ToList();
+                                        
+                                        var disabledItems = servicesData.ResourceComponents
+                                            .Where(x => !x.Enabled && x.Id != resourceComponent.Id)
+                                            .OrderBy(x => x.SortOrder)
+                                            .ToList();
+                                        
+                                        // Add the newly enabled item at the end of enabled items
+                                        enabledItems.Add(resourceComponent);
+                                        
+                                        // Reassign sort orders
+                                        int sortOrder = 1;
+                                        foreach (var item in enabledItems)
                                         {
-                                            message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = resourceComponent.Name + " enabled!";
+                                            item.SortOrder = sortOrder++;
                                         }
-                                        else
+                                        foreach (var item in disabledItems)
                                         {
-                                            message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = resourceComponent.Name + " enabling failed! Please check the Admin Log for details.";
-                                            message.MessageDetails = serviceResponse.ResponseMessage;
+                                            item.SortOrder = sortOrder++;
                                         }
+                                        
+                                        // Save all items with updated sort orders
+                                        await ResourceComponentService!.UpdateSortOrderAsync(servicesData.ResourceComponents);
+                                        
+                                        message.Type = MessageTypesEnum.SUCCESS;
+                                        message.Message = resourceComponent.Name + " enabled!";
                                     }
                                     else
                                     {
@@ -2483,18 +2501,37 @@
                                     if (GeneralHelper.IsNotNull(resourceComponent))
                                     {
                                         resourceComponent.Enabled = false;
-                                        serviceResponse = await ResourceComponentService!.PostItemAsync(resourceComponent);
-                                        if (serviceResponse.Success)
+                                        
+                                        // Reorganize all items: enabled first (ordered by current sort), then disabled
+                                        var enabledItems = servicesData.ResourceComponents
+                                            .Where(x => x.Enabled && x.Id != resourceComponent.Id)
+                                            .OrderBy(x => x.SortOrder)
+                                            .ToList();
+                                        
+                                        var disabledItems = servicesData.ResourceComponents
+                                            .Where(x => !x.Enabled && x.Id != resourceComponent.Id)
+                                            .OrderBy(x => x.SortOrder)
+                                            .ToList();
+                                        
+                                        // Add the newly disabled item at the end of disabled items
+                                        disabledItems.Add(resourceComponent);
+                                        
+                                        // Reassign sort orders
+                                        int sortOrder = 1;
+                                        foreach (var item in enabledItems)
                                         {
-                                            message.Type = MessageTypesEnum.SUCCESS;
-                                            message.Message = resourceComponent.Name + " disabled!";
+                                            item.SortOrder = sortOrder++;
                                         }
-                                        else
+                                        foreach (var item in disabledItems)
                                         {
-                                            message.Type = MessageTypesEnum.ERROR;
-                                            message.Message = resourceComponent.Name + " disabling failed! Please check the Admin Log for details.";
-                                            message.MessageDetails = serviceResponse.ResponseMessage;
+                                            item.SortOrder = sortOrder++;
                                         }
+                                        
+                                        // Save all items with updated sort orders
+                                        await ResourceComponentService!.UpdateSortOrderAsync(servicesData.ResourceComponents);
+                                        
+                                        message.Type = MessageTypesEnum.SUCCESS;
+                                        message.Message = resourceComponent.Name + " disabled!";
                                     }
                                     else
                                     {
@@ -2633,7 +2670,34 @@
                                     if (GeneralHelper.IsNotNull(resourceDelimiter))
                                     {
                                         resourceDelimiter.Enabled = true;
-                                        serviceResponse = await ResourceDelimiterService!.PostItemAsync(resourceDelimiter);
+                                        
+                                        // Reorganize all items: enabled first (ordered by current sort), then disabled
+                                        var enabledItems = servicesData.ResourceDelimiters
+                                            .Where(x => x.Enabled && x.Id != resourceDelimiter.Id)
+                                            .OrderBy(x => x.SortOrder)
+                                            .ToList();
+                                        
+                                        var disabledItems = servicesData.ResourceDelimiters
+                                            .Where(x => !x.Enabled && x.Id != resourceDelimiter.Id)
+                                            .OrderBy(x => x.SortOrder)
+                                            .ToList();
+                                        
+                                        // Add the newly enabled item at the end of enabled items
+                                        enabledItems.Add(resourceDelimiter);
+                                        
+                                        // Reassign sort orders
+                                        int sortOrder = 1;
+                                        foreach (var item in enabledItems)
+                                        {
+                                            item.SortOrder = sortOrder++;
+                                        }
+                                        foreach (var item in disabledItems)
+                                        {
+                                            item.SortOrder = sortOrder++;
+                                        }
+                                        
+                                        // Save all items with updated sort orders
+                                        serviceResponse = await ResourceDelimiterService!.PostConfigAsync(servicesData.ResourceDelimiters);
                                         if (serviceResponse.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
@@ -2655,7 +2719,34 @@
                                     if (GeneralHelper.IsNotNull(resourceDelimiter))
                                     {
                                         resourceDelimiter.Enabled = false;
-                                        serviceResponse = await ResourceDelimiterService!.PostItemAsync(resourceDelimiter);
+                                        
+                                        // Reorganize all items: enabled first (ordered by current sort), then disabled
+                                        var enabledItems = servicesData.ResourceDelimiters
+                                            .Where(x => x.Enabled && x.Id != resourceDelimiter.Id)
+                                            .OrderBy(x => x.SortOrder)
+                                            .ToList();
+                                        
+                                        var disabledItems = servicesData.ResourceDelimiters
+                                            .Where(x => !x.Enabled && x.Id != resourceDelimiter.Id)
+                                            .OrderBy(x => x.SortOrder)
+                                            .ToList();
+                                        
+                                        // Add the newly disabled item at the end of disabled items
+                                        disabledItems.Add(resourceDelimiter);
+                                        
+                                        // Reassign sort orders
+                                        int sortOrder = 1;
+                                        foreach (var item in enabledItems)
+                                        {
+                                            item.SortOrder = sortOrder++;
+                                        }
+                                        foreach (var item in disabledItems)
+                                        {
+                                            item.SortOrder = sortOrder++;
+                                        }
+                                        
+                                        // Save all items with updated sort orders
+                                        serviceResponse = await ResourceDelimiterService!.PostConfigAsync(servicesData.ResourceDelimiters);
                                         if (serviceResponse.Success)
                                         {
                                             message.Type = MessageTypesEnum.SUCCESS;
