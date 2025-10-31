@@ -496,8 +496,19 @@ namespace AzureNamingTool.Services
         {
             try
             {
-                // Build Resource Graph query
-                var query = $"Resources | where name =~ '{resourceName.Replace("'", "\\'")}' | where type =~ '{resourceType.Replace("'", "\\'")}' | project id, name, type, resourceGroup";
+                // Get the full Azure resource type from shortname
+                var resourceTypeInfo = await GetResourceTypeInfoAsync(resourceType);
+                if (resourceTypeInfo == null)
+                {
+                    _logger.LogWarning("Could not find resource type info for {ResourceType}", resourceType);
+                    return (false, new List<string>());
+                }
+
+                // Convert to Azure Resource Manager format (e.g., "Microsoft.Web/serverfarms")
+                var azureResourceType = ConvertToAzureResourceType(resourceTypeInfo.Resource);
+
+                // Build Resource Graph query using the full Azure resource type
+                var query = $"Resources | where name =~ '{resourceName.Replace("'", "\\'")}' | where type =~ '{azureResourceType.Replace("'", "\\'")}' | project id, name, type, resourceGroup";
 
                 var result = await ExecuteResourceGraphQueryAsync(query, settings);
 
@@ -692,6 +703,18 @@ namespace AzureNamingTool.Services
 
             // Default fallback
             return ("Microsoft.Resources", resourceType);
+        }
+
+        /// <summary>
+        /// Converts a resource type from shorthand format to Azure Resource Manager format
+        /// Examples: "Storage/storageAccounts" -> "microsoft.storage/storageaccounts"
+        ///           "Web/serverfarms" -> "microsoft.web/serverfarms"
+        /// </summary>
+        private string ConvertToAzureResourceType(string resourceType)
+        {
+            var (providerNamespace, resourceTypeName) = ParseResourceType(resourceType);
+            // Azure Resource Graph uses lowercase for resource types
+            return $"{providerNamespace.ToLowerInvariant()}/{resourceTypeName.ToLowerInvariant()}";
         }
 
         /// <summary>
