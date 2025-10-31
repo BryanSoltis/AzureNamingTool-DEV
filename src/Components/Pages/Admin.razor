@@ -2418,10 +2418,12 @@
                         if (GeneralHelper.IsNotNull(e.Value))
                         {
                             ConfigurationHelper.SetAppSetting("AzureTenantNameValidationEnabled", e.Value!.ToString() ?? "");
+                            azuretenantamevalidationenabled = (bool)e.Value!;
                             message.Message = "Azure Tenant Name Validation setting updated to " + e.Value?.ToString()!.ToUpper() ?? "" + "!";
+                            StateHasChanged(); // Force UI refresh to show/hide Azure configuration section
                             if ((bool)e.Value!)
                             {
-                                ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Azure Tenant Validation Enabled", "<p>Azure tenant name validation is now enabled.</p><p>You can configure Azure connection settings in the <strong>Azure Validation</strong> tab.</p><p>Note: Azure validation requires proper authentication and permissions to query your Azure tenant.</p>", "", admin);
+                                ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Azure Tenant Validation Enabled", "<p>Azure tenant name validation is now enabled.</p><p>You can configure Azure connection settings below.</p><p>Note: Azure validation requires proper authentication and permissions to query your Azure tenant.</p>", "", admin);
                             }
                         }
                         break;
