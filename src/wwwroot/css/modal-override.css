@@ -18,9 +18,19 @@
 }
 
 /* Add padding back to the body content */
-.modern-modal-content,
+.modern-modal-content {
+    padding: 24px !important;
+}
+
+/* Modal footer with proper vertical spacing */
 .modern-modal-footer {
     padding: 24px !important;
+    display: flex !important;
+    gap: 12px !important;
+    justify-content: flex-end !important;
+    align-items: center !important;
+    border-top: 1px solid var(--color-border) !important;
+    min-height: 80px !important;
 }
 
 .bm-title,
