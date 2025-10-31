@@ -103,22 +103,33 @@ namespace AzureNamingTool.Services
             };
 
             // Extract the instance number pattern from the end of the name
-            // Expected patterns: -001, -01, -1, etc.
-            var instancePattern = @"-(\d+)$";
-            var match = Regex.Match(originalName, instancePattern);
+            // Expected patterns: -001, -01, -1, 001, 01, 1, etc.
+            // Try with hyphen first, then without
+            var instancePatternWithHyphen = @"-(\d+)$";
+            var instancePatternNoHyphen = @"(\d+)$";
+            var match = Regex.Match(originalName, instancePatternWithHyphen);
+            var hasHyphen = true;
 
             if (!match.Success)
             {
-                // No instance number found, cannot auto-increment
-                result.ErrorMessage = "Cannot auto-increment: No instance number pattern found in name";
-                result.Warning = "Original name does not contain an instance number (e.g., -001). Cannot auto-increment.";
-                return result;
+                // Try without hyphen
+                match = Regex.Match(originalName, instancePatternNoHyphen);
+                hasHyphen = false;
+
+                if (!match.Success)
+                {
+                    // No instance number found, cannot auto-increment
+                    result.ErrorMessage = "Cannot auto-increment: No instance number pattern found in name";
+                    result.Warning = "Original name does not contain an instance number (e.g., -001 or 001). Cannot auto-increment.";
+                    return result;
+                }
             }
 
             var prefix = originalName[..match.Index]; // Everything before the instance number
             var instanceStr = match.Groups[1].Value;
             var instanceNum = int.Parse(instanceStr);
             var padding = instanceStr.Length; // Preserve original padding (e.g., 001 = 3 digits)
+            var delimiter = hasHyphen ? "-" : ""; // Preserve original delimiter
 
             // Try incrementing until we find a unique name or hit max attempts
             var maxAttempts = settings.ConflictResolution.MaxAttempts;
@@ -127,7 +138,7 @@ namespace AzureNamingTool.Services
             for (int i = instanceNum + 1; attempts < maxAttempts; i++, attempts++)
             {
                 var newInstanceStr = i.ToString().PadLeft(padding, '0');
-                var candidateName = $"{prefix}-{newInstanceStr}";
+                var candidateName = $"{prefix}{delimiter}{newInstanceStr}";
 
                 // Check if this name exists in Azure
                 var validation = await _validationService.ValidateNameAsync(candidateName, resourceType);

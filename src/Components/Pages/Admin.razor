@@ -431,9 +431,9 @@
                                 <div>
                                     <strong>Getting Started with Azure Validation</strong>
                                     <ol class="mb-0 mt-2 ps-3">
-                                        <li><strong>Configure Subscription IDs</strong> - Add your Azure subscription ID(s) below to scope validation</li>
                                         <li><strong>Choose Authentication Mode</strong> - Managed Identity (recommended for Azure) or Service Principal</li>
-                                        <li><strong>Test Connection</strong> - Verify authentication and permissions</li>
+                                        <li><strong>Test Connection</strong> - Verify authentication and discover accessible subscriptions</li>
+                                        <li><strong>Select Subscriptions</strong> - Choose which subscriptions to validate against (optional)</li>
                                         <li><strong>Select Conflict Strategy</strong> - Choose how to handle existing resource names</li>
                                         <li><strong>Save Settings</strong> - Click the save button at the bottom</li>
                                     </ol>
@@ -443,6 +443,49 @@
                                 </div>
                             </div>
                         }
+
+                        <!-- Authentication Mode -->
+                        <div class="mb-4">
+                            <h6 class="fw-bold">Authentication Mode</h6>
+                            <div class="modern-notification-info mb-3">
+                                <i class="bi bi-info-circle"></i>
+                                <div>
+                                    <strong>Managed Identity</strong> - Recommended for Azure-hosted deployments<br />
+                                    <strong>Service Principal</strong> - Use when Managed Identity is not available
+                                </div>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="authMode" id="authModeManagedIdentity" value="ManagedIdentity" checked="@(azureAuthMode == "ManagedIdentity")" @onchange="@(() => azureAuthMode = "ManagedIdentity")">
+                                <label class="form-check-label" for="authModeManagedIdentity">
+                                    <strong>Managed Identity</strong> (Recommended)
+                                </label>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="radio" name="authMode" id="authModeServicePrincipal" value="ServicePrincipal" checked="@(azureAuthMode == "ServicePrincipal")" @onchange="@(() => azureAuthMode = "ServicePrincipal")">
+                                <label class="form-check-label" for="authModeServicePrincipal">
+                                    <strong>Service Principal</strong>
+                                </label>
+                            </div>
+
+                            @if (azureAuthMode == "ServicePrincipal")
+                            {
+                                <div class="mt-3">
+                                    <div class="modern-notification-warning mb-3">
+                                        <i class="bi bi-exclamation-triangle"></i>
+                                        <div>
+                                            Configure Service Principal credentials in <code>settings/azurevalidationsettings.json</code> or use Azure Key Vault.
+                                        </div>
+                                    </div>
+                                    <label class="modern-form-label">Tenant ID</label>
+                                    <input type="text" class="modern-form-input mb-3" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" value="@azureTenantId" @oninput="@((e) => azureTenantId = e.Value?.ToString() ?? "")" />
+                                    
+                                    <label class="modern-form-label">Client ID</label>
+                                    <input type="text" class="modern-form-input mb-3" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" value="@azureClientId" @oninput="@((e) => azureClientId = e.Value?.ToString() ?? "")" />
+                                    
+                                    <small class="text-muted"><i class="bi bi-shield-lock"></i> Client Secret should be stored in Azure Key Vault or configuration file.</small>
+                                </div>
+                            }
+                        </div>
 
                         <!-- Connection Status -->
                         <div class="mb-4">
@@ -503,62 +546,41 @@
                             </div>
                         </div>
 
-                        <!-- Authentication Mode -->
-                        <div class="mb-4">
-                            <h6 class="fw-bold">Authentication Mode</h6>
-                            <div class="modern-notification-info mb-3">
-                                <i class="bi bi-info-circle"></i>
-                                <div>
-                                    <strong>Managed Identity</strong> - Recommended for Azure-hosted deployments<br />
-                                    <strong>Service Principal</strong> - Use when Managed Identity is not available
-                                </div>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="authMode" id="authModeManagedIdentity" value="ManagedIdentity" checked="@(azureAuthMode == "ManagedIdentity")" @onchange="@(() => azureAuthMode = "ManagedIdentity")">
-                                <label class="form-check-label" for="authModeManagedIdentity">
-                                    <strong>Managed Identity</strong> (Recommended)
-                                </label>
-                            </div>
-                            <div class="form-check mt-2">
-                                <input class="form-check-input" type="radio" name="authMode" id="authModeServicePrincipal" value="ServicePrincipal" checked="@(azureAuthMode == "ServicePrincipal")" @onchange="@(() => azureAuthMode = "ServicePrincipal")">
-                                <label class="form-check-label" for="authModeServicePrincipal">
-                                    <strong>Service Principal</strong>
-                                </label>
-                            </div>
-
-                            @if (azureAuthMode == "ServicePrincipal")
-                            {
-                                <div class="mt-3">
-                                    <div class="modern-notification-warning mb-3">
-                                        <i class="bi bi-exclamation-triangle"></i>
-                                        <div>
-                                            Configure Service Principal credentials in <code>settings/azurevalidationsettings.json</code> or use Azure Key Vault.
-                                        </div>
-                                    </div>
-                                    <label class="modern-form-label">Tenant ID</label>
-                                    <input type="text" class="modern-form-input mb-3" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" value="@azureTenantId" @oninput="@((e) => azureTenantId = e.Value?.ToString() ?? "")" />
-                                    
-                                    <label class="modern-form-label">Client ID</label>
-                                    <input type="text" class="modern-form-input mb-3" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" value="@azureClientId" @oninput="@((e) => azureClientId = e.Value?.ToString() ?? "")" />
-                                    
-                                    <small class="text-muted"><i class="bi bi-shield-lock"></i> Client Secret should be stored in Azure Key Vault or configuration file.</small>
-                                </div>
-                            }
-                        </div>
-
                         <!-- Subscription Configuration -->
                         <div class="mb-4">
                             <h6 class="fw-bold">Subscription Scope</h6>
-                            <p class="text-muted small">Configure which Azure subscriptions to check for existing resources. Leave empty to check all accessible subscriptions.</p>
+                            <p class="text-muted small">Select which Azure subscriptions to check for existing resources. Leave all unchecked to query all accessible subscriptions.</p>
                             
-                            <label class="modern-form-label">Subscription IDs (one per line)</label>
-                            <textarea class="modern-form-input" rows="4" 
-                                      placeholder="01760e96-666d-43f8-9c2f-e066323c6465&#10;xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" 
-                                      @bind="azureSubscriptionIds"></textarea>
-                            <small class="text-muted">
-                                <i class="bi bi-info-circle"></i> Enter subscription IDs (GUIDs) separated by new lines. 
-                                If empty, all subscriptions accessible by the authentication principal will be queried.
-                            </small>
+                            @if (azureConnectionSuccess && availableSubscriptions.Any())
+                            {
+                                <div class="subscription-list">
+                                    @foreach (var sub in availableSubscriptions)
+                                    {
+                                        <div class="form-check mb-2">
+                                            <input class="form-check-input" type="checkbox" 
+                                                   id="sub_@sub.SubscriptionId" 
+                                                   checked="@selectedSubscriptionIds.Contains(sub.SubscriptionId)"
+                                                   @onchange="@(e => ToggleSubscription(sub.SubscriptionId, (bool)e.Value!))">
+                                            <label class="form-check-label" for="sub_@sub.SubscriptionId">
+                                                <strong>@sub.DisplayName</strong><br/>
+                                                <small class="text-muted">@sub.SubscriptionId (@sub.State)</small>
+                                            </label>
+                                        </div>
+                                    }
+                                </div>
+                                <small class="text-muted">
+                                    <i class="bi bi-info-circle"></i> @selectedSubscriptionIds.Count subscription(s) selected. 
+                                    If none are selected, all @availableSubscriptions.Count accessible subscriptions will be queried.
+                                </small>
+                            }
+                            else if (azureConnectionTested && !azureConnectionSuccess)
+                            {
+                                <p class="text-warning"><i class="bi bi-exclamation-triangle"></i> Connection test failed. Please verify authentication settings and test connection again.</p>
+                            }
+                            else
+                            {
+                                <p class="text-muted"><i class="bi bi-arrow-up"></i> Test connection above to see available subscriptions</p>
+                            }
                         </div>
 
                         <!-- Conflict Resolution Strategy -->
@@ -1498,10 +1520,11 @@
     private string azureConnectionDetails = String.Empty;
     private string azureTenantInfo = String.Empty;
     private int azureSubscriptionCount = 0;
+    private List<SubscriptionAccess> availableSubscriptions = new();
+    private HashSet<string> selectedSubscriptionIds = new();
     private string azureAuthMode = "ManagedIdentity";
     private string azureTenantId = String.Empty;
     private string azureClientId = String.Empty;
-    private string azureSubscriptionIds = String.Empty;
     private string azureConflictStrategy = "NotifyOnly";
     private bool azureCacheEnabled = true;
     private int azureCacheDuration = 5;
@@ -1553,10 +1576,14 @@
                             azureCacheEnabled = azureSettings.Cache.Enabled;
                             azureCacheDuration = azureSettings.Cache.DurationMinutes;
                             
-                            // Load subscription IDs
+                            // Load subscription IDs into selected set
+                            selectedSubscriptionIds.Clear();
                             if (azureSettings.SubscriptionIds != null && azureSettings.SubscriptionIds.Any())
                             {
-                                azureSubscriptionIds = string.Join(Environment.NewLine, azureSettings.SubscriptionIds);
+                                foreach (var subId in azureSettings.SubscriptionIds)
+                                {
+                                    selectedSubscriptionIds.Add(subId);
+                                }
                             }
                             
                             // Load Service Principal settings if available
@@ -3590,6 +3617,12 @@
                     azureSubscriptionCount = testResult.AccessibleSubscriptions.Count;
                 }
 
+                // Populate available subscriptions for checkbox selection
+                availableSubscriptions = testResult.AccessibleSubscriptions.ToList();
+                
+                // Note: selectedSubscriptionIds is already populated from settings in OnAfterRenderAsync
+                // and updated via checkbox interactions, so no need to reload here
+
                 toastService.ShowSuccess("Successfully connected to Azure!");
                 
                 await AdminLogService!.PostItemAsync(new AdminLogMessage()
@@ -3631,6 +3664,18 @@
         }
     }
 
+    private void ToggleSubscription(string subscriptionId, bool isChecked)
+    {
+        if (isChecked)
+        {
+            selectedSubscriptionIds.Add(subscriptionId);
+        }
+        else
+        {
+            selectedSubscriptionIds.Remove(subscriptionId);
+        }
+    }
+
     private async Task SaveAzureValidationSettings()
     {
         try
@@ -3658,18 +3703,13 @@
             settings.Cache.Enabled = azureCacheEnabled;
             settings.Cache.DurationMinutes = azureCacheDuration;
 
-            // Parse and update subscription IDs
+            // Parse and update subscription IDs from checkbox selection
             settings.SubscriptionIds.Clear();
-            if (!string.IsNullOrWhiteSpace(azureSubscriptionIds))
+            foreach (var subId in selectedSubscriptionIds)
             {
-                var subscriptionLines = azureSubscriptionIds.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                foreach (var line in subscriptionLines)
+                if (!string.IsNullOrWhiteSpace(subId) && Guid.TryParse(subId, out _))
                 {
-                    var subId = line.Trim();
-                    if (!string.IsNullOrWhiteSpace(subId) && Guid.TryParse(subId, out _))
-                    {
-                        settings.SubscriptionIds.Add(subId);
-                    }
+                    settings.SubscriptionIds.Add(subId);
                 }
             }
 

@@ -502,11 +502,23 @@
                             }
                             <div class="mb-3">
                                 <br />
-                                <button class="modern-btn-success" type="submit" title="Generate" disabled=@boolFormDisabled>
-                                    <span class="oi oi-loop-circular" aria-hidden="true"></span> Generate
-                                </button>
+                                <div class="d-flex align-items-center gap-3">
+                                    <button class="modern-btn-success" type="submit" title="Generate" disabled=@boolFormDisabled>
+                                        <span class="oi oi-loop-circular" aria-hidden="true"></span> Generate
+                                    </button>
+                                    @if (isGenerating)
+                                    {
+                                        <div class="d-flex align-items-center">
+                                            <div class="spinner-border spinner-border-sm me-2" role="status" style="color: var(--color-success); border-width: 2px;">
+                                                <span class="visually-hidden">Loading...</span>
+                                            </div>
+                                            <span class="fst-italic" style="color: var(--color-text-primary);">@generatingMessage</span>
+                                        </div>
+                                    }
+                                </div>
                             </div>
                         </div>
+                        
                         @if (@namerequested)
                         {
                             <div class="modern-card @resultClass mt-3">
@@ -594,6 +606,8 @@
     private string message = String.Empty;
     private string resultClass = String.Empty;
     private string resultHeader = String.Empty;
+    private bool isGenerating = false;
+    private string generatingMessage = "Generating name...";
     private string componentsVisible = "collapse in";
     private string resourcetypeVisible = "";
     private string resourcetypesVisible = "collapse";
@@ -655,15 +669,25 @@
 
     private async Task HandleValidSubmit()
     {
-        namerequested = false;
-        var workingmodaloptions = new ModalOptions()
-            {
-                HideCloseButton = true,
-                UseCustomLayout = true
-            };
-        if (GeneralHelper.IsNotNull(Modal))
+        // Queue the work asynchronously to prevent UI blocking on first render
+        await InvokeAsync(async () =>
         {
-            var workingmodal = Modal!.Show<WorkingModal>("Working", workingmodaloptions);
+            namerequested = false;
+            isGenerating = true;
+            
+            // Check if Azure validation is enabled to show appropriate message
+            var siteConfig = ConfigurationHelper.GetConfigurationData();
+            var azureValidationEnabled = siteConfig?.AzureTenantNameValidationEnabled?.Equals("True", StringComparison.OrdinalIgnoreCase) == true;
+            generatingMessage = azureValidationEnabled 
+                ? "Generating name and validating against Azure..." 
+                : "Generating name...";
+            
+            boolFormDisabled = true;
+            StateHasChanged();
+            
+            // Longer delay to ensure circuit is fully established
+            await Task.Delay(100);
+            
             try
             {
                 if (!GeneralHelper.IsNotNull(servicesData))
@@ -910,11 +934,11 @@
                 // Always show the response
                 generatedName = sbNames.ToString();
                 namerequested = true;
+                StateHasChanged();
 
                 // TO DO: Implement retention of the selected values
                 //await SetRetainedSelections();
             }
-
             catch (Exception ex)
             {
                 await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
@@ -922,9 +946,10 @@
             }
             finally
             {
-                workingmodal.Close();
+                isGenerating = false;
+                StateHasChanged();
             }
-        }
+        });
     }
 
     private async Task OnGenerateModeChange(string mode)

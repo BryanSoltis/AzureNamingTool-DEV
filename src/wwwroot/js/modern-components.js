@@ -577,5 +577,29 @@ function forceBlazoredModalStyling() {
     console.log('Blazored Modal styling watcher initialized');
 }
 
+/* ===================================================================
+   SCROLL TO ELEMENT
+   Smooth scroll to a specific element by ID
+   =================================================================== */
+
+function scrollToElement(elementId) {
+    console.log('Scrolling to element:', elementId);
+    
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest'
+        });
+        console.log('Scrolled to element:', elementId);
+    } else {
+        console.warn('Element not found:', elementId);
+    }
+}
+
+// Make scrollToElement globally available for Blazor interop
+window.scrollToElement = scrollToElement;
+
 console.log('Modern Components JavaScript initialized successfully');
 

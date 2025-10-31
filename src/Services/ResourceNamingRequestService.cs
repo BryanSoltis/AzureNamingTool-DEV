@@ -874,8 +874,14 @@ namespace AzureNamingTool.Services
                 if (valid)
                 {
                     bool nameallowed = true;
+                    
+                    // Check if Azure validation is enabled - if so, skip internal duplicate check
+                    // as Azure validation will handle conflict resolution
+                    var configData = ConfigurationHelper.GetConfigurationData();
+                    var azureValidationEnabled = configData?.AzureTenantNameValidationEnabled?.Equals("True", StringComparison.OrdinalIgnoreCase) == true;
+                    
                     bool nameexists = await ConfigurationHelper.CheckIfGeneratedNameExists(name, _generatedNamesService);
-                    if (nameexists)
+                    if (nameexists && !azureValidationEnabled)
                     {
                         // Check if the request contains Resource Instance is a selected componoent
                         if (!String.IsNullOrEmpty(GeneralHelper.GetPropertyValue(request, "ResourceInstance")?.ToString()))
