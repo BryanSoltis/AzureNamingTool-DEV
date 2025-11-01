@@ -40,4 +40,11 @@ public interface IResourceOrgService
     /// <param name="items">The list of resource organizations to configure.</param>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
     Task<ServiceResponse> PostConfigAsync(List<ResourceOrg> items);
+
+    /// <summary>
+    /// Updates the sort order of resource organizations without resetting IDs.
+    /// </summary>
+    /// <param name="items">The list of resource organizations with updated sort orders.</param>
+    /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+    Task<ServiceResponse> UpdateSortOrderAsync(List<ResourceOrg> items);
 }

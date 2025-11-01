@@ -40,4 +40,11 @@ public interface IResourceFunctionService
     /// <param name="items">The list of resource functions to configure.</param>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
     Task<ServiceResponse> PostConfigAsync(List<ResourceFunction> items);
+
+    /// <summary>
+    /// Updates the sort order of resource functions without resetting IDs.
+    /// </summary>
+    /// <param name="items">The list of resource functions with updated sort orders.</param>
+    /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+    Task<ServiceResponse> UpdateSortOrderAsync(List<ResourceFunction> items);
 }

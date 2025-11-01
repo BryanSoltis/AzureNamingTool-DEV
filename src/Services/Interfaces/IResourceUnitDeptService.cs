@@ -40,4 +40,11 @@ public interface IResourceUnitDeptService
     /// <param name="items">The list of resource unit/departments to configure.</param>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
     Task<ServiceResponse> PostConfigAsync(List<ResourceUnitDept> items);
+
+    /// <summary>
+    /// Updates the sort order of resource unit/departments without resetting IDs.
+    /// </summary>
+    /// <param name="items">The list of resource unit/departments with updated sort orders.</param>
+    /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+    Task<ServiceResponse> UpdateSortOrderAsync(List<ResourceUnitDept> items);
 }

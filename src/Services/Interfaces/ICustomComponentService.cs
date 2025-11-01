@@ -62,4 +62,11 @@ public interface ICustomComponentService
     /// <param name="parentcomponentid">The parent component ID.</param>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
     Task<ServiceResponse> DeleteByParentComponentIdAsync(int parentcomponentid);
+
+    /// <summary>
+    /// Updates the sort order of custom components without resetting IDs.
+    /// </summary>
+    /// <param name="items">List of custom components with updated sort orders.</param>
+    /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+    Task<ServiceResponse> UpdateSortOrderAsync(List<CustomComponent> items);
 }

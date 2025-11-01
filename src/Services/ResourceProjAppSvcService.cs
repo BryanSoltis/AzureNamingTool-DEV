@@ -301,6 +301,28 @@ namespace AzureNamingTool.Services
             }
             return serviceResponse;
         }
+
+        /// <summary>
+        /// Updates the sort order of resource project/app/services without resetting IDs or normalizing
+        /// </summary>
+        /// <param name="items">List of resource project/app/services with updated sort orders</param>
+        /// <returns>ServiceResponse indicating success or failure</returns>
+        public async Task<ServiceResponse> UpdateSortOrderAsync(List<ResourceProjAppSvc> items)
+        {
+            ServiceResponse serviceResponse = new();
+            try
+            {
+                await _repository.SaveAllAsync(items);
+                serviceResponse.Success = true;
+            }
+            catch (Exception ex)
+            {
+                await _adminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = ex.Message });
+                serviceResponse.Success = false;
+                serviceResponse.ResponseObject = ex;
+            }
+            return serviceResponse;
+        }
     }
 }
 

@@ -40,4 +40,11 @@ public interface IResourceProjAppSvcService
     /// <param name="items">The list of resource project/application/services to configure.</param>
     /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
     Task<ServiceResponse> PostConfigAsync(List<ResourceProjAppSvc> items);
+
+    /// <summary>
+    /// Updates the sort order of resource project/application/services without resetting IDs.
+    /// </summary>
+    /// <param name="items">The list of resource project/application/services with updated sort orders.</param>
+    /// <returns>A <see cref="Task{ServiceResponse}"/> representing the asynchronous operation.</returns>
+    Task<ServiceResponse> UpdateSortOrderAsync(List<ResourceProjAppSvc> items);
 }
