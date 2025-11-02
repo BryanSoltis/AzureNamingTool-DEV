@@ -6,6 +6,12 @@ namespace AzureNamingTool.Models
     public class AzureValidationSettings
     {
         /// <summary>
+        /// Gets or sets the unique identifier for this settings record
+        /// Always 1 since this is a singleton settings object
+        /// </summary>
+        public long Id { get; set; } = 1;
+
+        /// <summary>
         /// Gets or sets a value indicating whether Azure tenant validation is enabled
         /// </summary>
         public bool Enabled { get; set; } = false;

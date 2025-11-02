@@ -8,6 +8,7 @@ using Azure.ResourceManager.Resources;
 using Azure.Security.KeyVault.Secrets;
 using AzureNamingTool.Helpers;
 using AzureNamingTool.Models;
+using AzureNamingTool.Repositories.Interfaces;
 using AzureNamingTool.Services.Interfaces;
 using System.Text.Json;
 using System.Net.Http.Headers;
@@ -24,9 +25,10 @@ namespace AzureNamingTool.Services
         private readonly IConfiguration _config;
         private readonly IResourceTypeService _resourceTypeService;
         private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfigurationRepository<AzureValidationSettings> _settingsRepository;
         private ArmClient? _armClient;
         private TokenCredential? _credential;
-        private const string SETTINGS_FILE = "azurevalidationsettings.json";
+        private const string SETTINGS_FILE = "azurevalidationsettings.json"; // Legacy file for migration
         private const string CACHE_KEY_PREFIX = "azure-validation:";
 
         /// <summary>
@@ -36,16 +38,19 @@ namespace AzureNamingTool.Services
         /// <param name="config">Configuration instance</param>
         /// <param name="resourceTypeService">Resource type service for accessing resource metadata</param>
         /// <param name="httpClientFactory">HTTP client factory for API calls</param>
+        /// <param name="settingsRepository">Repository for Azure validation settings</param>
         public AzureValidationService(
             ILogger<AzureValidationService> logger, 
             IConfiguration config,
             IResourceTypeService resourceTypeService,
-            IHttpClientFactory httpClientFactory)
+            IHttpClientFactory httpClientFactory,
+            IConfigurationRepository<AzureValidationSettings> settingsRepository)
         {
             _logger = logger;
             _config = config;
             _resourceTypeService = resourceTypeService;
             _httpClientFactory = httpClientFactory;
+            _settingsRepository = settingsRepository;
         }
 
         /// <summary>
@@ -296,25 +301,80 @@ namespace AzureNamingTool.Services
         {
             try
             {
-                var settingsPath = Path.Combine("settings", SETTINGS_FILE);
-                var settingsContent = await FileSystemHelper.ReadFile(SETTINGS_FILE, "settings/");
+                // Try to get settings from repository (SQLite or JSON depending on storage provider)
+                var settings = await _settingsRepository.GetByIdAsync(1);
                 
-                if (!string.IsNullOrEmpty(settingsContent))
+                if (settings != null)
                 {
-                    var settings = JsonSerializer.Deserialize<AzureValidationSettings>(settingsContent);
-                    if (settings != null)
+                    return settings;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Table might not exist yet or other database error
+                _logger.LogWarning(ex, "Could not load Azure validation settings from repository, trying legacy migration");
+            }
+
+            try
+            {
+                // If no settings exist, try to migrate from legacy JSON file
+                var migrated = await MigrateLegacySettingsAsync();
+                if (migrated != null)
+                {
+                    return migrated;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Could not migrate legacy Azure validation settings");
+            }
+
+            // Return default settings
+            return new AzureValidationSettings { Id = 1 };
+        }
+
+        /// <summary>
+        /// Migrates legacy JSON file settings to repository if they exist
+        /// </summary>
+        private async Task<AzureValidationSettings?> MigrateLegacySettingsAsync()
+        {
+            try
+            {
+                var settingsPath = Path.Combine("settings", SETTINGS_FILE);
+                if (File.Exists(settingsPath))
+                {
+                    _logger.LogInformation("Migrating legacy Azure validation settings from JSON file");
+                    
+                    var settingsContent = await FileSystemHelper.ReadFile(SETTINGS_FILE, "settings/");
+                    
+                    if (!string.IsNullOrEmpty(settingsContent))
                     {
-                        return settings;
+                        var settings = JsonSerializer.Deserialize<AzureValidationSettings>(settingsContent);
+                        if (settings != null)
+                        {
+                            settings.Id = 1; // Ensure ID is set
+                            await _settingsRepository.SaveAsync(settings);
+                            
+                            _logger.LogInformation("Legacy Azure validation settings migrated successfully");
+                            
+                            // Optionally rename the old file to indicate migration
+                            try
+                            {
+                                File.Move(settingsPath, settingsPath + ".migrated");
+                            }
+                            catch { /* Ignore errors renaming file */ }
+                            
+                            return settings;
+                        }
                     }
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error loading Azure validation settings");
+                _logger.LogWarning(ex, "Error migrating legacy Azure validation settings, will use defaults");
             }
 
-            // Return default settings
-            return new AzureValidationSettings();
+            return null;
         }
 
         /// <summary>
@@ -326,12 +386,10 @@ namespace AzureNamingTool.Services
 
             try
             {
-                var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions 
-                { 
-                    WriteIndented = true 
-                });
+                // Ensure ID is always 1 (singleton pattern)
+                settings.Id = 1;
                 
-                await FileSystemHelper.WriteFile(SETTINGS_FILE, json, "settings/");
+                await _settingsRepository.SaveAsync(settings);
 
                 // Clear ARM client to force re-authentication with new settings
                 _armClient = null;

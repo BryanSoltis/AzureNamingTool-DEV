@@ -231,6 +231,10 @@ builder.Services.AddDbContext<ConfigurationDbContext>(options =>
 // Always register Migration Service (needed by MainLayout and Admin page)
 builder.Services.AddScoped<IStorageMigrationService, StorageMigrationService>();
 
+// Ensure configuration files are present before reading them
+// This copies files from repository/ to settings/ if needed
+ConfigurationHelper.VerifyConfiguration(new StateContainer());
+
 // Configure Storage Provider based on SiteConfiguration.StorageProvider setting
 // This allows users to switch between FileSystem and SQLite via the Admin page
 var siteConfig = ConfigurationHelper.GetConfigurationData();

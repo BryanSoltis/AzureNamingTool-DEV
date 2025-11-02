@@ -94,8 +94,45 @@ namespace AzureNamingTool.Services
                     Directory.CreateDirectory(directory);
                 }
 
-                // Create or migrate database
-                await _dbContext.Database.MigrateAsync();
+                // Check if database exists
+                bool databaseExists = File.Exists(_databasePath);
+
+                if (!databaseExists)
+                {
+                    // Create new database with all tables
+                    await _dbContext.Database.EnsureCreatedAsync();
+                }
+                else
+                {
+                    // Database exists - ensure all tables exist using raw SQL
+                    // This handles the case where new tables were added to the model
+                    var connection = _dbContext.Database.GetDbConnection();
+                    await connection.OpenAsync();
+
+                    try
+                    {
+                        // Create AzureValidationSettings table if it doesn't exist
+                        var createTableCommand = connection.CreateCommand();
+                        createTableCommand.CommandText = @"
+                            CREATE TABLE IF NOT EXISTS AzureValidationSettings (
+                                Id INTEGER PRIMARY KEY NOT NULL,
+                                Enabled INTEGER NOT NULL,
+                                AuthMode INTEGER NOT NULL,
+                                TenantId TEXT,
+                                SubscriptionIds TEXT NOT NULL,
+                                ManagementGroupId TEXT,
+                                ServicePrincipal TEXT,
+                                KeyVault TEXT,
+                                ConflictResolution TEXT NOT NULL,
+                                Cache TEXT NOT NULL
+                            )";
+                        await createTableCommand.ExecuteNonQueryAsync();
+                    }
+                    finally
+                    {
+                        await connection.CloseAsync();
+                    }
+                }
             }
             catch (Exception ex)
             {

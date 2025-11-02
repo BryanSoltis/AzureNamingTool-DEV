@@ -94,6 +94,12 @@ namespace AzureNamingTool.Data
         public DbSet<GeneratedName> GeneratedNames { get; set; } = null!;
 
         /// <summary>
+        /// Gets or sets the AzureValidationSettings entity set
+        /// Singleton settings - only one record with Id=1
+        /// </summary>
+        public DbSet<AzureValidationSettings> AzureValidationSettings { get; set; } = null!;
+
+        /// <summary>
         /// Configures the database connection and options
         /// </summary>
         /// <param name="optionsBuilder">Options builder for database configuration</param>
@@ -269,6 +275,57 @@ namespace AzureNamingTool.Data
                     .HasConversion(
                         v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
                         v => System.Text.Json.JsonSerializer.Deserialize<List<string[]>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string[]>()
+                    )
+                    .HasColumnType("TEXT");
+            });
+
+            // Configure AzureValidationSettings (singleton - always Id=1)
+            modelBuilder.Entity<AzureValidationSettings>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Id).ValueGeneratedNever();
+                entity.Property(e => e.Enabled).IsRequired();
+                entity.Property(e => e.AuthMode).IsRequired();
+                entity.Property(e => e.TenantId).HasMaxLength(100);
+                entity.Property(e => e.ManagementGroupId).HasMaxLength(100);
+                
+                // SubscriptionIds is a List<string> - serialize as JSON
+                entity.Property(e => e.SubscriptionIds)
+                    .HasConversion(
+                        v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                        v => System.Text.Json.JsonSerializer.Deserialize<List<string>>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new List<string>()
+                    )
+                    .HasColumnType("TEXT");
+
+                // ServicePrincipal is a complex type - serialize as JSON
+                entity.Property(e => e.ServicePrincipal)
+                    .HasConversion(
+                        v => v == null ? null : System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                        v => string.IsNullOrEmpty(v) ? null : System.Text.Json.JsonSerializer.Deserialize<ServicePrincipalSettings>(v, (System.Text.Json.JsonSerializerOptions?)null)
+                    )
+                    .HasColumnType("TEXT");
+
+                // KeyVault is a complex type - serialize as JSON
+                entity.Property(e => e.KeyVault)
+                    .HasConversion(
+                        v => v == null ? null : System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                        v => string.IsNullOrEmpty(v) ? null : System.Text.Json.JsonSerializer.Deserialize<KeyVaultSettings>(v, (System.Text.Json.JsonSerializerOptions?)null)
+                    )
+                    .HasColumnType("TEXT");
+
+                // ConflictResolution is a complex type - serialize as JSON
+                entity.Property(e => e.ConflictResolution)
+                    .HasConversion(
+                        v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                        v => System.Text.Json.JsonSerializer.Deserialize<ConflictResolutionSettings>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new ConflictResolutionSettings()
+                    )
+                    .HasColumnType("TEXT");
+
+                // Cache is a complex type - serialize as JSON
+                entity.Property(e => e.Cache)
+                    .HasConversion(
+                        v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions?)null),
+                        v => System.Text.Json.JsonSerializer.Deserialize<CacheSettings>(v, (System.Text.Json.JsonSerializerOptions?)null) ?? new CacheSettings()
                     )
                     .HasColumnType("TEXT");
             });
