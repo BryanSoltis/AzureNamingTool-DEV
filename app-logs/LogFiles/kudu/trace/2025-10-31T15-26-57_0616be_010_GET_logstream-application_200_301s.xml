@@ -1,0 +1,6 @@
+<step title="Incoming Request" date="2025-10-31T15:26:57.414" instance="0616be" url="/logstream/application" method="GET" type="request" pid="823,1,24" Host="azurenamingtool-dev-fbcrb8bdgbcmfebq.scm.eastus2-01.azurewebsites.net" User-Agent="AZURECLI/2.77.0 (MSI)" Accept-Encoding="identity" Authorization="Bas..." x-ms-client-request-id="03a755bd-b66e-11f0-a0a0-6ca10053058a" X-ARR-LOG-ID="03a755bd-b66e-11f0-a0a0-6ca10053058a" CLIENT-IP="52.167.115.14:6153" X-SITE-DEPLOYMENT-ID="azurenamingtool-dev" WAS-DEFAULT-HOSTNAME="azurenamingtool-dev-fbcrb8bdgbcmfebq.scm.eastus2-01.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/logstream/application" X-Client-IP="52.167.115.14" X-Client-Port="6153" >
+  <step title="Cleanup Xml Logs" date="2025-10-31T15:26:57.465" /><!-- duration: 56ms -->
+  <step title="LogStreamHandlerMiddleware.Invoke" date="2025-10-31T15:26:57.605" /><!-- duration: 465ms -->
+  <step title="Error occurred" date="2025-10-31T15:31:58.253" type="error" text="LogStreamManager: ProcessRequest end" /><!-- duration: 18ms -->
+  <step title="Outgoing response" date="2025-10-31T15:31:58.405" type="response" statusCode="200" statusText="OK" /><!-- duration: 3ms -->
+</step><!-- duration: 301008ms -->

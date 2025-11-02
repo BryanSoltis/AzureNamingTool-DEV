@@ -1,0 +1,17 @@
+<step title="Incoming Request" date="2025-11-01T20:29:57.961" instance="0616be" url="/api/zipdeploy?isAsync=true" method="POST" type="request" pid="823,1,5" Accept="*/*" Host="azurenamingtool-dev-fbcrb8bdgbcmfebq.scm.eastus2-01.azurewebsites.net" User-Agent="AZURECLI/2.77.0 (MSI)" Accept-Encoding="gzip, deflate" Authorization="Bas..." Cache-Control="no-cache" Content-Type="application/octet-stream" Content-Length="48019026" x-ms-client-request-id="6743284e-b761-11f0-b88a-6ca10053058a" x-ms-artifact-checksum="acc5d1b66f4dfbe7f4eff0510c001f2d502b55459d067543a3ebcaf83e12303b" X-ARR-LOG-ID="6743284e-b761-11f0-b88a-6ca10053058a" CLIENT-IP="107.221.147.106:61015" X-SITE-DEPLOYMENT-ID="azurenamingtool-dev" WAS-DEFAULT-HOSTNAME="azurenamingtool-dev-fbcrb8bdgbcmfebq.scm.eastus2-01.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/zipdeploy?isAsync=true" X-Client-IP="107.221.147.106" X-Client-Port="61015" >
+  <step title="ZipPushDeploy" date="2025-11-01T20:30:07.726" >
+    <step title="ZipDeploy. Run from package." date="2025-11-01T20:30:07.900" /><!-- duration: 30ms -->
+    <step title="None repository commit" date="2025-11-01T20:30:08.163" >
+      <step title="Commit id: 389137c5-b3ef-45e6-836e-685b329f94ab" date="2025-11-01T20:30:08.327" Message="N/A" AuthorName="N/A" AuthorEmail="N/A" /><!-- duration: 76ms -->
+    </step><!-- duration: 256ms -->
+    <step title="Starting PushDeployAsync" date="2025-11-01T20:30:08.452" /><!-- duration: 37ms -->
+    <step title="WEBSITE_RUN_FROM_PACKAGE is set to 1. Writing zip to SitePackagesPath" date="2025-11-01T20:30:08.875" /><!-- duration: 14ms -->
+    <step title="Copying zip to SitePackages /home/data/SitePackages/20251101203007.zip from request body" date="2025-11-01T20:30:09.031" /><!-- duration: 10ms -->
+    <step title="Writing multipart request body to /home/data/SitePackages/20251101203007.zip" date="2025-11-01T20:30:09.156" /><!-- duration: 97ms -->
+    <step title="Start deployment in the background" date="2025-11-01T20:32:03.482" >
+      <step title="Acquiring Deployment Lock" date="2025-11-01T20:32:05.862" /><!-- duration: 165ms -->
+      <step title="Acquired Deployment Lock" date="2025-11-01T20:32:08.059" /><!-- duration: 104ms -->
+    </step><!-- duration: 5599ms -->
+  </step><!-- duration: 121665ms -->
+  <step title="Outgoing response" date="2025-11-01T20:32:10.343" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 104ms -->
+</step><!-- duration: 132527ms -->

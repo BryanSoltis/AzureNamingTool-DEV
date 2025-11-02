@@ -60,11 +60,20 @@ namespace AzureNamingTool.Helpers
                 }
             }
             
-            var config = new ConfigurationBuilder()
-                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                    .AddJsonFile("settings/appsettings.json")
-                    .Build()
-                    .Get<SiteConfiguration>();
+            // Try to load from settings first, fallback to repository if not found
+            var configBuilder = new ConfigurationBuilder().SetBasePath(AppDomain.CurrentDomain.BaseDirectory);
+            
+            if (File.Exists(appsettingsPath))
+            {
+                configBuilder.AddJsonFile("settings/appsettings.json", optional: false);
+            }
+            else
+            {
+                // Fallback to repository version if settings version doesn't exist
+                configBuilder.AddJsonFile("repository/appsettings.json", optional: false);
+            }
+            
+            var config = configBuilder.Build().Get<SiteConfiguration>();
             return config!;
         }
 

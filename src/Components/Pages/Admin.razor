@@ -563,14 +563,18 @@
                                                    @onchange="@(e => ToggleSubscription(sub.SubscriptionId, (bool)e.Value!))">
                                             <label class="form-check-label" for="sub_@sub.SubscriptionId">
                                                 <strong>@sub.DisplayName</strong><br/>
-                                                <small class="text-muted">@sub.SubscriptionId (@sub.State)</small>
+                                                <small class="text-muted">@sub.SubscriptionId @(sub.State != "Unknown" ? $"({sub.State})" : "(Previously Saved)")</small>
                                             </label>
                                         </div>
                                     }
                                 </div>
                                 <small class="text-muted">
                                     <i class="bi bi-info-circle"></i> @selectedSubscriptionIds.Count subscription(s) selected. 
-                                    If none are selected, all @availableSubscriptions.Count accessible subscriptions will be queried.
+                                    @if (availableSubscriptions.Any(s => s.State == "Unknown"))
+                                    {
+                                        <span>Click "Test Connection" to verify subscription access. </span>
+                                    }
+                                    If none are selected, all accessible subscriptions will be queried.
                                 </small>
                             }
                             else if (azureConnectionTested && !azureConnectionSuccess)
@@ -1583,6 +1587,24 @@
                                 foreach (var subId in azureSettings.SubscriptionIds)
                                 {
                                     selectedSubscriptionIds.Add(subId);
+                                    
+                                    // Also add to availableSubscriptions so they show in UI before connection test
+                                    if (!availableSubscriptions.Any(s => s.SubscriptionId == subId))
+                                    {
+                                        availableSubscriptions.Add(new SubscriptionAccess
+                                        {
+                                            SubscriptionId = subId,
+                                            DisplayName = $"Subscription (Saved)",
+                                            State = "Unknown"
+                                        });
+                                    }
+                                }
+                                
+                                // Mark that we have saved subscriptions to display
+                                if (availableSubscriptions.Any())
+                                {
+                                    azureConnectionSuccess = true; // Show the subscription list
+                                    azureConnectionTested = true;
                                 }
                             }
                             
@@ -3617,12 +3639,14 @@
                     azureSubscriptionCount = testResult.AccessibleSubscriptions.Count;
                 }
 
-                // Populate available subscriptions for checkbox selection
+                // Replace availableSubscriptions with fresh data from Azure
                 availableSubscriptions = testResult.AccessibleSubscriptions.ToList();
                 
-                // Note: selectedSubscriptionIds is already populated from settings in OnAfterRenderAsync
-                // and updated via checkbox interactions, so no need to reload here
-
+                // selectedSubscriptionIds is preserved from settings and checkbox interactions
+                // Remove any selected subscriptions that are no longer accessible
+                var accessibleSubIds = availableSubscriptions.Select(s => s.SubscriptionId).ToHashSet();
+                selectedSubscriptionIds.RemoveWhere(id => !accessibleSubIds.Contains(id));
+                
                 toastService.ShowSuccess("Successfully connected to Azure!");
                 
                 await AdminLogService!.PostItemAsync(new AdminLogMessage()
