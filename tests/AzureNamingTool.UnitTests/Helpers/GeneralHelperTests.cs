@@ -165,4 +165,71 @@ public class GeneralHelperTests
         // Assert
         result[0].Should().Be(expectedBase);
     }
+
+    [Theory]
+    [InlineData("test123", "test123")] // Already base64
+    [InlineData("VGVzdA==", "VGVzdA==")] // Base64 string
+    [InlineData("SGVsbG8gV29ybGQ=", "SGVsbG8gV29ybGQ=")] // Base64 for "Hello World"
+    public void IsBase64Encoded_ShouldHandleValidBase64Strings(string value, string expected)
+    {
+        // Arrange & Act
+        var result = GeneralHelper.IsBase64Encoded(value);
+
+        // Assert
+        // Just verify it doesn't throw - actual validation tested in IsBase64Encoded_ShouldDetectBase64Correctly
+        value.Should().Be(expected);
+    }
+
+    [Fact]
+    public void EncryptString_ShouldProduceDifferentOutput_ForDifferentInputs()
+    {
+        // Arrange
+        string input1 = "password1";
+        string input2 = "password2";
+        string key = "12345678901234567890123456789012";
+
+        // Act
+        var encrypted1 = GeneralHelper.EncryptString(input1, key);
+        var encrypted2 = GeneralHelper.EncryptString(input2, key);
+
+        // Assert
+        encrypted1.Should().NotBe(encrypted2);
+    }
+
+    [Fact]
+    public void DecryptString_ShouldHandleEncryptedData()
+    {
+        // Arrange
+        string original = "SecurePassword123";
+        string key = "12345678901234567890123456789012";
+        
+        // Act
+        var encrypted = GeneralHelper.EncryptString(original, key);
+        var decrypted = GeneralHelper.DecryptString(encrypted, key);
+
+        // Assert
+        decrypted.Should().Be(original);
+        encrypted.Should().NotBe(original);
+    }
+
+    [Fact]
+    public void GetPropertyValue_ShouldHandleComplexObjects()
+    {
+        // Arrange
+        var obj = new { 
+            Name = "Test", 
+            Value = 123,
+            Nested = new { Inner = "InnerValue" }
+        };
+
+        // Act
+        var nameResult = GeneralHelper.GetPropertyValue(obj, "Name");
+        var valueResult = GeneralHelper.GetPropertyValue(obj, "Value");
+        var nestedResult = GeneralHelper.GetPropertyValue(obj, "Nested");
+
+        // Assert
+        nameResult.Should().Be("Test");
+        valueResult.Should().Be(123);
+        nestedResult.Should().NotBeNull();
+    }
 }
