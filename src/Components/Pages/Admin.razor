@@ -1486,6 +1486,7 @@
     private bool showadmindetailstoallusers = false;
     private bool azuretenantamevalidationenabled = false;
     private string customhomecontent = String.Empty;
+    private bool customHomeContentLoaded = false;
     MarkdownEditor mdCustomHomeContent = new();
     private string customlogopath = String.Empty;
     private string customtoolname = String.Empty;
@@ -1627,7 +1628,7 @@
                 }
                 
                 customhomecontent = ConfigurationHelper.GetAppSetting("CustomHomeContent", false);
-                //await mdCustomHomeContent.SetValueAsync(customhomecontent);
+                customHomeContentLoaded = true;
                 customlogopath = ConfigurationHelper.GetAppSetting("CustomLogoPath", false);
                 customtoolname = ConfigurationHelper.GetAppSetting("CustomToolName", false);
                 currentgenerationwebhook = ConfigurationHelper.GetAppSetting("GenerationWebhook", true);
@@ -1659,6 +1660,33 @@
             {
                 await Task.Delay(100); // Small delay to ensure DOM is rendered
                 await JSRuntime.InvokeVoidAsync("initializeTabs");
+            }
+            
+            // Initialize MarkdownEditor with saved content after everything else is ready
+            // Using Task.Run to not block the UI and allow the component to fully initialize
+            if (customHomeContentLoaded && !string.IsNullOrEmpty(customhomecontent))
+            {
+                _ = Task.Run(async () =>
+                {
+                    await Task.Delay(1000); // Wait 1 second for full initialization
+                    try
+                    {
+                        await InvokeAsync(async () =>
+                        {
+                            await mdCustomHomeContent.SetValueAsync(customhomecontent);
+                            StateHasChanged();
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log the error for debugging
+                        await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                        { 
+                            Title = "WARNING", 
+                            Message = $"Failed to initialize Custom Home Content in editor: {ex.Message}" 
+                        });
+                    }
+                });
             }
 
             var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);

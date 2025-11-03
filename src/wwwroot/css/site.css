@@ -361,6 +361,15 @@ a, .btn-link {
     color: #ffffff !important;
 }
 
+.blazored-modal-header {
+    background-color: #004494 !important;
+}
+
+.blazored-modal-title,
+.blazored-modal-header h3 {
+    color: #ffffff !important;
+}
+
 /* Remove focus outline from modal container and backdrop */
 .blazored-modal-container:focus,
 .blazored-modal-container:focus-visible,
@@ -371,8 +380,6 @@ a, .btn-link {
 div[class*="blazored-modal"]:focus,
 div[class*="blazored-modal"]:focus-visible {
     outline: none !important;
-    box-shadow: none !important;
-    border: none !important;
 }
 
 /* Also remove from any element that might be getting auto-focused */
