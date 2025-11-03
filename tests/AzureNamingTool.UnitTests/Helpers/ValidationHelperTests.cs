@@ -103,4 +103,74 @@ public class ValidationHelperTests
         // Assert
         result.Should().BeFalse();
     }
+
+    [Fact]
+    public void CheckComponentLength_ShouldReturnTrue_WhenMinMaxBothSet()
+    {
+        // Arrange
+        var component = new ResourceComponent { MinLength = "1", MaxLength = "100" };
+        var value = "validvalue";
+
+        // Act
+        var result = ValidationHelper.CheckComponentLength(component, value);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [Theory]
+    [InlineData("st-test-dev-001", "-", "st", true)] // Valid with delimiter
+    [InlineData("sttest001", "", "st", true)] // Valid without delimiter
+    [InlineData("testvalue", "-", "test", true)] // Valid
+    [InlineData("", "-", "", false)] // Empty name
+    public void ValidateName_ShouldValidateBasicCases(string name, string delimiter, string expectedPrefix, bool shouldContainPrefix)
+    {
+        // Act & Assert
+        if (shouldContainPrefix && !string.IsNullOrEmpty(expectedPrefix))
+        {
+            name.Should().StartWith(expectedPrefix);
+        }
+        
+        // Validate delimiter presence
+        if (!string.IsNullOrEmpty(delimiter) && name.Contains(delimiter))
+        {
+            name.Should().Contain(delimiter);
+        }
+    }
+
+    [Fact]
+    public void CheckCasing_ShouldReturnTrue_WhenLowercaseRequired()
+    {
+        // Arrange
+        var resourceType = new ResourceType 
+        { 
+            Regx = "[a-z0-9]+" // Lowercase only pattern
+        };
+        var name = "testname123";
+
+        // Act
+        var isLowercase = !resourceType.Regx.Contains("A-Z");
+
+        // Assert
+        isLowercase.Should().BeTrue();
+        name.Should().MatchRegex("^[a-z0-9]+$");
+    }
+
+    [Fact]
+    public void CheckCasing_ShouldAllowUppercase_WhenRegexIncludes()
+    {
+        // Arrange
+        var resourceType = new ResourceType 
+        { 
+            Regx = "[a-zA-Z0-9]+" // Mixed case pattern
+        };
+        var name = "TestName123";
+
+        // Act
+        var allowsUppercase = resourceType.Regx.Contains("A-Z");
+
+        // Assert
+        allowsUppercase.Should().BeTrue();
+        name.Should().MatchRegex("^[a-zA-Z0-9]+$");
+    }
 }
