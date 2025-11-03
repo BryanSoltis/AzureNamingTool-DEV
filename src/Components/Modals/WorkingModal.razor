@@ -5,7 +5,7 @@
 @inject IToastService toastService
 @inject ILogger<PasswordModal> Logger
 
-<div class="modern-modal-content text-center">
+<div class="modern-modal-content text-center" style="align-items: center; justify-content: center;">
     @if (!String.IsNullOrEmpty(message))
     {
         <p class="mb-3" style="font-style:italic; font-size: 1.1rem;">
@@ -18,7 +18,7 @@
             Working....
         </p>
     }
-    <img src="/images/loading-buffering.gif" alt="Loading..." style="max-width: 100px;" />
+    <img src="/images/loading-buffering.gif" alt="Loading..." style="max-width: 100px; display: block; margin: 0 auto;" />
 </div>
 
 @code {

@@ -154,6 +154,9 @@ namespace AzureNamingTool.Services
                 await MigrateEntityAsync<AdminUser>("adminusers.json", result);
                 await MigrateEntityAsync<AdminLogMessage>("adminlogmessages.json", result);
                 await MigrateEntityAsync<GeneratedName>("generatednames.json", result);
+                
+                // Migrate Azure Validation settings (singleton entity)
+                await MigrateAzureValidationSettingsAsync(result);
 
                 stopwatch.Stop();
                 result.Duration = stopwatch.Elapsed;
@@ -239,6 +242,68 @@ namespace AzureNamingTool.Services
         }
 
         /// <summary>
+        /// Migrates Azure Validation settings from JSON file to SQLite (singleton entity)
+        /// </summary>
+        /// <param name="result">Migration result to update</param>
+        private async Task MigrateAzureValidationSettingsAsync(MigrationResult result)
+        {
+            const string fileName = "azurevalidationsettings.json";
+            
+            try
+            {
+                var filePath = Path.Combine(_settingsPath, fileName);
+                
+                if (!File.Exists(filePath))
+                {
+                    _logger.LogDebug("File {FileName} does not exist, skipping Azure Validation settings migration", fileName);
+                    result.EntityCounts[nameof(AzureValidationSettings)] = 0;
+                    return;
+                }
+
+                var json = await File.ReadAllTextAsync(filePath);
+                if (string.IsNullOrWhiteSpace(json) || json == "{}")
+                {
+                    _logger.LogDebug("File {FileName} is empty, skipping Azure Validation settings migration", fileName);
+                    result.EntityCounts[nameof(AzureValidationSettings)] = 0;
+                    return;
+                }
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    PropertyNameCaseInsensitive = true
+                };
+
+                var settings = JsonSerializer.Deserialize<AzureValidationSettings>(json, options);
+                if (settings == null)
+                {
+                    _logger.LogDebug("No Azure Validation settings found in {FileName}", fileName);
+                    result.EntityCounts[nameof(AzureValidationSettings)] = 0;
+                    return;
+                }
+
+                // Ensure ID is set to 1 for singleton pattern
+                settings.Id = 1;
+
+                // Add to database
+                _dbContext.AzureValidationSettings.Add(settings);
+                await _dbContext.SaveChangesAsync();
+
+                result.EntitiesMigrated += 1;
+                result.EntityCounts[nameof(AzureValidationSettings)] = 1;
+
+                _logger.LogInformation("Migrated Azure Validation settings from {FileName}", fileName);
+            }
+            catch (Exception ex)
+            {
+                var error = $"Failed to migrate Azure Validation settings from {fileName}: {ex.Message}";
+                result.Errors.Add(error);
+                _logger.LogError(ex, "Error migrating Azure Validation settings");
+                // Don't throw - allow migration to continue even if Azure Validation settings fail
+            }
+        }
+
+        /// <summary>
         /// Validates that migrated data matches the source JSON files
         /// </summary>
         /// <returns>Validation result with entity count comparisons</returns>
@@ -264,6 +329,9 @@ namespace AzureNamingTool.Services
                 await ValidateEntityAsync<AdminUser>("adminuser.json", validation);
                 await ValidateEntityAsync<AdminLogMessage>("adminlogmessage.json", validation);
                 await ValidateEntityAsync<GeneratedName>("generatedname.json", validation);
+                
+                // Validate Azure Validation settings (singleton)
+                await ValidateAzureValidationSettingsAsync(validation);
 
                 validation.Message = validation.IsValid
                     ? "Validation successful - all entities match"
@@ -309,6 +377,61 @@ namespace AzureNamingTool.Services
                 // Get target count from SQLite
                 var dbSet = _dbContext.Set<TEntity>();
                 detail.TargetCount = await dbSet.CountAsync();
+
+                detail.Matches = detail.SourceCount == detail.TargetCount;
+                
+                if (!detail.Matches)
+                {
+                    detail.Discrepancies.Add($"Count mismatch: JSON={detail.SourceCount}, SQLite={detail.TargetCount}");
+                    validation.IsValid = false;
+                }
+
+                validation.EntityValidation[entityName] = detail;
+
+                _logger.LogDebug("Validation for {EntityType}: Source={SourceCount}, Target={TargetCount}, Matches={Matches}",
+                    entityName, detail.SourceCount, detail.TargetCount, detail.Matches);
+            }
+            catch (Exception ex)
+            {
+                detail.Discrepancies.Add($"Validation error: {ex.Message}");
+                validation.EntityValidation[entityName] = detail;
+                validation.IsValid = false;
+                _logger.LogError(ex, "Error validating {EntityType}", entityName);
+            }
+        }
+
+        /// <summary>
+        /// Validates Azure Validation settings migration (singleton entity)
+        /// </summary>
+        /// <param name="validation">Validation result to update</param>
+        private async Task ValidateAzureValidationSettingsAsync(ValidationResult validation)
+        {
+            var detail = new ValidationDetail();
+            const string fileName = "azurevalidationsettings.json";
+            const string entityName = nameof(AzureValidationSettings);
+
+            try
+            {
+                var filePath = Path.Combine(_settingsPath, fileName);
+
+                // Get source count from JSON (should be 1 or 0)
+                if (File.Exists(filePath))
+                {
+                    var json = await File.ReadAllTextAsync(filePath);
+                    if (!string.IsNullOrWhiteSpace(json) && json != "{}")
+                    {
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                            PropertyNameCaseInsensitive = true
+                        };
+                        var settings = JsonSerializer.Deserialize<AzureValidationSettings>(json, options);
+                        detail.SourceCount = settings != null ? 1 : 0;
+                    }
+                }
+
+                // Get target count from SQLite (should be 1 or 0)
+                detail.TargetCount = await _dbContext.AzureValidationSettings.CountAsync();
 
                 detail.Matches = detail.SourceCount == detail.TargetCount;
                 

@@ -1,9 +1,0 @@
-<step title="Incoming Request" date="2025-10-20T22:07:36.265" instance="fcfd6c" url="/api/deployments/latest" method="GET" type="request" pid="831,1,42" Accept="*/*" Host="azurenamingtool-dev-fbcrb8bdgbcmfebq.scm.eastus2-01.azurewebsites.net" User-Agent="AZURECLI/2.77.0 (MSI)" Accept-Encoding="gzip, deflate" Authorization="Bas..." x-ms-client-request-id="1fbe224a-ae01-11f0-81ef-6ca10053058a" X-ARR-LOG-ID="1fbe224a-ae01-11f0-81ef-6ca10053058a" CLIENT-IP="107.221.147.106:50303" X-SITE-DEPLOYMENT-ID="azurenamingtool-dev" WAS-DEFAULT-HOSTNAME="azurenamingtool-dev-fbcrb8bdgbcmfebq.scm.eastus2-01.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/deployments/latest" X-Client-IP="107.221.147.106" X-Client-Port="50303" >
-  <step title="Cleanup Xml Logs" date="2025-10-20T22:07:36.436" /><!-- duration: 181ms -->
-  <step title="DeploymentService.GetResult" date="2025-10-20T22:07:37.450" >
-    <step title="DeploymentService.GetLatestDeployment" date="2025-10-20T22:07:37.649" >
-      <step title="DeploymentManager.GetResults" date="2025-10-20T22:07:37.791" /><!-- duration: 4412ms -->
-    </step><!-- duration: 4673ms -->
-  </step><!-- duration: 4898ms -->
-  <step title="Outgoing response" date="2025-10-20T22:07:42.562" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 10ms -->
-</step><!-- duration: 6318ms -->
