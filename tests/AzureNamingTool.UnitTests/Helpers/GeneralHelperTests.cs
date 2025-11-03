@@ -1,0 +1,117 @@
+using AzureNamingTool.Helpers;
+using FluentAssertions;
+using Xunit;
+
+namespace AzureNamingTool.UnitTests.Helpers;
+
+public class GeneralHelperTests
+{
+    [Theory]
+    [InlineData("VGVzdA==", true)] // "Test" in base64
+    [InlineData("SGVsbG8gV29ybGQ=", true)] // "Hello World" in base64
+    [InlineData("not-base64!", false)]
+    public void IsBase64Encoded_ShouldDetectBase64Correctly(string value, bool expected)
+    {
+        // Act
+        var result = GeneralHelper.IsBase64Encoded(value);
+
+        // Assert
+        result.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData("Resource Location", false, "Location")]
+    [InlineData("Resource Environment", true, "environment")]
+    [InlineData("My Resource Type", false, "MyType")]
+    [InlineData("My Resource Type", true, "mytype")]
+    [InlineData("Simple Name", false, "SimpleName")]
+    [InlineData("Simple Name", true, "simplename")]
+    public void NormalizeName_ShouldNormalizeCorrectly(string input, bool lowercase, string expected)
+    {
+        // Act
+        var result = GeneralHelper.NormalizeName(input, lowercase);
+
+        // Assert
+        result.Should().Be(expected);
+    }
+
+    [Theory]
+    [InlineData(true, "")]
+    [InlineData(false, "disabled-text")]
+    public void SetTextEnabledClass_ShouldReturnCorrectClass(bool enabled, string expected)
+    {
+        // Act
+        var result = GeneralHelper.SetTextEnabledClass(enabled);
+
+        // Assert
+        result.Should().Be(expected);
+    }
+
+    [Fact]
+    public void IsNotNull_ShouldReturnTrue_WhenObjectIsNotNull()
+    {
+        // Arrange
+        var obj = new object();
+
+        // Act
+        var result = GeneralHelper.IsNotNull(obj);
+
+        // Assert
+        result.Should().BeTrue();
+    }
+
+    [Fact]
+    public void IsNotNull_ShouldReturnFalse_WhenObjectIsNull()
+    {
+        // Arrange
+        object? obj = null;
+
+        // Act
+        var result = GeneralHelper.IsNotNull(obj);
+
+        // Assert
+        result.Should().BeFalse();
+    }
+
+    [Fact]
+    public void EncryptString_ShouldEncryptAndDecrypt_Successfully()
+    {
+        // Arrange
+        string original = "TestPassword123";
+        string key = "12345678901234567890123456789012"; // 32 chars for AES-256
+
+        // Act
+        var encrypted = GeneralHelper.EncryptString(original, key);
+        var decrypted = GeneralHelper.DecryptString(encrypted, key);
+
+        // Assert
+        encrypted.Should().NotBe(original);
+        decrypted.Should().Be(original);
+    }
+
+    [Fact]
+    public void GetPropertyValue_ShouldReturnPropertyValue_WhenPropertyExists()
+    {
+        // Arrange
+        var obj = new { Name = "Test", Value = 123 };
+
+        // Act
+        var result = GeneralHelper.GetPropertyValue(obj, "Name");
+
+        // Assert
+        result.Should().Be("Test");
+    }
+
+    [Fact]
+    public void GetPropertyValue_ShouldReturnNull_WhenPropertyDoesNotExist()
+    {
+        // Arrange
+        var obj = new { Name = "Test" };
+
+        // Act
+        var result = GeneralHelper.GetPropertyValue(obj, "NonExistent");
+
+        // Assert
+        result.Should().BeNull();
+    }
+}
