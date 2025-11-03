@@ -147,3 +147,43 @@ public class ValidateNameResponseTests
         response.Message.Should().Be("Name is valid");
     }
 }
+
+public class AdminUserTests
+{
+    [Fact]
+    public void AdminUser_ShouldInitializeWithDefaultValues()
+    {
+        // Act
+        var user = new AdminUser();
+
+        // Assert
+        user.Id.Should().Be(0);
+        user.Name.Should().BeEmpty();
+    }
+
+    [Fact]
+    public void AdminUser_ShouldSetIdProperty()
+    {
+        // Arrange
+        var user = new AdminUser();
+
+        // Act
+        user.Id = 42;
+
+        // Assert
+        user.Id.Should().Be(42);
+    }
+
+    [Fact]
+    public void AdminUser_ShouldSetNameProperty()
+    {
+        // Arrange
+        var user = new AdminUser();
+
+        // Act
+        user.Name = "TestUser";
+
+        // Assert
+        user.Name.Should().Be("TestUser");
+    }
+}
