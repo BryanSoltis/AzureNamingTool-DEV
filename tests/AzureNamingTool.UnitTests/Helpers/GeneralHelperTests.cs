@@ -106,12 +106,63 @@ public class GeneralHelperTests
     public void GetPropertyValue_ShouldReturnNull_WhenPropertyDoesNotExist()
     {
         // Arrange
-        var obj = new { Name = "Test" };
+        var obj = new { Name = "Test", Value = 123 };
 
         // Act
-        var result = GeneralHelper.GetPropertyValue(obj, "NonExistent");
+        var result = GeneralHelper.GetPropertyValue(obj, "NonExistentProperty");
 
         // Assert
         result.Should().BeNull();
+    }
+
+    [Fact]
+    public void GenerateRandomString_ShouldReturnStringOfCorrectLength()
+    {
+        // Arrange
+        var length = 10;
+
+        // Act
+        var result = GeneralHelper.GenerateRandomString(length, false);
+
+        // Assert
+        result.Should().HaveLength(length);
+    }
+
+    [Fact]
+    public void GenerateRandomString_ShouldContainOnlyLowercaseLetters_WhenAlphanumericIsFalse()
+    {
+        // Arrange
+        var length = 50;
+
+        // Act
+        var result = GeneralHelper.GenerateRandomString(length, false);
+
+        // Assert
+        result.Should().MatchRegex("^[a-z]+$");
+    }
+
+    [Fact]
+    public void GenerateRandomString_ShouldContainAlphanumericCharacters_WhenAlphanumericIsTrue()
+    {
+        // Arrange
+        var length = 100; // Larger sample to ensure we likely get both letters and numbers
+
+        // Act
+        var result = GeneralHelper.GenerateRandomString(length, true);
+
+        // Assert
+        result.Should().MatchRegex("^[a-z0-9]+$");
+    }
+
+    [Theory]
+    [InlineData("Microsoft.Storage/storageAccounts", "Microsoft.Storage/storageAccounts")]
+    [InlineData("Microsoft.Compute/virtualMachines (VM Details)", "Microsoft.Compute/virtualMachines")]
+    public void FormatResourceType_ShouldFormatCorrectly(string input, string expectedBase)
+    {
+        // Act
+        var result = GeneralHelper.FormatResoureType(input);
+
+        // Assert
+        result[0].Should().Be(expectedBase);
     }
 }
