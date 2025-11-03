@@ -625,3 +625,196 @@ public class ResourceDelimiterTests
         none.Delimiter.Should().BeEmpty();
     }
 }
+
+public class ResourceOrgTests
+{
+    [Fact]
+    public void ResourceOrg_ShouldInitializeWithDefaultValues()
+    {
+        // Act
+        var resourceOrg = new ResourceOrg();
+
+        // Assert
+        resourceOrg.Id.Should().Be(0);
+        resourceOrg.Name.Should().BeEmpty();
+        resourceOrg.ShortName.Should().BeEmpty();
+        resourceOrg.SortOrder.Should().Be(0);
+    }
+
+    [Fact]
+    public void ResourceOrg_ShouldSetShortNameProperty()
+    {
+        // Arrange
+        var resourceOrg = new ResourceOrg();
+
+        // Act
+        resourceOrg.ShortName = "org";
+
+        // Assert
+        resourceOrg.ShortName.Should().Be("org");
+    }
+
+    [Fact]
+    public void ResourceOrg_ShouldSetAllProperties()
+    {
+        // Arrange
+        var resourceOrg = new ResourceOrg();
+
+        // Act
+        resourceOrg.Id = 1;
+        resourceOrg.Name = "Engineering";
+        resourceOrg.ShortName = "eng";
+        resourceOrg.SortOrder = 5;
+
+        // Assert
+        resourceOrg.Id.Should().Be(1);
+        resourceOrg.Name.Should().Be("Engineering");
+        resourceOrg.ShortName.Should().Be("eng");
+        resourceOrg.SortOrder.Should().Be(5);
+    }
+}
+
+public class ResourceFunctionTests
+{
+    [Fact]
+    public void ResourceFunction_ShouldInitializeWithDefaultValues()
+    {
+        // Act
+        var resourceFunction = new ResourceFunction();
+
+        // Assert
+        resourceFunction.Id.Should().Be(0);
+        resourceFunction.Name.Should().BeEmpty();
+        resourceFunction.ShortName.Should().BeEmpty();
+        resourceFunction.SortOrder.Should().Be(0);
+    }
+
+    [Fact]
+    public void ResourceFunction_ShouldSetShortNameProperty()
+    {
+        // Arrange
+        var resourceFunction = new ResourceFunction();
+
+        // Act
+        resourceFunction.ShortName = "web";
+
+        // Assert
+        resourceFunction.ShortName.Should().Be("web");
+    }
+
+    [Fact]
+    public void ResourceFunction_ShouldSetAllProperties()
+    {
+        // Arrange
+        var resourceFunction = new ResourceFunction();
+
+        // Act
+        resourceFunction.Id = 1;
+        resourceFunction.Name = "Web Application";
+        resourceFunction.ShortName = "webapp";
+        resourceFunction.SortOrder = 10;
+
+        // Assert
+        resourceFunction.Id.Should().Be(1);
+        resourceFunction.Name.Should().Be("Web Application");
+        resourceFunction.ShortName.Should().Be("webapp");
+        resourceFunction.SortOrder.Should().Be(10);
+    }
+}
+
+public class ResourceProjAppSvcTests
+{
+    [Fact]
+    public void ResourceProjAppSvc_ShouldInitializeWithDefaultValues()
+    {
+        // Act
+        var resourceProjAppSvc = new ResourceProjAppSvc();
+
+        // Assert
+        resourceProjAppSvc.Id.Should().Be(0);
+        resourceProjAppSvc.Name.Should().BeEmpty();
+        resourceProjAppSvc.ShortName.Should().BeEmpty();
+        resourceProjAppSvc.SortOrder.Should().Be(0);
+    }
+
+    [Fact]
+    public void ResourceProjAppSvc_ShouldSetShortNameProperty()
+    {
+        // Arrange
+        var resourceProjAppSvc = new ResourceProjAppSvc();
+
+        // Act
+        resourceProjAppSvc.ShortName = "app";
+
+        // Assert
+        resourceProjAppSvc.ShortName.Should().Be("app");
+    }
+
+    [Fact]
+    public void ResourceProjAppSvc_ShouldSetAllProperties()
+    {
+        // Arrange
+        var resourceProjAppSvc = new ResourceProjAppSvc();
+
+        // Act
+        resourceProjAppSvc.Id = 1;
+        resourceProjAppSvc.Name = "Customer Portal";
+        resourceProjAppSvc.ShortName = "cust";
+        resourceProjAppSvc.SortOrder = 15;
+
+        // Assert
+        resourceProjAppSvc.Id.Should().Be(1);
+        resourceProjAppSvc.Name.Should().Be("Customer Portal");
+        resourceProjAppSvc.ShortName.Should().Be("cust");
+        resourceProjAppSvc.SortOrder.Should().Be(15);
+    }
+}
+
+public class ResourceUnitDeptTests
+{
+    [Fact]
+    public void ResourceUnitDept_ShouldInitializeWithDefaultValues()
+    {
+        // Act
+        var resourceUnitDept = new ResourceUnitDept();
+
+        // Assert
+        resourceUnitDept.Id.Should().Be(0);
+        resourceUnitDept.Name.Should().BeEmpty();
+        resourceUnitDept.ShortName.Should().BeEmpty();
+        resourceUnitDept.SortOrder.Should().Be(0);
+    }
+
+    [Fact]
+    public void ResourceUnitDept_ShouldSetShortNameProperty()
+    {
+        // Arrange
+        var resourceUnitDept = new ResourceUnitDept();
+
+        // Act
+        resourceUnitDept.ShortName = "dev";
+
+        // Assert
+        resourceUnitDept.ShortName.Should().Be("dev");
+    }
+
+    [Fact]
+    public void ResourceUnitDept_ShouldSetAllProperties()
+    {
+        // Arrange
+        var resourceUnitDept = new ResourceUnitDept();
+
+        // Act
+        resourceUnitDept.Id = 1;
+        resourceUnitDept.Name = "Development";
+        resourceUnitDept.ShortName = "dev";
+        resourceUnitDept.SortOrder = 20;
+
+        // Assert
+        resourceUnitDept.Id.Should().Be(1);
+        resourceUnitDept.Name.Should().Be("Development");
+        resourceUnitDept.ShortName.Should().Be("dev");
+        resourceUnitDept.SortOrder.Should().Be(20);
+    }
+}
+
