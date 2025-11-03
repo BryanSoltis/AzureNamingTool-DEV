@@ -316,19 +316,19 @@ namespace AzureNamingTool.Services
                 _logger.LogInformation("Validating migration");
 
                 // Validate each entity type
-                await ValidateEntityAsync<ResourceType>("resourcetype.json", validation);
-                await ValidateEntityAsync<ResourceLocation>("resourcelocation.json", validation);
-                await ValidateEntityAsync<ResourceEnvironment>("resourceenvironment.json", validation);
-                await ValidateEntityAsync<ResourceOrg>("resourceorg.json", validation);
-                await ValidateEntityAsync<ResourceProjAppSvc>("resourceprojappsvc.json", validation);
-                await ValidateEntityAsync<ResourceUnitDept>("resourceunitdept.json", validation);
-                await ValidateEntityAsync<ResourceFunction>("resourcefunction.json", validation);
-                await ValidateEntityAsync<ResourceDelimiter>("resourcedelimiter.json", validation);
-                await ValidateEntityAsync<ResourceComponent>("resourcecomponent.json", validation);
-                await ValidateEntityAsync<CustomComponent>("customcomponent.json", validation);
-                await ValidateEntityAsync<AdminUser>("adminuser.json", validation);
-                await ValidateEntityAsync<AdminLogMessage>("adminlogmessage.json", validation);
-                await ValidateEntityAsync<GeneratedName>("generatedname.json", validation);
+                await ValidateEntityAsync<ResourceType>("resourcetypes.json", validation);
+                await ValidateEntityAsync<ResourceLocation>("resourcelocations.json", validation);
+                await ValidateEntityAsync<ResourceEnvironment>("resourceenvironments.json", validation);
+                await ValidateEntityAsync<ResourceOrg>("resourceorgs.json", validation);
+                await ValidateEntityAsync<ResourceProjAppSvc>("resourceprojappsvcs.json", validation);
+                await ValidateEntityAsync<ResourceUnitDept>("resourceunitdepts.json", validation);
+                await ValidateEntityAsync<ResourceFunction>("resourcefunctions.json", validation);
+                await ValidateEntityAsync<ResourceDelimiter>("resourcedelimiters.json", validation);
+                await ValidateEntityAsync<ResourceComponent>("resourcecomponents.json", validation);
+                await ValidateEntityAsync<CustomComponent>("customcomponents.json", validation);
+                await ValidateEntityAsync<AdminUser>("adminusers.json", validation);
+                await ValidateEntityAsync<AdminLogMessage>("adminlogmessages.json", validation);
+                await ValidateEntityAsync<GeneratedName>("generatednames.json", validation);
                 
                 // Validate Azure Validation settings (singleton)
                 await ValidateAzureValidationSettingsAsync(validation);

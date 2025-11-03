@@ -202,7 +202,7 @@ public class StorageMigrationServiceTests : IDisposable
             new() { Id = 1, Resource = "rg", ShortName = "rg", Enabled = true },
             new() { Id = 2, Resource = "vm", ShortName = "vm", Enabled = true }
         };
-        CreateTestJsonFile("resourcetype.json", testData);
+        CreateTestJsonFile("resourcetypes.json", testData);
 
         var service = new StorageMigrationServiceTestable(_dbContext, _loggerMock.Object, _testSettingsPath, _testBackupPath);
 
@@ -229,16 +229,16 @@ public class StorageMigrationServiceTests : IDisposable
     public async Task MigrateToSQLiteAsync_ShouldHandleMultipleEntityTypes()
     {
         // Arrange
-        CreateTestJsonFile("resourcetype.json", new List<ResourceType>
+        CreateTestJsonFile("resourcetypes.json", new List<ResourceType>
         {
             new() { Id = 1, Resource = "rg", ShortName = "rg", Enabled = true }
         });
-        CreateTestJsonFile("resourcelocation.json", new List<ResourceLocation>
+        CreateTestJsonFile("resourcelocations.json", new List<ResourceLocation>
         {
             new() { Id = 1, Name = "East US", ShortName = "eus", Enabled = true },
             new() { Id = 2, Name = "West US", ShortName = "wus", Enabled = true }
         });
-        CreateTestJsonFile("resourceenvironment.json", new List<ResourceEnvironment>
+        CreateTestJsonFile("resourceenvironments.json", new List<ResourceEnvironment>
         {
             new() { Id = 1, Name = "Production", ShortName = "prd" }
         });
@@ -251,10 +251,11 @@ public class StorageMigrationServiceTests : IDisposable
         // Assert
         result.Success.Should().BeTrue();
         result.EntitiesMigrated.Should().Be(4, "1 + 2 + 1 = 4 entities");
-        result.EntityCounts.Should().HaveCount(3, "three entity types migrated");
+        result.EntityCounts.Should().HaveCount(4, "three entity types plus AzureValidationSettings");
         result.EntityCounts["ResourceType"].Should().Be(1);
         result.EntityCounts["ResourceLocation"].Should().Be(2);
         result.EntityCounts["ResourceEnvironment"].Should().Be(1);
+        result.EntityCounts["AzureValidationSettings"].Should().Be(0, "no validation settings file");
 
         // Verify database
         var types = await _dbContext.ResourceTypes.ToListAsync();
@@ -270,11 +271,11 @@ public class StorageMigrationServiceTests : IDisposable
     public async Task MigrateToSQLiteAsync_ShouldSkipEmptyJsonFiles()
     {
         // Arrange
-        CreateTestJsonFile("resourcetype.json", new List<ResourceType>
+        CreateTestJsonFile("resourcetypes.json", new List<ResourceType>
         {
             new() { Id = 1, Resource = "rg", ShortName = "rg", Enabled = true }
         });
-        CreateTestJsonFile("resourcelocation.json", "[]"); // Empty array
+        CreateTestJsonFile("resourcelocations.json", "[]"); // Empty array
 
         var service = new StorageMigrationServiceTestable(_dbContext, _loggerMock.Object, _testSettingsPath, _testBackupPath);
 
@@ -292,7 +293,7 @@ public class StorageMigrationServiceTests : IDisposable
     public async Task MigrateToSQLiteAsync_ShouldUseProvidedBackupPath()
     {
         // Arrange
-        CreateTestJsonFile("resourcetype.json", new List<ResourceType>
+        CreateTestJsonFile("resourcetypes.json", new List<ResourceType>
         {
             new() { Id = 1, Resource = "rg", ShortName = "rg", Enabled = true }
         });
@@ -312,7 +313,7 @@ public class StorageMigrationServiceTests : IDisposable
     public async Task MigrateToSQLiteAsync_ShouldRollbackOnFailure()
     {
         // Arrange
-        CreateTestJsonFile("resourcetype.json", "{ invalid json }"); // Invalid JSON to trigger failure
+        CreateTestJsonFile("resourcetypes.json", "{ invalid json }"); // Invalid JSON to trigger failure
 
         var service = new StorageMigrationServiceTestable(_dbContext, _loggerMock.Object, _testSettingsPath, _testBackupPath);
 
@@ -335,7 +336,7 @@ public class StorageMigrationServiceTests : IDisposable
             new() { Id = 1, Resource = "rg", ShortName = "rg", Enabled = true },
             new() { Id = 2, Resource = "vm", ShortName = "vm", Enabled = true }
         };
-        CreateTestJsonFile("resourcetype.json", testData);
+        CreateTestJsonFile("resourcetypes.json", testData);
 
         var service = new StorageMigrationServiceTestable(_dbContext, _loggerMock.Object, _testSettingsPath, _testBackupPath);
 
@@ -363,7 +364,7 @@ public class StorageMigrationServiceTests : IDisposable
             new() { Id = 1, Resource = "rg", ShortName = "rg", Enabled = true },
             new() { Id = 2, Resource = "vm", ShortName = "vm", Enabled = true }
         };
-        CreateTestJsonFile("resourcetype.json", testData);
+        CreateTestJsonFile("resourcetypes.json", testData);
 
         // Add only one item to database (simulating incomplete migration)
         await _dbContext.ResourceTypes.AddAsync(new ResourceType { Id = 1, Resource = "rg", ShortName = "rg", Enabled = true });
@@ -386,7 +387,7 @@ public class StorageMigrationServiceTests : IDisposable
     public async Task GetMigrationStatusAsync_ShouldReturnCorrectStatus_WhenNotMigrated()
     {
         // Arrange
-        CreateTestJsonFile("resourcetype.json", new List<ResourceType>
+        CreateTestJsonFile("resourcetypes.json", new List<ResourceType>
         {
             new() { Id = 1, Resource = "rg", ShortName = "rg", Enabled = true }
         });
@@ -409,7 +410,7 @@ public class StorageMigrationServiceTests : IDisposable
     public async Task GetMigrationStatusAsync_ShouldReturnCorrectStatus_WhenMigrated()
     {
         // Arrange
-        CreateTestJsonFile("resourcetype.json", new List<ResourceType>
+        CreateTestJsonFile("resourcetypes.json", new List<ResourceType>
         {
             new() { Id = 1, Resource = "rg", ShortName = "rg", Enabled = true }
         });
@@ -436,7 +437,7 @@ public class StorageMigrationServiceTests : IDisposable
         {
             new() { Id = 1, Resource = "rg", ShortName = "rg", Enabled = true }
         };
-        CreateTestJsonFile("resourcetype.json", testData);
+        CreateTestJsonFile("resourcetypes.json", testData);
 
         var service = new StorageMigrationServiceTestable(_dbContext, _loggerMock.Object, _testSettingsPath, _testBackupPath);
 
@@ -448,7 +449,7 @@ public class StorageMigrationServiceTests : IDisposable
         await _dbContext.SaveChangesAsync();
 
         // Modify JSON file to be different from backup
-        CreateTestJsonFile("resourcetype.json", new List<ResourceType>
+        CreateTestJsonFile("resourcetypes.json", new List<ResourceType>
         {
             new() { Id = 2, Resource = "modified", ShortName = "mod", Enabled = true }
         });
@@ -458,7 +459,7 @@ public class StorageMigrationServiceTests : IDisposable
 
         // Assert
         // Database should be cleared (can't verify directly with in-memory DB, but method shouldn't throw)
-        var jsonContent = await File.ReadAllTextAsync(Path.Combine(_testSettingsPath, "resourcetype.json"));
+        var jsonContent = await File.ReadAllTextAsync(Path.Combine(_testSettingsPath, "resourcetypes.json"));
         var restoredData = JsonSerializer.Deserialize<List<ResourceType>>(jsonContent, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
         
         restoredData.Should().HaveCount(1, "original data should be restored from backup");
