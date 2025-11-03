@@ -334,3 +334,294 @@ public class GeneratedNameTests
         generatedName.Message.Should().Be("Test message");
     }
 }
+
+public class ResourceTypeTests
+{
+    [Fact]
+    public void ResourceType_ShouldInitializeWithDefaultValues()
+    {
+        // Act
+        var resourceType = new ResourceType();
+
+        // Assert
+        resourceType.Id.Should().Be(0);
+        resourceType.Resource.Should().BeEmpty();
+        resourceType.Optional.Should().BeEmpty();
+        resourceType.Exclude.Should().BeEmpty();
+        resourceType.Property.Should().BeEmpty();
+        resourceType.ShortName.Should().BeEmpty();
+        resourceType.Enabled.Should().BeTrue();
+        resourceType.ApplyDelimiter.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ResourceType_ShouldSetShortNameProperty()
+    {
+        // Arrange
+        var resourceType = new ResourceType();
+
+        // Act
+        resourceType.ShortName = "st";
+
+        // Assert
+        resourceType.ShortName.Should().Be("st");
+    }
+
+    [Fact]
+    public void ResourceType_ShouldSetAllProperties()
+    {
+        // Arrange
+        var resourceType = new ResourceType();
+
+        // Act
+        resourceType.Id = 1;
+        resourceType.Resource = "Microsoft.Storage/storageAccounts";
+        resourceType.Optional = "ResourceOrg";
+        resourceType.Exclude = "ResourceInstance";
+        resourceType.Property = "Storage";
+        resourceType.ShortName = "st";
+        resourceType.Scope = "global";
+        resourceType.LengthMin = "3";
+        resourceType.LengthMax = "24";
+        resourceType.ValidText = "Lowercase letters and numbers";
+        resourceType.InvalidCharacters = "-_";
+        resourceType.Regx = "^[a-z0-9]+$";
+        resourceType.StaticValues = "none";
+        resourceType.Enabled = true;
+        resourceType.ApplyDelimiter = false;
+
+        // Assert
+        resourceType.Id.Should().Be(1);
+        resourceType.Resource.Should().Be("Microsoft.Storage/storageAccounts");
+        resourceType.Optional.Should().Be("ResourceOrg");
+        resourceType.Exclude.Should().Be("ResourceInstance");
+        resourceType.Property.Should().Be("Storage");
+        resourceType.ShortName.Should().Be("st");
+        resourceType.Scope.Should().Be("global");
+        resourceType.LengthMin.Should().Be("3");
+        resourceType.LengthMax.Should().Be("24");
+        resourceType.Enabled.Should().BeTrue();
+        resourceType.ApplyDelimiter.Should().BeFalse();
+    }
+}
+
+public class ResourceComponentTests
+{
+    [Fact]
+    public void ResourceComponent_ShouldInitializeWithDefaultValues()
+    {
+        // Act
+        var component = new ResourceComponent();
+
+        // Assert
+        component.Id.Should().Be(0);
+        component.Name.Should().BeEmpty();
+        component.DisplayName.Should().BeEmpty();
+        component.Enabled.Should().BeFalse();
+        component.SortOrder.Should().Be(0);
+        component.IsCustom.Should().BeFalse();
+        component.IsFreeText.Should().BeFalse();
+        component.MinLength.Should().Be("1");
+        component.MaxLength.Should().Be("10");
+    }
+
+    [Fact]
+    public void ResourceComponent_ShouldSetEnabledProperty()
+    {
+        // Arrange
+        var component = new ResourceComponent();
+
+        // Act
+        component.Enabled = true;
+
+        // Assert
+        component.Enabled.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ResourceComponent_ShouldSetAllProperties()
+    {
+        // Arrange
+        var component = new ResourceComponent();
+
+        // Act
+        component.Id = 1;
+        component.Name = "ResourceEnvironment";
+        component.DisplayName = "Environment";
+        component.Enabled = true;
+        component.SortOrder = 5;
+        component.IsCustom = false;
+        component.IsFreeText = false;
+        component.MinLength = "2";
+        component.MaxLength = "5";
+
+        // Assert
+        component.Id.Should().Be(1);
+        component.Name.Should().Be("ResourceEnvironment");
+        component.DisplayName.Should().Be("Environment");
+        component.Enabled.Should().BeTrue();
+        component.SortOrder.Should().Be(5);
+        component.IsCustom.Should().BeFalse();
+        component.IsFreeText.Should().BeFalse();
+        component.MinLength.Should().Be("2");
+        component.MaxLength.Should().Be("5");
+    }
+}
+
+public class ResourceEnvironmentTests
+{
+    [Fact]
+    public void ResourceEnvironment_ShouldInitializeWithDefaultValues()
+    {
+        // Act
+        var environment = new ResourceEnvironment();
+
+        // Assert
+        environment.Id.Should().Be(0);
+        environment.Name.Should().BeEmpty();
+        environment.ShortName.Should().BeEmpty();
+        environment.SortOrder.Should().Be(0);
+    }
+
+    [Fact]
+    public void ResourceEnvironment_ShouldSetShortNameProperty()
+    {
+        // Arrange
+        var environment = new ResourceEnvironment();
+
+        // Act
+        environment.ShortName = "dev";
+
+        // Assert
+        environment.ShortName.Should().Be("dev");
+    }
+
+    [Fact]
+    public void ResourceEnvironment_ShouldSetAllProperties()
+    {
+        // Arrange
+        var environment = new ResourceEnvironment();
+
+        // Act
+        environment.Id = 1;
+        environment.Name = "Development";
+        environment.ShortName = "dev";
+        environment.SortOrder = 1;
+
+        // Assert
+        environment.Id.Should().Be(1);
+        environment.Name.Should().Be("Development");
+        environment.ShortName.Should().Be("dev");
+        environment.SortOrder.Should().Be(1);
+    }
+}
+
+public class ResourceLocationTests
+{
+    [Fact]
+    public void ResourceLocation_ShouldInitializeWithDefaultValues()
+    {
+        // Act
+        var location = new ResourceLocation();
+
+        // Assert
+        location.Id.Should().Be(0);
+        location.Name.Should().BeEmpty();
+        location.ShortName.Should().BeEmpty();
+        location.Enabled.Should().BeTrue(); // Default is true
+    }
+
+    [Fact]
+    public void ResourceLocation_ShouldSetShortNameProperty()
+    {
+        // Arrange
+        var location = new ResourceLocation();
+
+        // Act
+        location.ShortName = "eus";
+
+        // Assert
+        location.ShortName.Should().Be("eus");
+    }
+
+    [Fact]
+    public void ResourceLocation_ShouldSetAllProperties()
+    {
+        // Arrange
+        var location = new ResourceLocation();
+
+        // Act
+        location.Id = 1;
+        location.Name = "East US";
+        location.ShortName = "eus";
+        location.Enabled = true;
+
+        // Assert
+        location.Id.Should().Be(1);
+        location.Name.Should().Be("East US");
+        location.ShortName.Should().Be("eus");
+        location.Enabled.Should().BeTrue();
+    }
+
+    [Fact]
+    public void ResourceLocation_ShouldAllowDisabling()
+    {
+        // Arrange
+        var location = new ResourceLocation { Enabled = false };
+
+        // Assert
+        location.Enabled.Should().BeFalse();
+    }
+}
+
+public class ResourceDelimiterTests
+{
+    [Fact]
+    public void ResourceDelimiter_ShouldInitializeWithDefaultValues()
+    {
+        // Act
+        var delimiter = new ResourceDelimiter();
+
+        // Assert
+        delimiter.Id.Should().Be(0);
+        delimiter.Name.Should().BeEmpty();
+        delimiter.Delimiter.Should().BeEmpty();
+        delimiter.Enabled.Should().BeTrue(); // Default is true
+        delimiter.SortOrder.Should().Be(0);
+    }
+
+    [Fact]
+    public void ResourceDelimiter_ShouldSetAllProperties()
+    {
+        // Arrange
+        var delimiter = new ResourceDelimiter();
+
+        // Act
+        delimiter.Id = 1;
+        delimiter.Name = "Dash";
+        delimiter.Delimiter = "-";
+        delimiter.Enabled = true;
+        delimiter.SortOrder = 1;
+
+        // Assert
+        delimiter.Id.Should().Be(1);
+        delimiter.Name.Should().Be("Dash");
+        delimiter.Delimiter.Should().Be("-");
+        delimiter.Enabled.Should().BeTrue();
+        delimiter.SortOrder.Should().Be(1);
+    }
+
+    [Fact]
+    public void ResourceDelimiter_ShouldSupportVariousDelimiters()
+    {
+        // Arrange & Act
+        var dash = new ResourceDelimiter { Delimiter = "-" };
+        var underscore = new ResourceDelimiter { Delimiter = "_" };
+        var none = new ResourceDelimiter { Delimiter = "" };
+
+        // Assert
+        dash.Delimiter.Should().Be("-");
+        underscore.Delimiter.Should().Be("_");
+        none.Delimiter.Should().BeEmpty();
+    }
+}
