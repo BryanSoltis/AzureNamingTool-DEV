@@ -2636,21 +2636,25 @@
                                     resourceDelimiter = servicesData.ResourceDelimiters!.Find(x => x.Id == id)!;
                                     if (GeneralHelper.IsNotNull(resourceDelimiter))
                                     {
+                                        // First, disable ALL delimiters
+                                        foreach (var item in servicesData.ResourceDelimiters)
+                                        {
+                                            item.Enabled = false;
+                                        }
+                                        
+                                        // Then enable only the selected one
                                         resourceDelimiter.Enabled = true;
                                         
                                         // Reorganize all items: enabled first (ordered by current sort), then disabled
                                         var enabledItems = servicesData.ResourceDelimiters
-                                            .Where(x => x.Enabled && x.Id != resourceDelimiter.Id)
+                                            .Where(x => x.Enabled)
                                             .OrderBy(x => x.SortOrder)
                                             .ToList();
                                         
                                         var disabledItems = servicesData.ResourceDelimiters
-                                            .Where(x => !x.Enabled && x.Id != resourceDelimiter.Id)
+                                            .Where(x => !x.Enabled)
                                             .OrderBy(x => x.SortOrder)
                                             .ToList();
-                                        
-                                        // Add the newly enabled item at the end of enabled items
-                                        enabledItems.Add(resourceDelimiter);
                                         
                                         // Reassign sort orders
                                         int sortOrder = 1;
