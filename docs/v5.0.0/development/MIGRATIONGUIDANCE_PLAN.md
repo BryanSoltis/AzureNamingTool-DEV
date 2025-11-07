@@ -1144,8 +1144,8 @@ curl -X GET "https://your-server/api/ImportExport/ExportConfiguration?includeAdm
 ## File Changes Summary
 
 ### Files to Create
-1. `docs/MIGRATIONGUIDANCE_PLAN.md` (this file)
-2. `docs/MIGRATION_GUIDE.md` (user-facing documentation)
+1. `docs/v5.0.0/development/MIGRATIONGUIDANCE_PLAN.md` (this file)
+2. `docs/v5.0.0/V5.0.0_MIGRATION_GUIDE.md` (user-facing documentation)
 3. `src/Components/Modals/TextConfirmationModal.razor` (new modal component)
 
 ### Files to Modify
@@ -1161,7 +1161,7 @@ curl -X GET "https://your-server/api/ImportExport/ExportConfiguration?includeAdm
    - Update InitiateMigration() with double confirmation
    - Update migration status display
 
-3. `docs/MODERNIZATION_PLAN.md`
+3. `docs/v5.0.0/development/MODERNIZATION_PLAN.md`
    - Update Phase 6 & 7 status
    - Document storage provider decision
    - Document backup strategy

@@ -221,7 +221,7 @@ Microsoft.DBforPostgreSQL, Microsoft.DBforMariaDB
 
 **Deliverables:**
 - `Components/Pages/Admin.razor` - Azure Validation tab (+838 lines)
-- `docs/PHASE5_UI_INTEGRATION_SUMMARY.md` - Implementation summary
+- `docs/v5.0.0/development/PHASE5_UI_INTEGRATION_SUMMARY.md` - Implementation summary
 
 **Key Features:**
 
@@ -568,7 +568,7 @@ Microsoft.DBforPostgreSQL, Microsoft.DBforMariaDB
 
 **Implementation Team:**
 - **Lead Developer:** AI Assistant (GitHub Copilot)
-- **Project Manager:** User (brsoltis)
+- **Project Manager:** Development Team
 - **Architecture:** Collaborative design
 - **Testing:** Comprehensive test suites defined
 - **Documentation:** Complete technical documentation
@@ -612,9 +612,9 @@ This release introduces enterprise-grade Azure tenant name validation, enabling 
 
 **Breaking Changes:** None (opt-in feature, V1 API unchanged)
 
-**Upgrade Path:** See [Administrator Guide](./docs/AZURE_VALIDATION_ADMIN_GUIDE.md)
+**Upgrade Path:** See [Administrator Guide](./AZURE_VALIDATION_ADMIN_GUIDE.md)
 
-**Documentation:** See [docs/README.md](./docs/README.md) for complete index
+**Documentation:** See [../README.md](../README.md) for complete index
 
 ---
 
