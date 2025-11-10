@@ -49,6 +49,9 @@ namespace AzureNamingTool.Repositories.Implementation.FileSystem
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     PropertyNameCaseInsensitive = true
                 };
+                // Convert enums to their string names for human-readable configuration files
+                options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+                
                 var items = JsonSerializer.Deserialize<List<T>>(json, options);
                 
                 _logger.LogDebug("Loaded {Count} items from {FileName}", items?.Count ?? 0, _fileName);
@@ -135,6 +138,8 @@ namespace AzureNamingTool.Repositories.Implementation.FileSystem
                     WriteIndented = true,
                     DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
                 };
+                // Convert enums to their string names for human-readable configuration files
+                options.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
 
                 var json = JsonSerializer.Serialize(items, options);
                 
@@ -219,6 +224,7 @@ namespace AzureNamingTool.Repositories.Implementation.FileSystem
                 nameof(Models.GeneratedName) => "generatednames.json",
                 nameof(Models.AdminLogMessage) => "adminlogmessages.json",
                 nameof(Models.AdminUser) => "adminusers.json",
+                nameof(Models.AzureValidationSettings) => "azurevalidationsettings.json",
                 _ => $"{typeName.ToLowerInvariant()}s.json"
             };
         }

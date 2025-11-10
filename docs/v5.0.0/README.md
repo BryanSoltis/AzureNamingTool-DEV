@@ -44,7 +44,8 @@ Comprehensive documentation for the Azure tenant name validation feature:
 |----------|-------------|----------|
 | [API V1 Wiki](./wiki/API_V1_WIKI.md) | Version 1 API documentation | Developers, API Consumers |
 | [API V2 Wiki](./wiki/API_V2_WIKI.md) | Version 2 API documentation (recommended) | Developers, API Consumers |
-| [Azure Validation Wiki](./wiki/AZURE_VALIDATION_WIKI.md) | Azure validation feature documentation | All Users |
+| [Azure Validation Wiki](./wiki/AZURE_VALIDATION_WIKI.md) | Complete Azure validation feature documentation | All Users |
+| [🐳 Azure Validation Docker Wiki](./AZURE_VALIDATION_DOCKER_WIKI.md) | **Docker deployment guide for Azure Validation** | Docker Users, DevOps |
 
 ### Other Development Documentation (`development/`)
 

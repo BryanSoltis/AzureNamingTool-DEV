@@ -36,7 +36,7 @@ builder.Services.AddRazorComponents()
     {
         // Optimize for better responsiveness in Azure App Service
         options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);  // Increased for slower networks
-        options.EnableDetailedErrors = false;
+        options.EnableDetailedErrors = builder.Configuration.GetValue<bool>("DetailedErrors", false);
         options.HandshakeTimeout = TimeSpan.FromSeconds(15);
         options.KeepAliveInterval = TimeSpan.FromSeconds(10);      // More frequent keep-alive
         options.MaximumParallelInvocationsPerClient = 2;           // Allow parallel operations
@@ -71,6 +71,16 @@ builder.Services.AddApiVersioning(options =>
 {
     options.GroupNameFormat = "'v'VVV";
     options.SubstituteApiVersionInUrl = true;
+});
+
+// Configure JSON serialization options globally
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    // Convert enums to their string names instead of numeric values
+    // This makes JSON configuration files human-readable
+    options.SerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.PropertyNameCaseInsensitive = true;
 });
 
 builder.Services.AddSwaggerGen(c =>
