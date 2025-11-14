@@ -13,7 +13,7 @@ namespace AzureNamingTool.Controllers.V2
     /// <summary>
     /// V2 API controller for managing Resource Orgs with modern REST practices.
     /// </summary>
-    [Route("api/v{{version:apiVersion}}/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiVersion("2.0")]
     [ApiController]
     [ApiKey]
