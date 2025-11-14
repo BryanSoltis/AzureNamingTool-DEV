@@ -87,7 +87,7 @@ namespace AzureNamingTool.Controllers.V2
         /// <summary>
         /// Gets a specific resourceenvironment by ID.
         /// </summary>
-        [HttpGet("{{id:int}}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(ApiResponse<ResourceEnvironment>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -217,7 +217,7 @@ namespace AzureNamingTool.Controllers.V2
         /// <summary>
         /// Deletes a resourceenvironment.
         /// </summary>
-        [HttpDelete("{{id:int}}")]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]

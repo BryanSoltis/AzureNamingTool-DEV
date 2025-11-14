@@ -87,7 +87,7 @@ namespace AzureNamingTool.Controllers.V2
         /// <summary>
         /// Gets a specific resourcecomponent by ID.
         /// </summary>
-        [HttpGet("{{id:int}}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(ApiResponse<ResourceComponent>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]

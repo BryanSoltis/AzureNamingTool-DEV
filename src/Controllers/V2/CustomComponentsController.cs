@@ -87,7 +87,7 @@ namespace AzureNamingTool.Controllers.V2
         /// <summary>
         /// Gets a specific customcomponent by ID.
         /// </summary>
-        [HttpGet("{{id:int}}")]
+        [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(ApiResponse<CustomComponent>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
@@ -217,7 +217,7 @@ namespace AzureNamingTool.Controllers.V2
         /// <summary>
         /// Deletes a customcomponent.
         /// </summary>
-        [HttpDelete("{{id:int}}")]
+        [HttpDelete("{id:int}")]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status500InternalServerError)]
