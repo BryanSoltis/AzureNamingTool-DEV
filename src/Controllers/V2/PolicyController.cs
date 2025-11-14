@@ -36,36 +36,25 @@ namespace AzureNamingTool.Controllers.V2
         /// <summary>
         /// Gets the Azure Policy definition for resource naming validation.
         /// </summary>
-        /// <returns>ApiResponse containing the policy definition</returns>
-        /// <response code="200">Returns the policy definition wrapped in ApiResponse</response>
-        /// <response code="500">Internal server error occurred</response>
+        /// <returns>ApiResponse indicating the feature is not implemented</returns>
+        /// <response code="501">Feature not yet implemented</response>
         [HttpGet]
         [Route("[action]")]
-        public async Task<IActionResult> GetPolicyDefinition()
+        [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status501NotImplemented)]
+        public IActionResult GetPolicyDefinition()
         {
-            try
+            var response = ApiResponse<object>.ErrorResponse(
+                "NOT_IMPLEMENTED",
+                "Policy definition generation is not yet implemented in V2 API",
+                "PolicyController.GetPolicyDefinition"
+            );
+            response.Metadata = new ApiMetadata
             {
-                var serviceResponse = await _policyService.GetPolicyAsync();
-                var response = new ApiResponse<object>
-                {
-                    Success = serviceResponse.Success,
-                    Data = serviceResponse.ResponseObject,
-                    Metadata = new ApiMetadata { CorrelationId = HttpContext.TraceIdentifier, Timestamp = System.DateTime.UtcNow, Version = "2.0" }
-                };
-                if (!serviceResponse.Success)
-                {
-                    response.Error = new ApiError { Code = "POLICY_GENERATION_FAILED", Message = "Failed to generate policy definition" };
-                }
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                await _adminLogService.PostItemAsync(new AdminLogMessage { Title = "ERROR", Message = ex.Message });
-                var response = ApiResponse<object>.ErrorResponse("INTERNAL_SERVER_ERROR", $"Error generating policy: {ex.Message}", "PolicyController.GetPolicyDefinition");
-                response.Error.InnerError = new ApiInnerError { Code = ex.GetType().Name };
-                response.Metadata.CorrelationId = HttpContext.TraceIdentifier;
-                return StatusCode(500, response);
-            }
+                CorrelationId = HttpContext.TraceIdentifier,
+                Timestamp = DateTime.UtcNow,
+                Version = "2.0"
+            };
+            return StatusCode(501, response);
         }
     }
 }
