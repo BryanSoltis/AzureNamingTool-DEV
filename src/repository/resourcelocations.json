@@ -308,5 +308,45 @@
     "id": 62,
     "name": "Jio India Central",
     "shortName": "injc"
+  },
+  {
+    "id": 63,
+    "name": "Austria East",
+    "shortName": "ateast"
+  },
+  {
+    "id": 64,
+    "name": "Belgium Central",
+    "shortName": "becentral"
+  },
+  {
+    "id": 65,
+    "name": "Chile Central",
+    "shortName": "clcentral"
+  },
+  {
+    "id": 66,
+    "name": "Indonesia Central",
+    "shortName": "idcentral"
+  },
+  {
+    "id": 67,
+    "name": "Malaysia West",
+    "shortName": "mywest"
+  },
+  {
+    "id": 68,
+    "name": "Mexico Central",
+    "shortName": "mxcentral"
+  },
+  {
+    "id": 69,
+    "name": "Spain Central",
+    "shortName": "escentral"
+  },
+  {
+    "id": 70,
+    "name": "Taiwan",
+    "shortName": "tw"
   }
 ]

@@ -5174,11 +5174,13 @@
 
     private async Task OnConfigurationAlertDismissed()
     {
+        versionalertshown = true;
         await session.SetAsync("versionalert-" + appversion + "-shown", true);
         if (dismissalert)
         {
             ConfigurationHelper.DismissVersionAlert();
         }
+        StateHasChanged();
     }
     private async Task OnConnectivtyAlertDismissed()
     {
