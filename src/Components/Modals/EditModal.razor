@@ -735,6 +735,7 @@
                 itemName = resourceType.Resource;
                 namelabel = "Resource";
                 itemShortName = resourceType.ShortName;
+                itemDescription = resourceType.Description;
                 optional = resourceType.Optional;
                 exclude = resourceType.Exclude;
                 itemRegEx = resourceType.Regx;
@@ -902,6 +903,7 @@
                             case "ResourceType":
                                 ResourceType resourceType = servicesData.ResourceTypes!.Find(x => x.Id == id)!;
                                 resourceType.ShortName = itemShortName;
+                                resourceType.Description = itemDescription;
                                 resourceType.Optional = "";
                                 resourceType.Exclude = "";
                                 resourceType.ApplyDelimiter = itemApplyDelimiter;
