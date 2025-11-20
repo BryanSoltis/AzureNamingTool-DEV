@@ -162,30 +162,22 @@
                 menuButton.classList.remove('menu-open');
             }
         };
-        
-        console.log('Mobile menu functions defined');
     })();
     
     // Setup mobile menu after DOM is ready
     function setupMobileMenu() {
-        console.log('Setting up mobile menu handlers');
         
         // Add backdrop click handler
         const backdrop = document.querySelector('.modern-sidebar-backdrop');
         if (backdrop) {
             backdrop.onclick = window.closeMobileMenu;
-            console.log('Backdrop click handler added');
-        } else {
-            console.warn('Backdrop not found during setup');
         }
         
         // Add nav link click handlers for mobile
         const navLinks = document.querySelectorAll('.modern-sidebar .nav-link');
-        console.log('Found', navLinks.length, 'nav links');
         navLinks.forEach(link => {
             link.addEventListener('click', function() {
                 if (window.innerWidth <= 768) {
-                    console.log('Nav link clicked on mobile, closing menu');
                     window.closeMobileMenu();
                 }
             });

@@ -312,41 +312,36 @@
   {
     "id": 63,
     "name": "Austria East",
-    "shortName": "ateast"
+    "shortName": "ate"
   },
   {
     "id": 64,
     "name": "Belgium Central",
-    "shortName": "becentral"
+    "shortName": "bec"
   },
   {
     "id": 65,
     "name": "Chile Central",
-    "shortName": "clcentral"
+    "shortName": "clc"
   },
   {
     "id": 66,
     "name": "Indonesia Central",
-    "shortName": "idcentral"
+    "shortName": "idc"
   },
   {
     "id": 67,
     "name": "Malaysia West",
-    "shortName": "mywest"
+    "shortName": "myw"
   },
   {
     "id": 68,
     "name": "Mexico Central",
-    "shortName": "mxcentral"
+    "shortName": "mxc"
   },
   {
     "id": 69,
     "name": "Spain Central",
-    "shortName": "escentral"
-  },
-  {
-    "id": 70,
-    "name": "Taiwan",
-    "shortName": "tw"
+    "shortName": "esc"
   }
 ]

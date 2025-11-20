@@ -32,7 +32,8 @@ builder.Services.AddResponseCompression(options =>
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents().AddHubOptions(options =>
+    .AddInteractiveServerComponents()
+    .AddHubOptions(options =>
     {
         // Optimize for better responsiveness in Azure App Service
         options.ClientTimeoutInterval = TimeSpan.FromSeconds(60);  // Increased for slower networks
@@ -42,6 +43,13 @@ builder.Services.AddRazorComponents()
         options.MaximumParallelInvocationsPerClient = 2;           // Allow parallel operations
         options.MaximumReceiveMessageSize = 102400000;
         options.StreamBufferCapacity = 10;
+    })
+    .AddCircuitOptions(options =>
+    {
+        // Configure circuit behavior for Azure App Service
+        options.DisconnectedCircuitMaxRetained = 100;
+        options.DisconnectedCircuitRetentionPeriod = TimeSpan.FromMinutes(3);
+        options.JSInteropDefaultCallTimeout = TimeSpan.FromMinutes(1);
     });
 
 

@@ -66,9 +66,6 @@
                 document.documentElement.classList.remove('theme-transitioning');
             }, 300);
 
-            // Log theme change
-            console.log('Theme changed to:', theme);
-
             // Dispatch custom event for theme change
             window.dispatchEvent(new CustomEvent('themeChanged', { detail: { theme } }));
         } catch (e) {
@@ -93,7 +90,6 @@
     function initTheme() {
         const theme = window.getTheme();
         document.documentElement.setAttribute('data-theme', theme);
-        console.log('Theme initialized:', theme);
     }
 
     /**
@@ -173,6 +169,4 @@
             return window.toggleTheme();
         }
     };
-
-    console.log('Theme management loaded');
 })();

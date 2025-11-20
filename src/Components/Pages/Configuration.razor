@@ -46,7 +46,7 @@
 <div class="modern-admin-container">
     @if (admin)
         {
-            @if ((!ConfigurationHelper.VerifyConnectivity().Result) && (!connectivityalertshown))
+            @if ((!hasInternetConnectivity) && (!connectivityalertshown))
             {
                 <div class="modern-alert modern-alert-danger mb-3">
                     <div class="modern-alert-header">
@@ -1632,8 +1632,10 @@
     private int componentRenderKey = 0;
     private int environmentRenderKey = 0;
     private bool dataLoaded = false;
+    private bool isLoading = false; // Prevent concurrent reload attempts
     private bool admin = false;
     private bool connectivityalertshown = false;
+    private bool hasInternetConnectivity = true; // Assume true until checked
     private string versionalert = String.Empty;
     private bool versionalertshown = false;
     private bool dismissalert = false;
@@ -1770,124 +1772,163 @@
 
     private SiteConfiguration config = ConfigurationHelper.GetConfigurationData();
 
+    protected override Task OnInitializedAsync()
+    {
+        // Always ensure we're starting fresh
+        dataLoaded = false;
+        isLoading = false;
+        return Task.CompletedTask;
+    }
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        currentuser = await IdentityHelper.GetCurrentUser(session);
-        if (firstRender)
+        // Skip if already loading to prevent concurrent initialization
+        if (isLoading) return;
+        
+        try
         {
-            var result = await session.GetAsync<bool>("admin");
-            admin = (bool)result.Value;
-            await ReloadSpecificData("ResourceComponent", "ResourceDelimiter", "ResourceEnvironment", "ResourceLocation", "ResourceOrg", "ResourceProjAppSvc", "ResourceType", "ResourceUnitDept", "ResourceFunction", "CustomComponent");
+            currentuser = await IdentityHelper.GetCurrentUser(session);
             
-            // Detect current storage provider for UI adaptation
-            currentStorageProvider = ConfigurationHelper.GetAppSetting("StorageProvider") ?? "FileSystem";
-
-            // Get the list of categories
-            categories = ResourceTypeService!.GetTypeCategories(servicesData.ResourceTypes!);
-            
-            // Initialize collapsed state for custom components
-            if (servicesData?.CustomComponents != null)
+            // Check if cache was cleared - if so, force reload
+            var forceReload = await session.GetAsync<bool>("forceconfigreload");
+            if (forceReload.Success && forceReload.Value)
             {
-                foreach (var customComponent in servicesData.CustomComponents)
-                {
-                    collapsedSections.Add($"custom{customComponent.Id}");
-                }
+                dataLoaded = false;
+                await session.DeleteAsync("forceconfigreload");
             }
             
-            dataLoaded = true;
-
-            // Determine if the connectivity notification has been dismissed
-            var resultConnectivityAlertShown = await session.GetAsync<bool>("connectivityalertshown");
-            connectivityalertshown = resultConnectivityAlertShown.Success ? resultConnectivityAlertShown.Value : false;
-
-            // Configuration File Check
-            // Determine if the installed version of the configuration files are up to date
-            if (admin)
+            // Do full initialization if not yet done (first load OR after cache clear)
+            if (!dataLoaded)
             {
-
-                // Determine if the version notification has been dismissed
-                var resultVersionAlert = await session.GetAsync<bool>("versionalert-" + appversion + "-shown");
-                versionalertshown = resultVersionAlert.Success ? resultVersionAlert.Value : false;
-                if (!versionalertshown)
+                isLoading = true;
+                
+                try
                 {
-                    versionalert = ConfigurationHelper.GetVersionAlert().Result;
-                    if (String.IsNullOrEmpty(versionalert))
-                    {
-                        versionalertshown = true;
-                        await session.SetAsync("versionalert-" + appversion + "-shown", true);
-                    }
-                }
+                    var result = await session.GetAsync<bool>("admin");
+                    admin = (bool)result.Value;
+                    await ReloadSpecificData("ResourceComponent", "ResourceDelimiter", "ResourceEnvironment", "ResourceLocation", "ResourceOrg", "ResourceProjAppSvc", "ResourceType", "ResourceUnitDept", "ResourceFunction", "CustomComponent");
+                
+                    // Detect current storage provider for UI adaptation
+                    currentStorageProvider = ConfigurationHelper.GetAppSetting("StorageProvider") ?? "FileSystem";
 
-                var resultConfigurationFileAlert = await session.GetAsync<bool>("configurationfilealertshown");
-                configurationfilealertshown = resultConfigurationFileAlert.Success ? resultConfigurationFileAlert.Value : false;
-
-                // Check connectivity
-                if (await ConfigurationHelper.VerifyConnectivity())
-                {
-                    if (!configurationfilealertshown)
+                    // Get the list of categories
+                    categories = ResourceTypeService!.GetTypeCategories(servicesData.ResourceTypes!);
+            
+                    // Initialize collapsed state for custom components
+                    if (servicesData?.CustomComponents != null)
                     {
-                        // Get a list of any configurations that are out of date
-                        List<string> versiondata = await ConfigurationHelper.VerifyConfigurationFileVersionData();
-                        if (versiondata.Count > 0)
+                        foreach (var customComponent in servicesData.CustomComponents)
                         {
-                            string versionmessage = "";
-                            foreach (string message in versiondata)
-                            {
-                                versionmessage += message;
-                            }
-                            // Display a notification of the files requiring updating
-                            ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "ATTENTION", versionmessage, "", admin);
-                            await session.SetAsync("configurationfilealertshown", true);
+                            collapsedSections.Add($"custom{customComponent.Id}");
                         }
                     }
                 }
-            }
-            StateHasChanged();
-            
-            // Initialize drag-and-drop for all sortable sections if admin (only on first render)
-            if (admin && dataLoaded)
-            {
-                // Register this component instance with JavaScript for callbacks
-                var dotNetReference = DotNetObjectReference.Create(this);
-                await JsRuntime.InvokeVoidAsync("registerConfigurationPage", dotNetReference);
-                
-                // Initialize Resource Components
-                await JsRuntime.InvokeVoidAsync("dragDropSort.init", 
-                    "resourceComponentsTableBody");
-
-                // Initialize Custom Components (one for each custom component)
-                if (servicesData?.ResourceComponents != null)
+                finally
                 {
-                    foreach (var resourceComponent in servicesData.ResourceComponents.Where(x => x.IsCustom))
-                    {
-                        var customComponentId = resourceComponent.Id;
-                        var containerId = $"customComponent{customComponentId}TableBody";
-                        await JsRuntime.InvokeVoidAsync("dragDropSort.init", containerId);
-                    }
+                    // ALWAYS set these flags even if an exception occurred
+                    dataLoaded = true;
+                    isLoading = false;
+                    // Don't call StateHasChanged here - it hangs on Azure after cache clear
+                    // The UI will update after the finally block completes
                 }
+                    
+                    // Check internet connectivity asynchronously
+                    hasInternetConnectivity = await ConfigurationHelper.VerifyConnectivity();
+                    
+                    // Determine if the connectivity notification has been dismissed
+                    var resultConnectivityAlertShown = await session.GetAsync<bool>("connectivityalertshown");
+                    connectivityalertshown = resultConnectivityAlertShown.Success ? resultConnectivityAlertShown.Value : false;
 
-                // Initialize Environments
-                await JsRuntime.InvokeVoidAsync("dragDropSort.init", "resourceEnvironmentsTableBody");
+                    // Configuration File Check
+                    // Determine if the installed version of the configuration files are up to date
+                    if (admin)
+                    {
 
-                // Initialize Functions
-                await JsRuntime.InvokeVoidAsync("dragDropSort.init", "resourceFunctionsTableBody");
+                        // Determine if the version notification has been dismissed
+                        var resultVersionAlert = await session.GetAsync<bool>("versionalert-" + appversion + "-shown");
+                        versionalertshown = resultVersionAlert.Success ? resultVersionAlert.Value : false;
+                        if (!versionalertshown)
+                        {
+                            versionalert = ConfigurationHelper.GetVersionAlert().Result;
+                            if (String.IsNullOrEmpty(versionalert))
+                            {
+                                versionalertshown = true;
+                                await session.SetAsync("versionalert-" + appversion + "-shown", true);
+                            }
+                        }
 
-                // Initialize Orgs
-                await JsRuntime.InvokeVoidAsync("dragDropSort.init", "resourceOrgsTableBody");
+                        var resultConfigurationFileAlert = await session.GetAsync<bool>("configurationfilealertshown");
+                        configurationfilealertshown = resultConfigurationFileAlert.Success ? resultConfigurationFileAlert.Value : false;
 
-                // Initialize Projects/Apps/Services
-                await JsRuntime.InvokeVoidAsync("dragDropSort.init", "resourceProjAppSvcsTableBody");
+                        // Check connectivity
+                        if (await ConfigurationHelper.VerifyConnectivity())
+                        {
+                            if (!configurationfilealertshown)
+                            {
+                                // Get a list of any configurations that are out of date
+                                List<string> versiondata = await ConfigurationHelper.VerifyConfigurationFileVersionData();
+                                if (versiondata.Count > 0)
+                                {
+                                    string versionmessage = "";
+                                    foreach (string message in versiondata)
+                                    {
+                                        versionmessage += message;
+                                    }
+                                    // Display a notification of the files requiring updating
+                                    ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "ATTENTION", versionmessage, "", admin);
+                                    await session.SetAsync("configurationfilealertshown", true);
+                                }
+                            }
+                        }
+                    }
+                    StateHasChanged();
+            
+                    // Initialize drag-and-drop for all sortable sections if admin (only on first render)
+                    if (admin && dataLoaded)
+                    {
+                        // Register this component instance with JavaScript for callbacks
+                        var dotNetReference = DotNetObjectReference.Create(this);
+                        await JsRuntime.InvokeVoidAsync("registerConfigurationPage", dotNetReference);
+                
+                        // Initialize Resource Components
+                        await JsRuntime.InvokeVoidAsync("dragDropSort.init", 
+                            "resourceComponentsTableBody");
 
-                // Initialize Units/Depts
-                await JsRuntime.InvokeVoidAsync("dragDropSort.init", "resourceUnitDeptsTableBody");
+                        // Initialize Custom Components (one for each custom component)
+                        if (servicesData?.ResourceComponents != null)
+                        {
+                            foreach (var resourceComponent in servicesData.ResourceComponents.Where(x => x.IsCustom))
+                            {
+                                var customComponentId = resourceComponent.Id;
+                                var containerId = $"customComponent{customComponentId}TableBody";
+                                await JsRuntime.InvokeVoidAsync("dragDropSort.init", containerId);
+                            }
+                        }
+
+                        // Initialize Environments
+                        await JsRuntime.InvokeVoidAsync("dragDropSort.init", "resourceEnvironmentsTableBody");
+
+                        // Initialize Functions
+                        await JsRuntime.InvokeVoidAsync("dragDropSort.init", "resourceFunctionsTableBody");
+
+                        // Initialize Orgs
+                        await JsRuntime.InvokeVoidAsync("dragDropSort.init", "resourceOrgsTableBody");
+
+                        // Initialize Projects/Apps/Services
+                        await JsRuntime.InvokeVoidAsync("dragDropSort.init", "resourceProjAppSvcsTableBody");
+
+                        // Initialize Units/Depts
+                        await JsRuntime.InvokeVoidAsync("dragDropSort.init", "resourceUnitDeptsTableBody");
+                    }
+                    
+                    StateHasChanged(); // Final render update
             }
         }
-        else
+        catch (Exception ex)
         {
-            if (!GeneralHelper.IsNotNull(servicesData))
-            {
-                await ReloadSpecificData("ResourceComponent", "ResourceDelimiter", "ResourceEnvironment", "ResourceLocation", "ResourceOrg", "ResourceProjAppSvc", "ResourceType", "ResourceUnitDept", "ResourceFunction", "CustomComponent");
-            }
+            await AdminLogService.PostItemAsync(new AdminLogMessage() { Title = "ERROR", Message = $"Configuration page load error: {ex.Message}" });
+            dataLoaded = true; // Set to true to show error instead of infinite loading
+            StateHasChanged();
         }
     }
 
@@ -5903,7 +5944,9 @@
         ServiceResponse serviceResponse;
         foreach (var dataType in dataTypes)
         {
-            switch (dataType)
+            try
+            {
+                switch (dataType)
             {
                 case "ResourceComponent":
                     serviceResponse = await ResourceComponentService!.GetItemsAsync(admin);
@@ -5977,6 +6020,16 @@
                         servicesData.CustomComponents = (List<CustomComponent>)serviceResponse.ResponseObject!;
                     }
                     break;
+            }
+            }
+            catch (Exception ex)
+            {
+                await AdminLogService!.PostItemAsync(new AdminLogMessage() 
+                { 
+                    Title = "ERROR", 
+                    Message = $"ReloadSpecificData failed for {dataType}: {ex.Message}" 
+                });
+                throw; // Re-throw to be caught by outer try-catch
             }
         }
         StateHasChanged();

@@ -2246,6 +2246,8 @@
                 break;
             case "clearcache":
                 CacheHelper.ClearAllCache();
+                // Set session flag to force Configuration page to reload data
+                await session.SetAsync("forceconfigreload", true);
                 message.Type = MessageTypesEnum.SUCCESS;
                 message.Header = "SUCCESS";
                 message.Message = "Cache cleared!";

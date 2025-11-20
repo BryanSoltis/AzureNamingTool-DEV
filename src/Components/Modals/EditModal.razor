@@ -735,7 +735,7 @@
                 itemName = resourceType.Resource;
                 namelabel = "Resource";
                 itemShortName = resourceType.ShortName;
-                itemDescription = resourceType.Description;
+                itemDescription = resourceType.Description ?? String.Empty;
                 optional = resourceType.Optional;
                 exclude = resourceType.Exclude;
                 itemRegEx = resourceType.Regx;

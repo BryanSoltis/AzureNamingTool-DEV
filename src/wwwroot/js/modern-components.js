@@ -23,8 +23,6 @@ document.addEventListener('DOMContentLoaded', function() {
    =================================================================== */
 
 function initializeTabs() {
-    console.log('Initializing tabs...');
-    
     // Handle all tab navigation
     document.querySelectorAll('.modern-tab').forEach(function(tab) {
         // Remove existing listeners to prevent duplicates
@@ -33,11 +31,9 @@ function initializeTabs() {
         
         newTab.addEventListener('click', function(e) {
             e.preventDefault();
-            console.log('Tab clicked:', newTab.getAttribute('data-tab'));
             
             const targetId = newTab.getAttribute('data-tab');
             if (!targetId) {
-                console.log('No target ID found');
                 return;
             }
             
@@ -55,21 +51,15 @@ function initializeTabs() {
             // Hide all tab contents in this container
             tabContainer.querySelectorAll('.modern-tab-content').forEach(function(content) {
                 content.classList.remove('active');
-                console.log('Hiding tab:', content.id);
             });
             
             // Show target content
             const targetContent = document.getElementById(targetId);
             if (targetContent) {
                 targetContent.classList.add('active');
-                console.log('Showing tab:', targetId);
-            } else {
-                console.log('Target content not found:', targetId);
             }
         });
     });
-    
-    console.log('Found', document.querySelectorAll('.modern-tab').length, 'tabs');
     
     // Activate first tab by default if none are active
     document.querySelectorAll('.modern-tabs').forEach(function(tabsContainer) {
@@ -502,11 +492,8 @@ function initializeScrollToTop() {
 
 function forceBlazoredModalStyling() {
     function applyModalFixes() {
-        console.log('=== applyModalFixes running ===');
-        
         // Remove padding and border from blazored-modal to let header extend to edges
         const modals = document.querySelectorAll('.blazored-modal');
-        console.log('Found', modals.length, 'blazored-modal elements');
         modals.forEach(modal => {
             modal.style.padding = '0';
             modal.style.border = 'none';
@@ -514,10 +501,7 @@ function forceBlazoredModalStyling() {
         
         // Force header to use nav color - using setProperty with !important to override CSS isolation
         const headers = document.querySelectorAll('.bm-header');
-        console.log('Found', headers.length, 'bm-header elements');
         headers.forEach(header => {
-            const beforeColor = window.getComputedStyle(header).backgroundColor;
-            console.log('Header background BEFORE:', beforeColor);
             
             // Completely clear all background properties
             header.style.removeProperty('background');
@@ -530,14 +514,6 @@ function forceBlazoredModalStyling() {
             // Apply same gradient as sidebar for visual consistency
             header.style.setProperty('background', 'linear-gradient(180deg, #2d3748 0%, #1a202c 100%)', 'important');
             header.style.setProperty('color', '#ffffff', 'important');
-            
-            // Check what was applied
-            setTimeout(() => {
-                const computed = window.getComputedStyle(header);
-                console.log('Header background AFTER:', computed.backgroundColor);
-                console.log('Header background-image AFTER:', computed.backgroundImage);
-                console.log('Header element:', header);
-            }, 50);
         });
     }
     
@@ -562,7 +538,6 @@ function forceBlazoredModalStyling() {
         });
         
         if (hasNewModal) {
-            console.log('NEW MODAL DETECTED - applying fixes');
             setTimeout(applyModalFixes, 10);
             setTimeout(applyModalFixes, 100);
             setTimeout(applyModalFixes, 250);
@@ -573,8 +548,6 @@ function forceBlazoredModalStyling() {
         childList: true,
         subtree: true
     });
-    
-    console.log('Blazored Modal styling watcher initialized');
 }
 
 /* ===================================================================
@@ -592,7 +565,6 @@ function scrollToElement(elementId) {
             block: 'start',
             inline: 'nearest'
         });
-        console.log('Scrolled to element:', elementId);
     } else {
         console.warn('Element not found:', elementId);
     }
@@ -600,6 +572,4 @@ function scrollToElement(elementId) {
 
 // Make scrollToElement globally available for Blazor interop
 window.scrollToElement = scrollToElement;
-
-console.log('Modern Components JavaScript initialized successfully');
 
