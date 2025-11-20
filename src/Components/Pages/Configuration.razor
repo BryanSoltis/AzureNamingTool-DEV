@@ -65,21 +65,19 @@
             }
             @if ((!versionalertshown) && (!String.IsNullOrEmpty(versionalert)))
             {
-                <div class="modern-alert modern-alert-warning mb-3">
-                    <div class="modern-alert-content-wrapper">
-                        <i class="bi bi-info-circle"></i>
-                        <div class="modern-alert-content-text">
-                            @((MarkupString)versionalert)
+                <div class="modern-notification-info" style="margin-bottom: 1rem;">
+                    <i class="bi bi-info-circle"></i>
+                    <div>
+                        @((MarkupString)versionalert)
+                        <div style="margin-top: 1rem; display: flex; justify-content: flex-end; align-items: center; gap: 1rem;">
+                            <label class="modern-form-check">
+                                <input type="checkbox" @bind="@dismissalert">
+                                <span>Do not show again</span>
+                            </label>
+                            <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@(e => OnConfigurationAlertDismissed())">
+                                Dismiss
+                            </button>
                         </div>
-                    </div>
-                    <div class="modern-alert-footer">
-                        <label class="modern-form-check">
-                            <input type="checkbox" @bind="@dismissalert">
-                            <span>Do not show again</span>
-                        </label>
-                        <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@(e => OnConfigurationAlertDismissed())">
-                            Dismiss
-                        </button>
                     </div>
                 </div>
             }

@@ -82,7 +82,7 @@
                 }
                 <button class="modern-tab" data-tab="tab-configuration">
                     <span class="oi oi-hard-drive tab-icon" aria-hidden="true"></span>
-                    Configuration
+                    Data
                 </button>
                 <button class="modern-tab" data-tab="tab-security">
                     <span class="oi oi-lock-locked tab-icon" aria-hidden="true"></span>
@@ -603,7 +603,7 @@
                                 <label class="form-check-label" for="strategyAutoIncrement">
                                     <strong>Auto-Increment</strong><br />
                                     <small class="text-muted">Example: vnet-001 → vnet-002</small><br />
-                                    <small class="text-warning">⚠️ Requires instance component (e.g., -001) in your naming convention</small>
+                                    <small style="color: #d97706;">⚠️ Requires instance component (e.g., -001) in your naming convention</small>
                                 </label>
                             </div>
                             <div class="form-check mb-2">
@@ -939,8 +939,10 @@
                         <div class="mt-3">
                             <div class="modern-notification-info mb-3">
                                 <i class="bi bi-info-circle"></i>
-                                <strong>SQLite Storage Active</strong><br />
-                                You can backup your data as a database file or export as JSON for portability.
+                                <div>
+                                    <strong>SQLite Storage Active</strong><br />
+                                    You can backup your data as a database file or export as JSON for portability.
+                                </div>
                             </div>
 
                             <div class="row g-3">
