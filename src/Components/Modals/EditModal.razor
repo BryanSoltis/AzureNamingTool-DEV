@@ -18,7 +18,7 @@
                 <h3 class="modern-modal-title">@title</h3>
             </div>
             <div class="modern-card-body">
-                <div class="mb-3">
+                <div style="margin-bottom: 1rem;">
                     <label for="itemName" class="modern-form-label">Name</label>
                     <input title="Name" value="@itemName" type="text" class="modern-form-input" id="name" @onchange="@((ui) => { itemName = (string)ui.Value!;})" />
                 </div>
@@ -30,9 +30,9 @@
                     {
                         if (Convert.ToBoolean(config.ResourceTypeEditingAllowed))
                     {
-                        <div class="alert alert-danger alert-dismissible fade show mb-3" role="alert">
+                        <div class="alert alert-danger alert-dismissible fade show" style="margin-bottom: 1rem;" role="alert">
                             <h4>ATTENTION</h4>
-                            <div class="mb-3">
+                            <div style="margin-bottom: 1rem;">
                                 <p>
                                     Resource Type settings are configured by the Azure Naming Tool team and match the Azure portal validation requirements. Overriding these values may result in invalid names for a resource.
                                 </p>
@@ -49,9 +49,9 @@
                     }
                     else
                     {
-                        <div class="alert alert-warning alert-dismissible fade show mb-3" role="alert">
+                        <div class="alert alert-warning alert-dismissible fade show" style="margin-bottom: 1rem;" role="alert">
                             <h4>NOTE</h4>
-                            <div class="mb-3">
+                            <div style="margin-bottom: 1rem;">
                                 Resource Type settings are disabled by default. You can allow the editing of these values by enabling the "Resource Type Editing" setting in the Admin section.
                             </div>
                             <div>
@@ -62,15 +62,15 @@
                         </div>
                     }
                 }
-                <div class="modern-card mb-3">
+                <div class="modern-card" style="margin-bottom: 1rem;">
                     <div class="modern-card-header">
                         Configuration
                     </div>
                     <div class="modern-card-body">
-                        <div class="mb-3">
+                        <div style="margin-bottom: 1rem;">
                             This section allows you to modify the configuration.
                         </div>
-                        <div class="mb-3">
+                        <div style="margin-bottom: 1rem;">
                             <label class="modern-form-label">
                                 @namelabel
                             </label>
@@ -87,7 +87,7 @@
                         </div>
                         @if (type != "ResourceComponent")
                         {
-                            <div class="mb-3">
+                            <div style="margin-bottom: 1rem;">
                                 <label class="modern-form-label">
                                     Short Name
                                 </label>
@@ -105,7 +105,7 @@
                         }
                         @if ((type == "ResourceComponent") || ((type == "ResourceType") && (Convert.ToBoolean(config.ResourceTypeEditingAllowed))))
                         {
-                            <div class="mb-3">
+                            <div style="margin-bottom: 1rem;">
                                 <label class="modern-form-label">
                                     Description
                                 </label>
@@ -115,7 +115,7 @@
                             </div>
                             @if ((type == "ResourceComponent") && (itemIsCustom))
                             {
-                                <div class="mb-3">
+                                <div style="margin-bottom: 1rem;">
                                     <label class="modern-form-label">
                                         Field Type
                                     </label>
@@ -126,12 +126,12 @@
                                 </div>
                                 @if (itemComponentType == "freetext")
                                 {
-                                    <div class="modern-card-body mb-3">
+                                    <div class="modern-card-body" style="margin-bottom: 1rem;">
                                         <div>
                                             <label class="modern-form-label">
                                                 Generate Random Value
                                             </label>
-                                            <div class="mb-3">
+                                            <div style="margin-bottom: 1rem;">
                                                 By default, Free Form allows any value. If enabled, this setting to generate a random value for the component.
                                             </div>
                                             <div>
@@ -144,11 +144,11 @@
                                         </div>
                                         @if (itemEnforceRandom)
                                         {
-                                            <div class="mt-3">
+                                            <div style="margin-top: 1rem;">
                                                 <label class="modern-form-label">
                                                     Generate Alphanumeric Values
                                                 </label>
-                                                <div class="mb-3">
+                                                <div style="margin-bottom: 1rem;">
                                                     If enabled, the tool will generate a random alphanumeric value for the component. If disabled, only letters will be generated.
                                                 </div>
                                                 <div>
@@ -163,7 +163,7 @@
                                     </div>
                                 }
                             }
-                            <div class="mb-3">
+                            <div style="margin-bottom: 1rem;">
                                 <label class="modern-form-label">
                                     Minimum Length
                                 </label>
@@ -171,7 +171,7 @@
                                     <input title="Minimum Length" value="@itemMinLength" type="text" class="modern-form-input" id="minlength" @onchange="@((ui) => { itemMinLength = (string)ui.Value!;})" onkeypress="return (event.charCode !=8 && event.charCode ==0 || (event.charCode >= 48 && event.charCode <= 57))" />
                                 </div>
                             </div>
-                            <div class="mb-3">
+                            <div style="margin-bottom: 1rem;">
                                 <label class="modern-form-label">
                                     Maximum Length
                                 </label>
@@ -181,11 +181,11 @@
                             </div>
                             @if (type == "ResourceComponent")
                             {
-                                <div class="mb-3">
+                                <div style="margin-bottom: 1rem;">
                                     <label class="modern-form-label">
                                         Apply Delimiter Before
                                     </label>
-                                    <div class="mb-3">
+                                    <div style="margin-bottom: 1rem;">
                                         If disabled, this setting will not add the current delimiter BEFORE the component value.
                                     </div>
                                     <div>
@@ -196,11 +196,11 @@
                                         <span class="align-text-top ms-2"> Enable</span>
                                     </div>
                                 </div>
-                                <div class="mb-3">
+                                <div style="margin-bottom: 1rem;">
                                     <label class="modern-form-label">
                                         Apply Delimiter After
                                     </label>
-                                    <div class="mb-3">
+                                    <div style="margin-bottom: 1rem;">
                                         If disabled, this setting will not add the current delimiter AFTER the component value.
                                     </div>
                                     <div>
@@ -214,11 +214,11 @@
                             }
                             if (type == "ResourceType")
                             {
-                                <div class="mb-3">
+                                <div style="margin-bottom: 1rem;">
                                     <label class="modern-form-label">
                                         Apply Delimiter
                                     </label>
-                                    <div class="mb-3">
+                                    <div style="margin-bottom: 1rem;">
                                         If disabled, the current delimiter will not be used for name generation.
                                     </div>
                                     <div>
@@ -229,28 +229,28 @@
                                         <span class="align-text-top ms-2"> Enable</span>
                                     </div>
                                 </div>
-                                <div id="typemetdadatacontainer" class="modern-card mb-3">
+                                <div id="typemetdadatacontainer" class="modern-card" style="margin-bottom: 1rem;">
                                     <div class="modern-card-header">
                                         <a id="typemetdadatalink" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="#typemetdadata" role="button" aria-expanded="false" aria-controls="typemetdadata">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Resoure Type Metadata
                                         </a>
                                     </div>
                                     <div class="collapse modern-card-body" id="typemetdadata">
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <p>
                                                 This section allows you to edit the Resouce Type metadata.
                                             </p>
-                                            <div class="alert alert-danger mb-3" role="alert">
+                                            <div class="alert alert-danger" style="margin-bottom: 1rem;" role="alert">
                                                 <h4>ATTENTION</h4>
                                                 <span class="modern-font-semibold">Please see the <a href="https://github.com/mspnp/AzureNamingTool/wiki/Resource-Type-Editing" target="_blank">Resource Type Editing documentation</a> for guidance on metadata editing.</span>
                                             </div>
                                         </div>
-                                        <div class="mb-3">
-                                            <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
+                                            <div style="margin-bottom: 1rem;">
                                                 <label class="modern-form-label">
                                                     Regex
                                                 </label>
-                                                <div class="mb-3">
+                                                <div style="margin-bottom: 1rem;">
                                                     Regex to apply to generated names.
                                                 </div>
                                                 <div>
@@ -265,7 +265,7 @@
                                                 <input title="Scope" value="@itemScope" type="text" class="modern-form-input" id="scope" @onchange="@((ui) => { itemScope = (string)ui.Value!;})" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Valid Text
                                             </label>
@@ -273,7 +273,7 @@
                                                 <input title="Valid Text" value="@itemValidText" type="text" class="modern-form-input" id="validtext" @onchange="@((ui) => { itemValidText = (string)ui.Value!;})" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Invalid Text
                                             </label>
@@ -281,7 +281,7 @@
                                                 <input title="Invalid Text" value="@itemInvalidText" type="text" class="modern-form-input" id="invalidtext" @onchange="@((ui) => { itemInvalidText = (string)ui.Value!;})" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Invalid Characters
                                             </label>
@@ -289,7 +289,7 @@
                                                 <input title="Invalid Characters" value="@itemInvalidCharacters" type="text" class="modern-form-input" id="invalidcharacters" @onchange="@((ui) => { itemInvalidCharacters = (string)ui.Value!;})" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Invalid Characters Start
                                             </label>
@@ -297,7 +297,7 @@
                                                 <input title="Invalid Characters Start" value="@itemInvalidCharactersStart" type="text" class="modern-form-input" id="invalidcharactersstart" @onchange="@((ui) => { itemInvalidCharactersStart = (string)ui.Value!;})" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Invalid Characters End
                                             </label>
@@ -305,7 +305,7 @@
                                                 <input title="Invalid Characters End" value="@itemInvalidCharactersEnd" type="text" class="modern-form-input" id="invalidcharactersend" @onchange="@((ui) => { itemInvalidCharactersEnd = (string)ui.Value!;})" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Invalid Characters Consecutive
                                             </label>
@@ -313,7 +313,7 @@
                                                 <input title="Invalid Characters Consecutive" value="@itemInvalidCharactersConsecutive" type="text" class="modern-form-input" id="invalidcharactersconsecutive" @onchange="@((ui) => { itemInvalidCharactersConsecutive = (string)ui.Value!;})" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Static Values
                                             </label>
@@ -329,11 +329,11 @@
                         {
                             @if ((type == "ResourceType") && (!Convert.ToBoolean(config.ResourceTypeEditingAllowed)))
                             {
-                                <div class="mb-3">
+                                <div style="margin-bottom: 1rem;">
                                     <label class="modern-form-label">
                                         Apply Delimiter
                                     </label>
-                                    <div class="mb-3">
+                                    <div style="margin-bottom: 1rem;">
                                         If disabled, the current delimiter will not be used for name generation.
                                     </div>
                                     <div>
@@ -347,28 +347,28 @@
                                         }
                                     </div>
                                 </div>
-                                <div id="typemetdadatadisabledcontainer" class="modern-card mb-3">
+                                <div id="typemetdadatadisabledcontainer" class="modern-card" style="margin-bottom: 1rem;">
                                     <div class="modern-card-header">
                                         <a id="typemetdadatadisabledlink" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="#typemetdadatadisabled" role="button" aria-expanded="false" aria-controls="typemetdadatadisabled">
                                             <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Resoure Type Metadata
                                         </a>
                                     </div>
                                     <div class="collapse modern-card-body" id="typemetdadatadisabled">
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             This section allows you to view the Resouce Type metadata.
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Regex
                                             </label>
-                                            <div class="mb-3">
+                                            <div style="margin-bottom: 1rem;">
                                                 Regex to apply to generated names.
                                             </div>
                                             <div>
                                                 <input title="RegEx" value="@itemRegEx" type="text" disabled class="modern-form-input" id="regex" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Scope
                                             </label>
@@ -376,7 +376,7 @@
                                                 <input title="Scope" value="@itemScope" type="text" disabled class="modern-form-input" id="scope" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Valid Text
                                             </label>
@@ -384,7 +384,7 @@
                                                 <input title="Valid Text" value="@itemValidText" type="text" disabled class="modern-form-input" id="validtext" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Invalid Text
                                             </label>
@@ -392,7 +392,7 @@
                                                 <input title="Invalid Text" value="@itemInvalidText" type="text" disabled class="modern-form-input" id="invalidtext" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Invalid Characters
                                             </label>
@@ -400,7 +400,7 @@
                                                 <input title="Invalid Characters" value="@itemInvalidCharacters" type="text" disabled class="modern-form-input" id="invalidcharacters" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Invalid Characters Start
                                             </label>
@@ -408,7 +408,7 @@
                                                 <input title="Invalid Characters Start" value="@itemInvalidCharactersStart" type="text" disabled class="modern-form-input" id="invalidcharactersstart" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Invalid Characters End
                                             </label>
@@ -416,7 +416,7 @@
                                                 <input title="Invalid Characters End" value="@itemInvalidCharactersEnd" type="text" disabled class="modern-form-input" id="invalidcharactersend" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Invalid Characters Consecutive
                                             </label>
@@ -424,7 +424,7 @@
                                                 <input title="Invalid Characters Consecutive" value="@itemInvalidCharactersConsecutive" type="text" disabled class="modern-form-input" id="invalidcharactersconsecutive" />
                                             </div>
                                         </div>
-                                        <div class="mb-3">
+                                        <div style="margin-bottom: 1rem;">
                                             <label class="modern-form-label">
                                                 Static Values
                                             </label>
@@ -441,14 +441,14 @@
                 </div>
                 @if (type == "ResourceComponent")
                 {
-                    <div id="globallyoptionalcontainer" class="modern-card mb-3">
+                    <div id="globallyoptionalcontainer" class="modern-card" style="margin-bottom: 1rem;">
                         <div class="modern-card-header">
                             <a id="OptionalComponents" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="#globallyoptional" role="button" aria-expanded="false" aria-controls="globallyoptional">
                                 <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Globally Optional Configuration
                             </a>
                         </div>
                         <div class="collapse modern-card-body" id="globallyoptional">
-                            <div class="mb-3">
+                            <div style="margin-bottom: 1rem;">
                                 This section allows you to add/remove the component as OPTIONAL for all resource types.
                             </div>
                             <table class="table @theme.ThemeStyle">
@@ -477,14 +477,14 @@
                             </table>
                         </div>
                     </div>
-                    <div id="globallyexcludecontainer" class="modern-card mb-3">
+                    <div id="globallyexcludecontainer" class="modern-card" style="margin-bottom: 1rem;">
                         <div class="modern-card-header">
                             <a id="OptionalComponents" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="#globallyexclude" role="button" aria-expanded="false" aria-controls="globallyexclude">
                                 <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Globally Exclude Configuration
                             </a>
                         </div>
                         <div class="collapse modern-card-body" id="globallyexclude">
-                            <div class="mb-3">
+                            <div style="margin-bottom: 1rem;">
                                 This section allows you to add/remove the component as EXCLUDE for all resource types.
                             </div>
                             <table class="table">
@@ -516,7 +516,7 @@
                 }
                 @if ((type == "ResourceType") && (GeneralHelper.IsNotNull(resourceComponents)))
                 {
-                    <div id="optional" class="modern-card mb-3">
+                    <div id="optional" class="modern-card" style="margin-bottom: 1rem;">
                         <div class="modern-card-header">
                             <a id="OptionalComponents" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="#optionalcomponents" role="button" aria-expanded="false" aria-controls="optionalcomponents">
                                 <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Optional Components
@@ -548,7 +548,7 @@
                         </div>
                     </div>
 
-                    <div id="excluded" class="modern-card mb-3">
+                    <div id="excluded" class="modern-card" style="margin-bottom: 1rem;">
                         <div class="modern-card-header">
                             <a id="ExcludedComponents" class="link-dark text-decoration-none" data-bs-toggle="collapse" href="#excludedcomponents" role="button" aria-expanded="false" aria-controls="excludedcomponents">
                                 <span class="oi oi-chevron-bottom" aria-hidden="true"></span> Excluded Components
@@ -832,7 +832,7 @@
                         if ((itemOriginalStandard) && (resourceComponent.IsFreeText))
                         {
                             bool confirm = false;
-                            confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div class=\"my-4\">This will update the custom component to free text and remove the current component options! This cannot be un-done!</div><div class=\"my-4\">Are you sure?</div>", "bg-danger", theme);
+                            confirm = await ModalHelper.ShowConfirmationModal(Modal!, "ATTENTION", "<div style='margin: 1.5rem 0;'>This will update the custom component to free text and remove the current component options! This cannot be un-done!</div><div style='margin: 1.5rem 0;'>Are you sure?</div>", "bg-danger", theme);
                             if (confirm)
                             {
                                 serviceResponse = await CustomComponentService.DeleteByParentComponentIdAsync((int)resourceComponent.Id);

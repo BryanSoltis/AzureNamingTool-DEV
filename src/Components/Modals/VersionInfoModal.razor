@@ -3,8 +3,8 @@
 @inject IJSRuntime JsRuntime
 
 <div class="modern-modal-content">
-    <div class="mb-4">
-        <h4 class="mb-3">Azure Naming Tool v@(VersionNumber)</h4>
+    <div style="margin-bottom: 1.5rem;">
+        <h3 style="margin-bottom: 1rem;">Azure Naming Tool v@(VersionNumber)</h3>
         <p>
             <a href="@ReleaseNotesUrl" target="_blank" class="modern-link">
                 <span class="oi oi-external-link" aria-hidden="true"></span> View Release Notes
@@ -12,7 +12,7 @@
         </p>
         @if (!String.IsNullOrEmpty(VersionAlert))
         {
-            <div class="modern-notification-info mt-3">
+            <div class="modern-notification-info" style="margin-top: 1rem;">
                 <i class="bi bi-info-circle"></i>
                 <div>
                     @((MarkupString)VersionAlert)
@@ -22,11 +22,11 @@
     </div>
     
     <div class="modern-modal-actions">
-        <h5 class="mb-3">Community & Support</h5>
-        <p class="text-secondary mb-3">
+        <h4 style="margin-bottom: 1rem;">Community & Support</h4>
+        <p style="color: var(--color-text-secondary); margin-bottom: 1rem;">
             Help us improve the Azure Naming Tool by reporting bugs, requesting features, or joining discussions.
         </p>
-        <div class="d-flex flex-wrap gap-2">
+        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
             <button type="button" class="modern-btn-primary" @onclick="@(() => OpenGitHubLink("feature"))" title="Feature request">
                 <span class="oi oi-plus" aria-hidden="true"></span> Feature Request
             </button>

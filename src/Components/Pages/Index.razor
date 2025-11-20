@@ -58,7 +58,6 @@
             <div class="dashboard-stats-grid">
                 <!-- Names Generated - Featured -->
                 <div class="stat-card featured">
-                    <div class="stat-icon">✨</div>
                     <div class="stat-content">
                         <div class="stat-value">@generatedCount</div>
                         <div class="stat-label">Names Generated</div>
@@ -416,7 +415,7 @@
                             // Check if the client's version matches the current offical version
                             if (appversion != latestversion)
                             {
-                                ModalHelper.ShowInformationModal(Modal!, theme!, "bg-navcolor", "ATTENTION", "<p style='font-weight:bold;'>Your current version is out of date!</p><p>Please click <a href='" + updateurl + "' target='_blank'>here</a> to update to the current version for the latest features!</p><p><span style='font-weight:bold;'>Installed Version:</span> <span style='font-style:italic; '>" + appversion + "</p><p><span style='font-weight:bold;'>Latest version:</span> <span style='font-style:italic; '>" + latestversion + "</span></p>", "", true);
+                                ModalHelper.ShowInformationModal(Modal!, theme!, "bg-navcolor", "ATTENTION", "<div style='margin: 1.5rem 0;'><p style='font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem;'>Your current version is out of date!</p><p style='margin-bottom: 1rem;'>Please <a href='" + updateurl + "' target='_blank' style='color: var(--color-primary); text-decoration: underline;'>update to the current version</a> for the latest features!</p><div style='display: grid; gap: 0.5rem;'><div><strong>Installed Version:</strong> <span style='color: var(--color-text-secondary);'>" + appversion + "</span></div><div><strong>Latest Version:</strong> <span style='color: var(--color-text-secondary);'>" + latestversion + "</span></div></div></div>", "", true);
                                 await session.SetAsync("versionnotification", true);
                                 StateHasChanged();
                             }

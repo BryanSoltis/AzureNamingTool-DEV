@@ -10,49 +10,49 @@
 <div class="modern-modal-content" style="max-height: 70vh; overflow-y: auto;">
     @if (GeneralHelper.IsNotNull(message))
     {
-        <div class="mb-3">
+        <div style="margin-bottom: 1rem;">
             @((MarkupString)message)
         </div>
     }
     @switch (component)
     {
         case "generateinstructions":
-            <div class="mb-3">
+            <div style="margin-bottom: 1rem;">
                 <GenerateInstructions theme="@theme" admin="@admin" />
             </div>
             break;
         case "generatednamesloginstructions":
-            <div class="mb-3">
+            <div style="margin-bottom: 1rem;">
                 <GeneratedNamesLogInstructions theme="@theme" admin="@admin" />
             </div>
             break;
         case "toolconfigurationinstructions":
-            <div class="mb-3">
+            <div style="margin-bottom: 1rem;">
                 <ConfigurationInstructions theme="@theme" admin="@admin" />
             </div>
             break;
         case "actionslegendinstructions":
-            <div class="mb-3">
+            <div style="margin-bottom: 1rem;">
                 <ActionsLegendInstructions theme="@theme" admin="@admin" />
             </div>
             break;
         case "referenceinstructions":
-            <div class="mb-3">
+            <div style="margin-bottom: 1rem;">
                 <ReferenceInstructions theme="@theme" admin="@admin" />
             </div>
             break;
         case "adminconfigurationinstructions":
-            <div class="mb-3">
+            <div style="margin-bottom: 1rem;">
                 <AdminConfigurationInstructions theme="@theme" admin="@admin" />
             </div>
             break;
         case "adminloginstructions":
-            <div class="mb-3">
+            <div style="margin-bottom: 1rem;">
                 <AdminLogInstructions theme="@theme" admin="@admin" />
             </div>
             break;
         case "externalcontent":
-            <div class="mb-3">
+            <div style="margin-bottom: 1rem;">
                 <ExternalContent theme="@theme" admin="@admin" externalurl="@externalurl"/>
             </div>
             break;
