@@ -126,6 +126,7 @@ namespace AzureNamingTool.Data
                 entity.Property(e => e.Id).ValueGeneratedNever(); // We manage IDs
                 entity.Property(e => e.Resource).IsRequired().HasMaxLength(200);
                 entity.Property(e => e.ShortName).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Description).HasMaxLength(500); // Nullable
                 entity.Property(e => e.Enabled).IsRequired();
                 entity.Property(e => e.ApplyDelimiter).IsRequired();
                 // All other string properties with defaults
