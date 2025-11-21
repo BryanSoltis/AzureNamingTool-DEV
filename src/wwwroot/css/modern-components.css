@@ -2327,6 +2327,19 @@ pre code {
     cursor: not-allowed;
 }
 
+/* Full opacity for disabled buttons in modals (for display/documentation purposes) */
+.blazored-modal button:disabled,
+.blazored-modal .modern-btn:disabled,
+.blazored-modal .modern-btn-primary:disabled,
+.blazored-modal .modern-btn-secondary:disabled,
+.blazored-modal .modern-btn-success:disabled,
+.blazored-modal .modern-btn-danger:disabled,
+.blazored-modal .modern-btn-warning:disabled,
+.blazored-modal .modern-btn-info:disabled,
+.blazored-modal .modern-btn-dark:disabled {
+    opacity: 1;
+}
+
 .modern-btn-primary {
     background-color: #1b6ec2;
     color: #ffffff;

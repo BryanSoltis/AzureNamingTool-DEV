@@ -37,9 +37,12 @@
         <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Configuration", String.Empty, "toolconfigurationinstructions", admin))">
             <span class="oi oi-document" aria-hidden="true"></span> Documentation
         </button>
-        <button class="modern-btn-secondary" title="Actions Legend" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Actions Legend", String.Empty, "actionslegendinstructions", admin))">
-            <span class="oi oi-list" aria-hidden="true"></span> Actions Legend
-        </button>
+        @if (admin)
+        {
+            <button class="modern-btn-secondary" title="Actions Legend" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Actions Legend", String.Empty, "actionslegendinstructions", admin))">
+                <span class="oi oi-list" aria-hidden="true"></span> Actions Legend
+            </button>
+        }
         <button type="button" class="modern-btn-secondary" @onclick="@ExpandAll" title="Expand all sections">
             <span class="oi oi-fullscreen-enter" aria-hidden="true"></span> Expand All
         </button>
