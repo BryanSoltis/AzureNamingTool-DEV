@@ -80,6 +80,14 @@
                         System
                     </button>
                 }
+                <button class="modern-tab" data-tab="tab-settings">
+                    <span class="oi oi-cog tab-icon" aria-hidden="true"></span>
+                    Site Settings
+                </button>
+                <button class="modern-tab @(((currentuser != "GlobalAdmin") && (!showadmindetailstoallusers)) ? "active" : "")" data-tab="tab-customization">
+                    <span class="oi oi-brush tab-icon" aria-hidden="true"></span>
+                    Customization
+                </button>
                 <button class="modern-tab" data-tab="tab-configuration">
                     <span class="oi oi-hard-drive tab-icon" aria-hidden="true"></span>
                     Data
@@ -91,14 +99,6 @@
                 <button class="modern-tab" data-tab="tab-identity">
                     <span class="oi oi-people tab-icon" aria-hidden="true"></span>
                     Identity Provider
-                </button>
-                <button class="modern-tab @(((currentuser != "GlobalAdmin") && (!showadmindetailstoallusers)) ? "active" : "")" data-tab="tab-customization">
-                    <span class="oi oi-brush tab-icon" aria-hidden="true"></span>
-                    Customization
-                </button>
-                <button class="modern-tab" data-tab="tab-settings">
-                    <span class="oi oi-cog tab-icon" aria-hidden="true"></span>
-                    Site Settings
                 </button>
             </div>
 
