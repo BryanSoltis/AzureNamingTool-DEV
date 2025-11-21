@@ -349,13 +349,35 @@ namespace AzureNamingTool.Services
                     
                     if (!string.IsNullOrEmpty(settingsContent))
                     {
-                        var settings = JsonSerializer.Deserialize<AzureValidationSettings>(settingsContent);
+                        var options = new JsonSerializerOptions
+                        {
+                            PropertyNameCaseInsensitive = true
+                        };
+                        
+                        AzureValidationSettings? settings = null;
+                        
+                        // Try array format first (legacy format: [{...}])
+                        try
+                        {
+                            var settingsArray = JsonSerializer.Deserialize<List<AzureValidationSettings>>(settingsContent, options);
+                            if (settingsArray != null && settingsArray.Count > 0)
+                            {
+                                settings = settingsArray[0];
+                            }
+                        }
+                        catch
+                        {
+                            // If array deserialization fails, try single object format
+                            settings = JsonSerializer.Deserialize<AzureValidationSettings>(settingsContent, options);
+                        }
+                        
                         if (settings != null)
                         {
                             settings.Id = 1; // Ensure ID is set
                             await _settingsRepository.SaveAsync(settings);
                             
-                            _logger.LogInformation("Legacy Azure validation settings migrated successfully");
+                            _logger.LogInformation("Legacy Azure validation settings migrated successfully. Strategy: {Strategy}, SubscriptionIds: {Count}", 
+                                settings.ConflictResolution?.Strategy, settings.SubscriptionIds?.Count ?? 0);
                             
                             // Optionally rename the old file to indicate migration
                             try

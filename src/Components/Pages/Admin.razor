@@ -407,12 +407,25 @@
                     <div class="toggle-content">
                         <div class="toggle-label">Azure Tenant Name Validation</div>
                         <div class="toggle-description">
-                            Enable validation of generated names against your Azure tenant to check if a resource name already exists. Configure authentication, conflict resolution, and caching options below.
+                            @if (!isUsingSQLite)
+                            {
+                                <div class="modern-notification-warning mb-2">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    <div>
+                                        <strong>SQLite Required</strong><br />
+                                        Azure Tenant Name Validation requires SQLite storage. Migrate to SQLite to enable this feature.
+                                    </div>
+                                </div>
+                            }
+                            else
+                            {
+                                <span>Enable validation of generated names against your Azure tenant to check if a resource name already exists. Configure authentication, conflict resolution, and caching options below.</span>
+                            }
                         </div>
                     </div>
                     <div class="toggle-switch-wrapper">
-                        <label class="modern-toggle-switch" title="Azure Tenant Name Validation Enabled">
-                            <input type="checkbox" checked="@azuretenantamevalidationenabled" @oninput='args => SettingChanged(args, "azuretenantamevalidationenabled")'>
+                        <label class="modern-toggle-switch" title="@(isUsingSQLite ? "Azure Tenant Name Validation Enabled" : "Requires SQLite storage")">
+                            <input type="checkbox" checked="@azuretenantamevalidationenabled" @oninput='args => SettingChanged(args, "azuretenantamevalidationenabled")' disabled="@(!isUsingSQLite)">
                             <span class="modern-toggle-slider"></span>
                         </label>
                     </div>
@@ -424,25 +437,31 @@
                     <div class="ms-4 mb-4 border-start border-3 border-primary ps-4">
                         
                         <!-- Getting Started Instructions -->
-                        @if (!azureConnectionTested || !azureConnectionSuccess)
-                        {
-                            <div class="modern-notification-info mb-4">
-                                <i class="bi bi-info-circle"></i>
-                                <div>
-                                    <strong>Getting Started with Azure Validation</strong>
-                                    <ol class="mb-0 mt-2 ps-3">
-                                        <li><strong>Choose Authentication Mode</strong> - Managed Identity (recommended for Azure) or Service Principal</li>
-                                        <li><strong>Test Connection</strong> - Verify authentication and discover accessible subscriptions</li>
-                                        <li><strong>Select Subscriptions</strong> - Choose which subscriptions to validate against (optional)</li>
-                                        <li><strong>Select Conflict Strategy</strong> - Choose how to handle existing resource names</li>
-                                        <li><strong>Save Settings</strong> - Click the save button at the bottom</li>
-                                    </ol>
-                                    <small class="text-muted mt-2 d-block">
-                                        <i class="bi bi-shield-check"></i> <strong>Required Permissions:</strong> Reader role on subscriptions + Resource Graph access
-                                    </small>
+                        <div class="modern-notification-info mb-4">
+                            <i class="bi bi-info-circle"></i>
+                            <div>
+                                <strong>Getting Started with Azure Validation</strong>
+                                <ol class="mb-0 mt-2 ps-3">
+                                    <li><strong>Choose Authentication Mode</strong> - Managed Identity (recommended for Azure) or Service Principal</li>
+                                    <li><strong>Test Connection</strong> - Verify authentication and discover accessible subscriptions</li>
+                                    <li><strong>Select Subscriptions</strong> - Choose which subscriptions to validate against (optional)</li>
+                                    <li><strong>Select Conflict Strategy</strong> - Choose how to handle existing resource names</li>
+                                    <li><strong>Save Settings</strong> - Click the save button at the bottom</li>
+                                </ol>
+                                <div class="mt-3">
+                                    <strong>Required Azure Permissions:</strong>
+                                    <ul class="mb-0 mt-2 ps-3">
+                                        <li><strong>Reader</strong> role on subscriptions</li>
+                                        <li><strong>Resource Graph</strong> access for scoped validation</li>
+                                    </ul>
+                                </div>
+                                <div class="mt-3">
+                                    <a href="https://github.com/mspnp/AzureNamingTool/wiki/Azure-Validation" target="_blank" class="text-primary">
+                                        <strong>Full Documentation →</strong>
+                                    </a>
                                 </div>
                             </div>
-                        }
+                        </div>
 
                         <!-- Authentication Mode -->
                         <div class="mb-4">
@@ -645,17 +664,6 @@
                             <button type="button" class="modern-btn-success" @onclick="SaveAzureValidationSettings" title="Save Azure Validation Settings">
                                 <span class="oi oi-check" aria-hidden="true"></span> Save Azure Validation Settings
                             </button>
-                        </div>
-
-                        <!-- Documentation -->
-                        <div class="modern-notification-info">
-                            <i class="bi bi-book"></i>
-                            <div>
-                                <strong>Required Azure Permissions:</strong><br />
-                                • <strong>Reader</strong> role on subscriptions<br />
-                                • <strong>Resource Graph</strong> access for scoped validation<br /><br />
-                                <a href="https://github.com/mspnp/AzureNamingTool/wiki/Azure-Validation" target="_blank" class="text-primary"><strong>Full Documentation →</strong></a>
-                            </div>
                         </div>
                     </div>
                 }

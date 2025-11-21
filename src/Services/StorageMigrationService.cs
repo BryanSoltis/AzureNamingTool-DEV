@@ -270,11 +270,31 @@ namespace AzureNamingTool.Services
 
                 var options = new JsonSerializerOptions
                 {
-                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     PropertyNameCaseInsensitive = true
                 };
 
-                var settings = JsonSerializer.Deserialize<AzureValidationSettings>(json, options);
+                // Try to deserialize as array first (legacy format), then as single object
+                AzureValidationSettings? settings = null;
+                
+                // Try array format first
+                var settingsArray = JsonSerializer.Deserialize<List<AzureValidationSettings>>(json, options);
+                if (settingsArray != null && settingsArray.Count > 0)
+                {
+                    settings = settingsArray[0];
+                    _logger.LogInformation("Deserialized Azure Validation settings from array format. Strategy: {Strategy}, SubscriptionIds count: {Count}", 
+                        settings.ConflictResolution?.Strategy, settings.SubscriptionIds?.Count ?? 0);
+                }
+                else
+                {
+                    // Try single object format
+                    settings = JsonSerializer.Deserialize<AzureValidationSettings>(json, options);
+                    if (settings != null)
+                    {
+                        _logger.LogInformation("Deserialized Azure Validation settings from single object format. Strategy: {Strategy}, SubscriptionIds count: {Count}", 
+                            settings.ConflictResolution?.Strategy, settings.SubscriptionIds?.Count ?? 0);
+                    }
+                }
+
                 if (settings == null)
                 {
                     _logger.LogDebug("No Azure Validation settings found in {FileName}", fileName);
@@ -284,10 +304,18 @@ namespace AzureNamingTool.Services
 
                 // Ensure ID is set to 1 for singleton pattern
                 settings.Id = 1;
+                
+                _logger.LogInformation("Before saving to database - Strategy: {Strategy}, SubscriptionIds: {Subs}", 
+                    settings.ConflictResolution?.Strategy, string.Join(", ", settings.SubscriptionIds ?? new List<string>()));
 
                 // Add to database
                 _dbContext.AzureValidationSettings.Add(settings);
                 await _dbContext.SaveChangesAsync();
+                
+                // Read back to verify
+                var savedSettings = await _dbContext.AzureValidationSettings.FindAsync(1L);
+                _logger.LogInformation("After saving to database - Strategy: {Strategy}, SubscriptionIds: {Subs}", 
+                    savedSettings?.ConflictResolution?.Strategy, string.Join(", ", savedSettings?.SubscriptionIds ?? new List<string>()));
 
                 result.EntitiesMigrated += 1;
                 result.EntityCounts[nameof(AzureValidationSettings)] = 1;
@@ -422,10 +450,23 @@ namespace AzureNamingTool.Services
                     {
                         var options = new JsonSerializerOptions
                         {
-                            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                             PropertyNameCaseInsensitive = true
                         };
-                        var settings = JsonSerializer.Deserialize<AzureValidationSettings>(json, options);
+                        
+                        AzureValidationSettings? settings = null;
+                        
+                        // Try array format first (settings stored as [{...}])
+                        var settingsArray = JsonSerializer.Deserialize<List<AzureValidationSettings>>(json, options);
+                        if (settingsArray != null && settingsArray.Count > 0)
+                        {
+                            settings = settingsArray[0];
+                        }
+                        else
+                        {
+                            // Fallback to single object format
+                            settings = JsonSerializer.Deserialize<AzureValidationSettings>(json, options);
+                        }
+                        
                         detail.SourceCount = settings != null ? 1 : 0;
                     }
                 }

@@ -5,7 +5,7 @@ Version 5.0.0 is a major release featuring a modern dashboard redesign, SQLite d
 
 ## 🎯 Major Features
 
-### Modern Dashboard Redesign (NEW)
+### Modern Dashboard Redesign
 - **Two-column hero layout** with logo on left, custom content on right
 - **Configuration Overview stats grid** showing counts for all enabled components
 - **Featured "Names Generated" stat card** with gradient styling
@@ -14,7 +14,7 @@ Version 5.0.0 is a major release featuring a modern dashboard redesign, SQLite d
 - Fixed component name matching issues (ResourceOrg, ResourceProjAppSvc, ResourceFunction)
 - Improved visual hierarchy and card-based design
 
-### SQLite Database Support (NEW)
+### SQLite Database Support
 - **Enhanced performance** with faster data access and queries
 - **Better scalability** for larger configurations
 - **Improved reliability** with transactional support and data integrity
@@ -24,7 +24,7 @@ Version 5.0.0 is a major release featuring a modern dashboard redesign, SQLite d
 - Admin UI for easy storage provider management
 - Maintains backward compatibility with file-based JSON storage
 
-### Azure Tenant Name Validation (NEW)
+### Azure Tenant Name Validation
 - **Validate generated names against your Azure tenant** before deployment
 - Prevent naming conflicts by checking if resource names already exist
 - Support for both **Managed Identity** (recommended) and **Service Principal** authentication
@@ -37,6 +37,7 @@ Version 5.0.0 is a major release featuring a modern dashboard redesign, SQLite d
 - **Scoped validation** - configure specific subscription(s) to check
 - **Multi-subscription support** for enterprise deployments
 - Integrated into Site Settings for easy configuration
+- **⚠️ IMPORTANT**: This feature **requires SQLite storage**. You must migrate to SQLite before enabling Azure Tenant Name Validation.
 
 ### Modern UI/UX Improvements
 - **Consistent card-based design** across all Admin tabs
