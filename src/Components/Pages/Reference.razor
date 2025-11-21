@@ -26,6 +26,12 @@
         <button class="modern-btn-secondary" title="Instructions" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Reference", String.Empty, "referenceinstructions", false))">
             <span class="oi oi-document" aria-hidden="true"></span> Documentation
         </button>
+        <button type="button" class="modern-btn-secondary" @onclick="@ExpandAll" title="Expand all sections">
+            <span class="oi oi-fullscreen-enter" aria-hidden="true"></span> Expand All
+        </button>
+        <button type="button" class="modern-btn-secondary" @onclick="@CollapseAll" title="Collapse all sections">
+            <span class="oi oi-fullscreen-exit" aria-hidden="true"></span> Collapse All
+        </button>
     </div>
 </div>
 
@@ -76,18 +82,22 @@
                 if (!IsTypeVisible(resourcetype))
                     continue;
                 
-                <div class="modern-card mb-4" id="@resourcetype.Id">
-                    <div class="modern-card-header">
+                <div class="modern-card mb-2" id="@resourcetype.Id">
+                    <div class="modern-card-header collapsible @(GetCollapseClass(resourcetype.Id.ToString()))" @onclick="@(() => ToggleCollapse(resourcetype.Id.ToString()))">
                         @if (!String.IsNullOrEmpty(resourcetype.Property))
                         {
-                            <h5 class="modern-card-title mb-0" style="word-wrap:anywhere;overflow-wrap:anywhere;white-space: normal;">@resourcetype.Resource - @resourcetype.Property</h5>
+                            <h3>
+                                <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourcetype.Resource - @resourcetype.Property
+                            </h3>
                         }
                         else
                         {
-                            <h5 class="modern-card-title mb-0" style="word-wrap:anywhere;overflow-wrap:anywhere;white-space: normal;">@resourcetype.Resource</h5>
+                            <h3>
+                                <span class="oi oi-chevron-bottom" aria-hidden="true"></span> @resourcetype.Resource
+                            </h3>
                         }
                     </div>
-                    <div class="modern-card-body">
+                    <div class="modern-card-body @(GetCollapseClass(resourcetype.Id.ToString()))">
                         @if (filteredscopes.Contains(resourcetype.Scope))
                         {
                             <div class="modern-alert-success mb-3">
@@ -370,6 +380,7 @@
     private string selectedResourceTypeCategory = String.Empty;
     private string[] filteredscopes = new string[] { "resource group", "resource group & region", "region", "global", "subscription", "tenant" };
     private List<string> categories = new();
+    private HashSet<string> collapsedSections = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -395,6 +406,9 @@
 
                 // Get the list of categories
                 categories = ResourceTypeService.GetTypeCategories(servicesData.ResourceTypes!);
+                
+                // Initialize all sections as collapsed by default
+                collapsedSections = new HashSet<string>(servicesData.ResourceTypes!.Select(rt => rt.Id.ToString()));
             }
             else
             {
@@ -524,5 +538,37 @@
                 visible = false;
         }
         return visible;
+    }
+    
+    private void ToggleCollapse(string section)
+    {
+        if (collapsedSections.Contains(section))
+        {
+            collapsedSections.Remove(section);
+        }
+        else
+        {
+            collapsedSections.Add(section);
+        }
+    }
+
+    private string GetCollapseClass(string section)
+    {
+        return collapsedSections.Contains(section) ? "collapsed" : "";
+    }
+    
+    private void ExpandAll()
+    {
+        collapsedSections.Clear();
+    }
+    
+    private void CollapseAll()
+    {
+        if (servicesData.ResourceTypes != null)
+        {
+            collapsedSections = new HashSet<string>(
+                servicesData.ResourceTypes.Select(rt => rt.Id.ToString())
+            );
+        }
     }
 }

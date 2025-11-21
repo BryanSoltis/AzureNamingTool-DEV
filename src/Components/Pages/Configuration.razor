@@ -40,6 +40,12 @@
         <button class="modern-btn-secondary" title="Actions Legend" @onclick="@(e => ModalHelper.ShowInformationModal(Modal!, theme, "bg-navcolor", "Actions Legend", String.Empty, "actionslegendinstructions", admin))">
             <span class="oi oi-list" aria-hidden="true"></span> Actions Legend
         </button>
+        <button type="button" class="modern-btn-secondary" @onclick="@ExpandAll" title="Expand all sections">
+            <span class="oi oi-fullscreen-enter" aria-hidden="true"></span> Expand All
+        </button>
+        <button type="button" class="modern-btn-secondary" @onclick="@CollapseAll" title="Collapse all sections">
+            <span class="oi oi-fullscreen-exit" aria-hidden="true"></span> Collapse All
+        </button>
     </div>
 </div>
 
@@ -81,16 +87,6 @@
                     </div>
                 </div>
             }
-
-            <!-- Expand/Collapse All Controls -->
-            <div class="mb-2 d-flex gap-2">
-                <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@ExpandAll" title="Expand all sections" style="font-size: 13px; padding: 6px 12px;">
-                    <span class="oi oi-fullscreen-enter" aria-hidden="true" style="font-size: 11px;"></span> Expand All
-                </button>
-                <button type="button" class="modern-btn-secondary modern-btn-sm" @onclick="@CollapseAll" title="Collapse all sections" style="font-size: 13px; padding: 6px 12px;">
-                    <span class="oi oi-fullscreen-exit" aria-hidden="true" style="font-size: 11px;"></span> Collapse All
-                </button>
-            </div>
         }
 
         @if (!dataLoaded)

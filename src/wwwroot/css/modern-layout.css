@@ -14,6 +14,7 @@
     display: flex;
     min-height: 100vh;
     background-color: var(--color-bg-primary);
+    isolation: auto;
 }
 
 /* ===================================================================
@@ -67,6 +68,7 @@
     display: flex;
     flex-direction: column;
     min-width: 0; /* Prevent flex item overflow */
+    isolation: isolate;
 }
 
 /* ===================================================================
@@ -84,7 +86,7 @@
     gap: var(--spacing-md);
     position: sticky;
     top: 0;
-    z-index: var(--z-header);
+    z-index: 100;
     box-shadow: var(--shadow-sm);
 }
 
@@ -593,7 +595,7 @@
         position: fixed;
         top: 8px;
         left: 16px;
-        z-index: 10000;
+        z-index: 1600;
         background-color: var(--color-azure-blue);
         color: white;
         border: none;
@@ -660,7 +662,7 @@
         bottom: 0;
         width: 260px !important;
         min-width: 260px !important;
-        z-index: 1050 !important;
+        z-index: 1150 !important;
         transition: left 0.3s ease-in-out !important;
         overflow-y: auto !important;
         overflow-x: hidden !important;
@@ -711,7 +713,7 @@
         right: 0;
         bottom: 0;
         background-color: rgba(0, 0, 0, 0.5);
-        z-index: 1040;
+        z-index: 1140;
     }
     
     .modern-sidebar-backdrop.show {

@@ -73,7 +73,7 @@ a, .btn-link {
    =================================================================== */
 
 .blazored-toast-container {
-    z-index: 99999 !important;
+    z-index: 2000 !important;
 }
 
 /* Toast Base Styles - Override Blazored defaults */
