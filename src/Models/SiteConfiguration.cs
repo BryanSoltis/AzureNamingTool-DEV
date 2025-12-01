@@ -128,7 +128,7 @@
         /// <summary>
         /// Gets or sets the storage provider for configuration data (FileSystem or SQLite).
         /// </summary>
-        public string? StorageProvider { get; set; } = "FileSystem";
+        public string? StorageProvider { get; set; } = "SQLite";
 
         /// <summary>
         /// Gets or sets a value indicating whether the user has dismissed the SQLite migration prompt.

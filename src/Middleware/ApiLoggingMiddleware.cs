@@ -105,8 +105,13 @@ namespace AzureNamingTool.Middleware
             {
                 request.EnableBuffering();
                 var buffer = new byte[Convert.ToInt32(request.ContentLength)];
-                await request.Body.ReadAsync(buffer, 0, buffer.Length);
-                var bodyAsText = Encoding.UTF8.GetString(buffer);
+                int totalRead = 0;
+                int bytesRead;
+                while (totalRead < buffer.Length && (bytesRead = await request.Body.ReadAsync(buffer.AsMemory(totalRead, buffer.Length - totalRead))) > 0)
+                {
+                    totalRead += bytesRead;
+                }
+                var bodyAsText = Encoding.UTF8.GetString(buffer, 0, totalRead);
                 request.Body.Position = 0; // Reset stream position
 
                 requestDetails.AppendLine($"  Body: {bodyAsText}");

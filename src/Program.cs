@@ -14,7 +14,7 @@ using Blazored.Modal;
 using Blazored.Toast;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -325,6 +325,41 @@ builder.Services.AddScoped<IResourceConfigurationCoordinator, ResourceConfigurat
 builder.Services.AddScoped<ServicesHelper>();
 
 var app = builder.Build();
+
+// Initialize SQLite database for fresh installs
+if (provider == "sqlite")
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ConfigurationDbContext>();
+        
+        // Create database and tables if they don't exist
+        bool isNewDatabase = !File.Exists(dbPath);
+        dbContext.Database.EnsureCreated();
+        
+        if (isNewDatabase)
+        {
+            Console.WriteLine("[Storage] New SQLite database created - seeding with default data from repository...");
+            
+            // For fresh installs, seed the database with default data from repository JSON files
+            var migrationService = scope.ServiceProvider.GetRequiredService<IStorageMigrationService>();
+            try
+            {
+                var result = await migrationService.LoadRepositoryDataIntoSQLiteAsync();
+                Console.WriteLine($"[Storage] Database seeded successfully: {result.EntitiesMigrated} entities migrated");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Storage] Warning: Could not seed database with default data: {ex.Message}");
+                Console.WriteLine("[Storage] Application will start with empty database");
+            }
+        }
+        else
+        {
+            Console.WriteLine("[Storage] SQLite database exists and is ready");
+        }
+    }
+}
 
 // Note: Automatic migration has been removed in favor of user-initiated migration
 // Users can migrate via the modal prompt (first run) or Admin page (ongoing management)
