@@ -19,11 +19,6 @@ using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Bind storage configuration
-var storageOptions = new StorageOptions();
-builder.Configuration.GetSection("StorageOptions").Bind(storageOptions);
-builder.Services.Configure<StorageOptions>(builder.Configuration.GetSection("StorageOptions"));
-
 // Add Response Compression for better performance
 builder.Services.AddResponseCompression(options =>
 {
@@ -136,7 +131,7 @@ builder.Services.AddHealthChecks()
         tags: new[] { "ready", "cache" });
 
 // Always register DbContext (needed by StorageMigrationService even when using FileSystem)
-var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, storageOptions.DatabasePath);
+var dbPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings/azurenamingtool.db");
 
 // Ensure the database directory exists (e.g., /settings for container persistence)
 var dbDirectory = Path.GetDirectoryName(dbPath);
@@ -249,14 +244,63 @@ builder.Services.AddDbContext<ConfigurationDbContext>(options =>
 // Always register Migration Service (needed by MainLayout and Admin page)
 builder.Services.AddScoped<IStorageMigrationService, StorageMigrationService>();
 
-// Ensure configuration files are present before reading them
-// This copies files from repository/ to settings/ if needed
+// Storage Provider Detection Logic
+// Default for v5.0.0: SQLite (set in repository/appsettings.json)
+// Only override if upgrading from < v5.0.0 (settings file exists but missing StorageProvider field)
+string settingsPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "settings");
+string settingsAppsettingsPath = Path.Combine(settingsPath, "appsettings.json");
+
+// Check if settings/appsettings.json exists BEFORE VerifyConfiguration runs
+if (File.Exists(settingsAppsettingsPath))
+{
+    Console.WriteLine("[Storage] Existing settings/appsettings.json detected - checking for StorageProvider field");
+    
+    try
+    {
+        // Read the existing settings/appsettings.json
+        var settingsJson = File.ReadAllText(settingsAppsettingsPath);
+        var settingsConfig = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, System.Text.Json.JsonElement>>(settingsJson);
+        
+        if (settingsConfig != null && !settingsConfig.ContainsKey("StorageProvider"))
+        {
+            // < v5.0.0 file - missing StorageProvider field = upgrade from v4.x
+            // v4.x always used JSON files (FileSystem provider)
+            Console.WriteLine("[Storage] Upgrade from < v5.0.0 detected (missing StorageProvider field)");
+            
+            // Add StorageProvider field to the existing file
+            try
+            {
+                settingsConfig.Add("StorageProvider", System.Text.Json.JsonSerializer.SerializeToElement("FileSystem"));
+                var options = new System.Text.Json.JsonSerializerOptions { WriteIndented = true };
+                var updatedJson = System.Text.Json.JsonSerializer.Serialize(settingsConfig, options);
+                File.WriteAllText(settingsAppsettingsPath, updatedJson);
+                Console.WriteLine("[Storage] Updated settings/appsettings.json with StorageProvider=FileSystem");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[Storage] Warning: Could not update settings/appsettings.json: {ex.Message}");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"[Storage] Warning: Could not read settings/appsettings.json: {ex.Message}");
+    }
+}
+else
+{
+    // No settings/appsettings.json = Fresh install
+    // VerifyConfiguration will copy repository/appsettings.json with StorageProvider=SQLite
+    Console.WriteLine("[Storage] Fresh install detected - will use default (SQLite)");
+}
+
+// Run VerifyConfiguration to ensure all config files exist
+// For fresh installs, this copies repository/appsettings.json → settings/appsettings.json (with StorageProvider=SQLite)
 ConfigurationHelper.VerifyConfiguration(new StateContainer());
 
-// Configure Storage Provider based on SiteConfiguration.StorageProvider setting
-// This allows users to switch between FileSystem and SQLite via the Admin page
+// Read the configuration and use the StorageProvider value
 var siteConfig = ConfigurationHelper.GetConfigurationData();
-var provider = siteConfig.StorageProvider?.ToLower() ?? "filesystem";
+var provider = siteConfig.StorageProvider?.ToLower() ?? "sqlite";
 
 if (provider == "sqlite")
 {
@@ -287,15 +331,6 @@ else
     
     Console.WriteLine("[Storage] Using FileSystem provider (JSON files)");
 }
-
-// Register Storage Provider
-// REMOVED - now configured above based on storageOptions.Provider
-
-// Register Repositories (Scoped for per-request lifetime)
-// REMOVED - now configured above based on storageOptions.Provider
-
-// Register Cache Service (Singleton since it wraps IMemoryCache)
-// MOVED - now configured above
 
 // Register Application Services (Scoped for per-request lifetime)
 builder.Services.AddScoped<IAdminLogService, AdminLogService>();

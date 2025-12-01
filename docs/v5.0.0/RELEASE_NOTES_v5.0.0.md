@@ -1,9 +1,18 @@
 # Azure Naming Tool - Release Notes v5.0.0
 
 ## Overview
-Version 5.0.0 is a major release featuring a modern dashboard redesign, SQLite database support, Azure Tenant Name Validation, enhanced UI/UX, improved configuration management, and API versioning support.
+Version 5.0.0 is a major release featuring .NET 10.0 framework upgrade, modern dashboard redesign, SQLite database support, Azure Tenant Name Validation, enhanced UI/UX, improved configuration management, and API versioning support.
 
 ## 🎯 Major Features
+
+### .NET 10.0 Framework Upgrade
+- **Latest .NET version** - Upgraded from .NET 8.0 to .NET 10.0
+- **Performance improvements** with enhanced runtime efficiency
+- **Security updates** including latest patches and improvements
+- **Modern features** providing access to newest .NET capabilities
+- **Long-term support** for better maintainability
+- **Breaking change:** Requires .NET 10.0 runtime for deployment
+- See [Migration Guide](V5.0.0_MIGRATION_GUIDE.md) for upgrade instructions
 
 ### Modern Dashboard Redesign
 - **Two-column hero layout** with logo on left, custom content on right
