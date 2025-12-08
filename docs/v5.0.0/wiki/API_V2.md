@@ -1,4 +1,4 @@
-# Using the Azure Naming Tool API (Version 2.0)
+# Azure Naming Tool API (Version 2.0)
 
 ## Table of Contents
 - [Overview](#overview)
@@ -68,7 +68,7 @@ V2 integrates with your Azure tenant to validate that generated names don't conf
 - **Configurable**: Enable/disable per resource type, set retry limits
 - **Metadata Included**: Validation results included in response
 
-**Learn More**: [Azure Validation WIKI](AZURE_VALIDATION_WIKI.md)
+**Learn More**: [Azure Validation WIKI](AZURE-VALIDATION-WIKI)
 
 ---
 
@@ -602,7 +602,7 @@ When Azure Validation is enabled, V2 automatically:
 3. **Resolves Conflicts** using your configured strategy if the name exists
 4. **Returns** the final name with validation metadata
 
-**Configuration**: See [Azure Validation WIKI](AZURE_VALIDATION_WIKI.md) for setup instructions.
+**Configuration**: See [Azure Validation WIKI](AZURE-VALIDATION-WIKI) for setup instructions.
 
 ---
 
@@ -1327,10 +1327,9 @@ if __name__ == "__main__":
 ## Additional Resources
 
 - **Swagger UI**: `https://your-naming-tool-url/swagger` (interactive API documentation)
-- **API V1 Documentation**: [Using the API V1](API_V1_WIKI.md) (backward compatibility)
-- **Azure Validation Guide**: [Azure Validation WIKI](AZURE_VALIDATION_WIKI.md) (setup and configuration)
+- **API V1 Documentation**: [Using the API V1](API-V1-WIKI) (backward compatibility)
+- **Azure Validation Guide**: [Azure Validation WIKI](AZURE-VALIDATION-WIKI) (setup and configuration)
 - **GitHub Repository**: [Azure Naming Tool](https://github.com/mspnp/AzureNamingTool)
-- **Migration Plan**: [API Migration Plan](API_MIGRATION_PLAN.md) (detailed migration guidance)
 
 ---
 
@@ -1339,10 +1338,3 @@ if __name__ == "__main__":
 - **Issues**: [GitHub Issues](https://github.com/mspnp/AzureNamingTool/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/mspnp/AzureNamingTool/discussions)
 - **Documentation**: [GitHub Wiki](https://github.com/mspnp/AzureNamingTool/wiki)
-
----
-
-**Last Updated**: January 2025  
-**API Version**: 2.0  
-**Tool Version**: 5.0.0+  
-**Recommended**: ✅ Use V2 for all new integrations

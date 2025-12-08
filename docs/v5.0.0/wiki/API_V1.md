@@ -1,4 +1,4 @@
-# Using the Azure Naming Tool API (Version 1.0)
+# Azure Naming Tool API (Version 1.0)
 
 ## Table of Contents
 - [Overview](#overview)
@@ -53,7 +53,7 @@ The Azure Naming Tool API Version 1.0 provides programmatic access to generate s
 - Export and import configurations
 - Access naming history and logs
 
-The V1 API is production-ready and stable. For new integrations, consider using [API V2](API_V2_WIKI.md) which offers enhanced features, standardized responses, and Azure tenant validation.
+The V1 API is production-ready and stable. For new integrations, consider using [API V2](API-V2-WIKI) which offers enhanced features, standardized responses, and Azure tenant validation.
 
 ---
 
@@ -210,7 +210,7 @@ V1 endpoints do NOT include a version number in the URL path:
 https://your-naming-tool.azurewebsites.net/api/ResourceNamingRequests/RequestName
 ```
 
-For V2 endpoints, see the [API V2 documentation](API_V2_WIKI.md).
+For V2 endpoints, see the [API V2 documentation](API-V2-WIKI).
 
 ### Request Headers
 
@@ -884,7 +884,7 @@ The V1 API does not currently enforce rate limiting. However, best practices rec
 
 ## Migration to V2
 
-Consider migrating to [API V2](API_V2_WIKI.md) for:
+Consider migrating to [API V2](API-V2-WIKI) for:
 
 ✅ **Standardized Response Format**: Consistent `ApiResponse<T>` wrapper  
 ✅ **Enhanced Error Handling**: Detailed error codes and messages  
@@ -1045,8 +1045,8 @@ steps:
 ## Additional Resources
 
 - **Swagger UI**: `https://your-naming-tool-url/swagger` (interactive API documentation)
-- **API V2 Documentation**: [Using the API V2](API_V2_WIKI.md) (enhanced features)
-- **Azure Validation Guide**: [Azure Validation WIKI](AZURE_VALIDATION_WIKI.md) (V2 feature)
+- **API V2 Documentation**: [Using the API V2](API-V2-WIKI) (enhanced features)
+- **Azure Validation Guide**: [Azure Validation WIKI](AZURE-VALIDATION-WIKI) (V2 feature)
 - **GitHub Repository**: [Azure Naming Tool](https://github.com/mspnp/AzureNamingTool)
 
 ---
@@ -1056,9 +1056,3 @@ steps:
 - **Issues**: [GitHub Issues](https://github.com/mspnp/AzureNamingTool/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/mspnp/AzureNamingTool/discussions)
 - **Documentation**: [GitHub Wiki](https://github.com/mspnp/AzureNamingTool/wiki)
-
----
-
-**Last Updated**: January 2025  
-**API Version**: 1.0  
-**Tool Version**: 5.0.0+

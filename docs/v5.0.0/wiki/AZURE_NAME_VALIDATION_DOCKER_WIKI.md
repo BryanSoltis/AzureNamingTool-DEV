@@ -1,15 +1,12 @@
 # Azure Validation - Docker Deployment Wiki
 
-**Version:** 5.0.0+  
-**Last Updated:** November 10, 2025
-
 ---
 
 ## Overview
 
 This wiki provides comprehensive step-by-step instructions for enabling Azure Tenant Name Validation in the Azure Naming Tool when running in Docker.
 
-> **Note:** For complete feature documentation, see the [Azure Validation Wiki](wiki/AZURE_VALIDATION_WIKI.md).
+> **Note:** For complete feature documentation, see the [Azure Validation Wiki](AZURE-VALIDATION-WIKI).
 
 ---
 
@@ -328,7 +325,7 @@ Here's a complete working example with placeholder values:
 
 ## Getting Help
 
-- **Full Documentation:** [AZURE_VALIDATION_WIKI.md](wiki/AZURE_VALIDATION_WIKI.md)
+- **Full Documentation:** [AZURE_VALIDATION_WIKI](AZURE-VALIDATION-WIKI)
 - **GitHub Issues:** [Azure Naming Tool Issues](https://github.com/mspnp/AzureNamingTool/issues)
 - **Docker Troubleshooting:** See [Docker Deployment Configuration](wiki/AZURE_VALIDATION_WIKI.md#docker-deployment-configuration)
 
@@ -340,11 +337,3 @@ Here's a complete working example with placeholder values:
 ✅ Configure conflict resolution strategy  
 ✅ Set up caching for better performance  
 ✅ Monitor validation success rates  
-
----
-
-**Document Version:** 1.0  
-**Last Updated:** November 10, 2025  
-**Applies To:** Azure Naming Tool v5.0.0+ running in Docker
-
-

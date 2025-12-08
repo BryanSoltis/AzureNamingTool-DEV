@@ -1,8 +1,5 @@
 # Azure Validation Feature
 
-**Last Updated:** November 10, 2025  
-**Version:** 5.0.0+
-
 ---
 
 ## Quick Start Guide
@@ -85,7 +82,7 @@ Choose your authentication method and follow the steps below to enable Azure Ten
      }
      ```
    - Restart container
-   - **See [Docker Wiki Guide](../AZURE_VALIDATION_DOCKER_WIKI.md) for detailed instructions**
+   - **See [Docker Wiki Guide](AZURE-VALIDATION-DOCKER-WIKI) for detailed instructions**
 
 3. **For Non-Docker Deployments - Use Admin UI:**
    - Navigate to **Admin** → **Site Settings**
@@ -1404,16 +1401,3 @@ Azure Validation settings were **not** migrated automatically.
 
 - [Azure Naming Tool GitHub Issues](https://github.com/mspnp/AzureNamingTool/issues)
 - [Azure Naming Tool Discussions](https://github.com/mspnp/AzureNamingTool/discussions)
-
-### Contact
-
-For questions or issues, please open an issue on GitHub or contact your Azure administrator.
-
----
-
-**Document Version:** 1.1  
-**Last Updated:** November 10, 2025  
-**Applies To:** Azure Naming Tool v5.0.0 and later  
-**New in v1.1:** Docker Deployment Configuration section
-
-
